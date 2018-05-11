@@ -23,14 +23,12 @@ import com.it.soul.lab.sql.SQLBuilder.Parameter;
 public class SQLExecutor implements Serializable{
 
 	private static final long serialVersionUID = 6052074650432885583L;
+	private Connection conn = null;
 
-	public SQLExecutor(){
-		
-	}
+	public SQLExecutor(Connection conn){ this.conn = conn; }
 	
 	@Override
 	protected void finalize() throws Throwable {
-		
 		super.finalize();
 		close();//so that unreleased statement object goes to garbage.
 	}
@@ -52,17 +50,47 @@ public class SQLExecutor implements Serializable{
 	}
 	
 	public void close(){
-		
-		if(getStatementHolder().size() > 0){
-			for (Statement iterable_element : getStatementHolder()) {
+		try {
+			int count = getStatementHolder().size();
+			Boolean isAllCloed = true;
+			if(count > 0){
+				for (Statement iterable_element : getStatementHolder()) {
+					try{
+						iterable_element.close();
+					}catch (SQLException e){
+						isAllCloed = false;
+					}
+				}
+			}
+			getStatementHolder().clear();
+			System.out.println("Retain Statement count was "+ count + ". All has been Closed : "+ (isAllCloed ? "YES":"NO"));
+			closeConnections(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void closeConnections(Connection conn) 
+			throws SQLException{
+		if(conn != null && !conn.isClosed()){
+			try{
+				if(!conn.getAutoCommit())
+					conn.commit();
+			}catch(SQLException exp){
+				if(!conn.getAutoCommit())
+					conn.rollback();
+				throw exp;
+			}
+			finally{
 				try {
-					iterable_element.close();
+					if(conn != null && !conn.isClosed())
+						conn.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
+				System.out.println("Executor Has Closed.");
 			}
 		}
-		getStatementHolder().clear();
 	}
 	
 	/**
@@ -127,7 +155,7 @@ public class SQLExecutor implements Serializable{
 ////////////////////////////////////Block Of Queries///////////////////////
 	
 	 
-	public boolean executeTableManipulation(Connection conn, String query)
+	public boolean executeTableManipulation(String query)
     throws SQLException,Exception{
 		
 		if(query == null 
@@ -170,7 +198,7 @@ public class SQLExecutor implements Serializable{
      * @param query
      * @return Number Of affected rows
      */
-    public int executeCUDQuery(Connection conn, String query)
+    public int executeCUDQuery(String query)
     throws SQLException,Exception{
     	
     	if(query == null 
@@ -213,8 +241,7 @@ public class SQLExecutor implements Serializable{
      * @return int as affected row count 
      * @throws SQLException
      */
-    public int executeUpdate(Connection conn
-    		, String tableName
+    public int executeUpdate(String tableName
     		, Map<String, Parameter> setParameter
     		, Logic whereLogic
     		, Map<String, Parameter> whereClause)
@@ -263,8 +290,7 @@ public class SQLExecutor implements Serializable{
     }
     
     @Deprecated
-    public Integer[] executeUpdate(Connection conn
-    		, int batchSize
+    public Integer[] executeUpdate(int batchSize
     		, String tableName
     		, List<Map<String, Parameter>> setParameter
     		, Logic whereLogic
@@ -333,8 +359,7 @@ public class SQLExecutor implements Serializable{
         return affectedRows.toArray(new Integer[]{});		
     }
     
-    public Integer[] executeUpdate(Connection conn
-    		, int batchSize
+    public Integer[] executeUpdate(int batchSize
     		, String tableName
     		, List<Map<String, Parameter>> setParameter
     		, Logic whereLogic
@@ -425,8 +450,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws Exception
      */
-    public int executeDelete(Connection conn
-    		, String tableName
+    public int executeDelete(String tableName
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
     		, Map<String, Parameter> whereClause)
@@ -461,8 +485,7 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
-    public int executeDelete(Connection conn
-    		, int batchSize
+    public int executeDelete(int batchSize
     		, String tableName
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
@@ -525,8 +548,7 @@ public class SQLExecutor implements Serializable{
      * @param query
      * @return Last Inserted ID
      */
-    public int executeInsert(Connection conn
-    		, boolean isAutoGenaretedId
+    public int executeInsert(boolean isAutoGenaretedId
     		, String query)
     throws SQLException,IllegalArgumentException{
     	
@@ -577,8 +599,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws IllegalArgumentException
      */
-    public int executeInsert(Connection conn
-    		, boolean isAutoGenaretedId
+    public int executeInsert(boolean isAutoGenaretedId
     		, String tableName
     		, Map<String, Parameter> params)
     throws SQLException,IllegalArgumentException,Exception{
@@ -632,8 +653,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws IllegalArgumentException
      */
-    public int executeParameterizedInsert(Connection conn
-    		, boolean isAutoGenaretedId
+    public int executeParameterizedInsert(boolean isAutoGenaretedId
     		, String tableName
     		, Map<String, Parameter> params)
     throws SQLException,IllegalArgumentException,Exception{
@@ -682,8 +702,7 @@ public class SQLExecutor implements Serializable{
     }
     
   
-    public Integer[] executeParameterizedInsert(Connection conn
-    		, boolean isAutoGenaretedId
+    public Integer[] executeParameterizedInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
     		, List<Map<String, Parameter>> params)
@@ -771,7 +790,7 @@ public class SQLExecutor implements Serializable{
      * @return
      * @throws SQLException
      */
-    public int getRowCount(Connection conn,String query)
+    public int getRowCount(String query)
     throws SQLException{
     	
         ResultSet rs = null;
@@ -807,8 +826,7 @@ public class SQLExecutor implements Serializable{
      * @return
      * @throws SQLException
      */
-    public int getRowCount(Connection conn
-    		,String tableName
+    public int getRowCount(String tableName
     		,String param
     		,String whereParam
     		,ComparisonType type
@@ -844,8 +862,7 @@ public class SQLExecutor implements Serializable{
         return rowCount;
      }
     
-    public int getRowCount(Connection conn
-    		,String tableName
+    public int getRowCount(String tableName
     		,String param
     		,Logic logic
     		,Map<String, ComparisonType> operators
@@ -886,7 +903,7 @@ public class SQLExecutor implements Serializable{
      * @param query
      * @return ResultSet
      */
-    public ResultSet executeSelect(Connection conn, String query)
+    public ResultSet executeSelect(String query)
     throws SQLException,IllegalArgumentException{
     	
         PreparedStatement stmt = null;
@@ -925,8 +942,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws IllegalArgumentException
      */
-    public ResultSet executeSelect(Connection conn
-    		, String table
+    public ResultSet executeSelect(String table
     		, String[]projectionParams
     		, Logic whereLogic    		
     		, Map<String, Parameter> whereClause)
@@ -965,8 +981,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws IllegalArgumentException
      */
-    public ResultSet executeSelect(Connection conn
-    		, String table
+    public ResultSet executeSelect(String table
     		, String[]projectionParams
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
