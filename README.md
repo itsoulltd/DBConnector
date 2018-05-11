@@ -1,9 +1,8 @@
 # DBConnector
 Some usefull java util classes for database programming.
 
-try{
 			
-			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","towhid@123");
+			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","root");
 			Connection conn = db.getConnection();
 			
 			SQLExecutor exe = new SQLExecutor();
@@ -22,9 +21,4 @@ try{
 			
 			db.closeConnections(conn);
 			
-		}catch(Exception e){
-			resString = String.format("{\"error\":\"%s\"}", e.getMessage());
-			e.printStackTrace();
-		}finally{
-			
-		}
+		
