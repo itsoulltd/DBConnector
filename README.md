@@ -2,7 +2,7 @@
 Some usefull java util classes for database programming.
 
 			
-			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","towhid@123");
+			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","root");
 			Connection conn = db.getConnection();
 			
 			SQLExecutor exe = new SQLExecutor();
