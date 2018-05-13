@@ -19,19 +19,17 @@ import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 
 import com.it.soul.lab.sql.JPQLBuilders;
-import com.it.soul.lab.sql.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.sql.EnumDefinitions.Logic;
+import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.util.EnumDefinitions.Logic;
 
-public class GenericService<T> extends Service<T> implements GenericServiceInterface<T>,Serializable {
+public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {
 
 	private static final long serialVersionUID = -1656018780509389672L;
 	private static final String _TAG = "GenericServiceImpl";
 	@SuppressWarnings("unused")
 	private static final String _MESSAGE = "GenericServiceImpl not available now!";
 	
-	public GenericService(EntityManager manager, String entity, Class<T> type)
-	{
-		
+	public ORMService(EntityManager manager, String entity, Class<T> type){
 		//Must Call super constructor
 		super(manager,entity,type);
 	}
@@ -675,7 +673,6 @@ public class GenericService<T> extends Service<T> implements GenericServiceInter
 
 	@Override
 	public String toString() {
-		
 		return  _TAG + " extends " + super.toString();
 	}
 

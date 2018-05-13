@@ -1,41 +1,36 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.util;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class ResourcesFactory {
+public class ResourcesLocator {
 
-	private static ResourcesFactory _sharedInstance = null;
+	private static ResourcesLocator _sharedInstance = null;
 	private static Object _local = new Object();
 	private static final String _EXTENTION = ".properties";
 	
-	private ResourcesFactory(){
-		
+	private ResourcesLocator(){
+		//
 	}
 	
-	public static ResourcesFactory sharedInstance(){
-		
+	public static ResourcesLocator sharedInstance(){
 		synchronized (_local) {
-			
 			if(_sharedInstance == null){
-				_sharedInstance = new ResourcesFactory();
+				_sharedInstance = new ResourcesLocator();
 			}
 		}
-		
 		return _sharedInstance;
 	}
 	
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		
 		return _sharedInstance;
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		
 		_sharedInstance = null;
 		super.finalize();
 	}
@@ -47,11 +42,9 @@ public class ResourcesFactory {
 	 * when resource file name is ResourcesBundel.properties
 	 * @return Properties
 	 */
-	public Properties getNamedResources(String resourceName)
+	public Properties findResources(String resourceName)
 	throws IOException,IllegalArgumentException{
-		
 		Properties result = null;
-		
 		try{
 			if(resourceName != null && !resourceName.trim().equals("")){
 				InputStream fileIO = getClass().getResourceAsStream("/" + resourceName + _EXTENTION);
@@ -68,11 +61,10 @@ public class ResourcesFactory {
 		catch(IllegalArgumentException ille){
 			throw ille;
 		}
-		
 		return result;
 	}
 	
-	public boolean saveNamedResources(String resourceName, Properties resource) 
+	public boolean saveResources(String resourceName, Properties resource) 
 	throws IOException,IllegalArgumentException{
 		
 		boolean result = false;

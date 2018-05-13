@@ -3,8 +3,9 @@ package com.it.soul.lab.sql;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.sql.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.sql.EnumDefinitions.Logic;
+import com.it.soul.lab.util.EnumDefinitions;
+import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.util.EnumDefinitions.Logic;
 
 
 public class JPQLBuilders {

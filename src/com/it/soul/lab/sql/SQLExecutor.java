@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.it.soul.lab.sql.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.sql.EnumDefinitions.DataType;
-import com.it.soul.lab.sql.EnumDefinitions.Logic;
-import com.it.soul.lab.sql.SQLBuilder.Parameter;
+import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.util.EnumDefinitions.DataType;
+import com.it.soul.lab.util.EnumDefinitions.Logic;
 
 public class SQLExecutor implements Serializable{
 
@@ -242,9 +241,9 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      */
     public int executeUpdate(String tableName
-    		, Map<String, Parameter> setParameter
+    		, List<Property> setParameter
     		, Logic whereLogic
-    		, Map<String, Parameter> whereClause)
+    		, List<Property> whereClause)
     throws SQLException,Exception{
     	
     	if(setParameter == null 
@@ -257,19 +256,19 @@ public class SQLExecutor implements Serializable{
         String query = null;
         String [] whereKeySet = null;
         if(whereClause != null && whereClause.size() > 0){
-        	whereKeySet = whereClause.keySet().toArray(new String[]{});
-        	query = SQLBuilder.createUpdateQuery(tableName, setParameter.keySet().toArray(new String[]{}), whereLogic, whereKeySet);
+        	whereKeySet = getProperties(whereClause);
+        	query = SQLBuilder.createUpdateQuery(tableName, getProperties(setParameter), whereLogic, whereKeySet);
         }else{
-        	query = SQLBuilder.createUpdateQuery(tableName, setParameter.keySet().toArray(new String[]{}), whereLogic, new String[]{});
+        	query = SQLBuilder.createUpdateQuery(tableName, getProperties(setParameter), whereLogic, new String[]{});
         }
         try{ 
             if(conn != null){
                 stmt = conn.prepareStatement(query);
                 
                 int length = setParameter.size();
-                stmt = bindValueToStatement(stmt, 1, setParameter.keySet().toArray(new String[]{}), setParameter);
+                stmt = bindValueToStatement(stmt, 1, getProperties(setParameter), convertToHashMap(setParameter));
                 if(whereKeySet != null)
-                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, whereClause);
+                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, convertToHashMap(whereClause));
                 
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
@@ -292,9 +291,9 @@ public class SQLExecutor implements Serializable{
     @Deprecated
     public Integer[] executeUpdate(int batchSize
     		, String tableName
-    		, List<Map<String, Parameter>> setParameter
+    		, List<Map<String, Property>> setParameter
     		, Logic whereLogic
-    		, Map<String, Parameter> whereClause)
+    		, Map<String, Property> whereClause)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(setParameter == null 
@@ -324,7 +323,7 @@ public class SQLExecutor implements Serializable{
                 int length = keySet.length;
                 stmt = conn.prepareStatement(query);
         		int batchCount = 1;
-        		for (Map<String, Parameter> row : setParameter) {
+        		for (Map<String, Property> row : setParameter) {
             		stmt = bindValueToStatement(stmt, 1, keySet, row);
             		stmt = bindValueToStatement(stmt, length+1, whereKeySet, whereClause);
             		stmt.addBatch();
@@ -361,9 +360,9 @@ public class SQLExecutor implements Serializable{
     
     public Integer[] executeUpdate(int batchSize
     		, String tableName
-    		, List<Map<String, Parameter>> setParameter
+    		, List<List<Property>> setParameter
     		, Logic whereLogic
-    		, List<Map<String, Parameter>> whereClause)
+    		, List<List<Property>> whereClause)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(setParameter == null 
@@ -375,10 +374,10 @@ public class SQLExecutor implements Serializable{
     	
     	List<Integer> affectedRows = new ArrayList<Integer>();
         PreparedStatement stmt=null;
-        String[] keySet = setParameter.get(0).keySet().toArray(new String[]{});
+        String[] keySet = getProperties(setParameter.get(0));
         String query = null;
         String[] whereKeySet = null;
-        whereKeySet = whereClause.get(0).keySet().toArray(new String[]{});
+        whereKeySet = getProperties(whereClause.get(0));
         query = SQLBuilder.createUpdateQuery(tableName
         		, keySet
         		, whereLogic
@@ -394,10 +393,10 @@ public class SQLExecutor implements Serializable{
                 stmt = conn.prepareStatement(query);
         		int batchCount = 1;
         		for (int index = 0; index < setParameter.size(); index++) {
-					Map<String, Parameter> row = setParameter
-							.get(index);
-					Map<String, Parameter> rowWhere = whereClause
-							.get(index);
+					Map<String, Property> row = convertToHashMap(setParameter
+							.get(index));
+					Map<String, Property> rowWhere = convertToHashMap(whereClause
+							.get(index));
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
 					stmt = bindValueToStatement(stmt, length + 1,
 							whereKeySet, rowWhere);
@@ -453,7 +452,7 @@ public class SQLExecutor implements Serializable{
     public int executeDelete(String tableName
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
-    		, Map<String, Parameter> whereClause)
+    		, List<Property> whereClause)
     throws SQLException,Exception{
     	
     	if(whereClause == null || whereClause.size() <= 0){
@@ -466,7 +465,7 @@ public class SQLExecutor implements Serializable{
         try{ 
             if(conn != null){
                 stmt = conn.prepareStatement(query);
-                stmt = bindValueToStatement(stmt, 1, whereClause.keySet().toArray(), whereClause);
+                stmt = bindValueToStatement(stmt, 1, getProperties(whereClause), convertToHashMap(whereClause));
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
                 	conn.commit(); 
@@ -489,7 +488,7 @@ public class SQLExecutor implements Serializable{
     		, String tableName
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
-    		, List<Map<String, Parameter>> whereClause)
+    		, List<List<Property>> whereClause)
     throws SQLException,Exception{
     	
     	if(whereClause == null || whereClause.size() <= 0){
@@ -499,16 +498,16 @@ public class SQLExecutor implements Serializable{
         int rowUpdated = 0;
         PreparedStatement stmt=null;
         String query = SQLBuilder.createDeleteQuery(tableName, whereLogic, operators);
-        String[] whereKeySet = whereClause.get(0).keySet().toArray(new String[]{});
+        String[] whereKeySet = getProperties(whereClause.get(0));
         try{
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
             if(conn != null){
             	conn.setAutoCommit(false);
                 int batchCount = 1;
                 stmt = conn.prepareStatement(query);
-            	for (Map <String,Parameter> paramValue: whereClause) {
+            	for (List<Property> paramValue: whereClause) {
             		
-                    stmt = bindValueToStatement(stmt, 1, whereKeySet, paramValue);
+                    stmt = bindValueToStatement(stmt, 1, whereKeySet, convertToHashMap(paramValue));
                     stmt.addBatch();
 					if ((++batchCount % batchSize) == 0) {
 						stmt.executeBatch();
@@ -601,7 +600,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeInsert(boolean isAutoGenaretedId
     		, String tableName
-    		, Map<String, Parameter> params)
+    		, List<Property> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -610,7 +609,7 @@ public class SQLExecutor implements Serializable{
     	
     	int affectedRows = 0;
         PreparedStatement stmt=null;        
-        String query = SQLBuilder.createInsertQuery(tableName, params);
+        String query = SQLBuilder.createInsertQuery(tableName, getProperties(params));
         try{ 
         	
             if(conn != null){
@@ -655,7 +654,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeParameterizedInsert(boolean isAutoGenaretedId
     		, String tableName
-    		, Map<String, Parameter> params)
+    		, List<Property> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -664,7 +663,7 @@ public class SQLExecutor implements Serializable{
     	
     	int affectedRows = 0;
         PreparedStatement stmt=null;
-        String query = SQLBuilder.createInsertQuery(tableName, params.keySet().toArray());
+        String query = SQLBuilder.createInsertQuery(tableName, getProperties(params));
         
         try{ 
         	
@@ -672,7 +671,7 @@ public class SQLExecutor implements Serializable{
                 
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,	Statement.RETURN_GENERATED_KEYS);
-                	stmt = bindValueToStatement(stmt, 1,params.keySet().toArray(), params);
+                	stmt = bindValueToStatement(stmt, 1,getProperties(params), convertToHashMap(params));
                 	stmt.executeUpdate();
                 	ResultSet set = stmt.getGeneratedKeys();
                 	if(set != null && set.next()){
@@ -680,7 +679,7 @@ public class SQLExecutor implements Serializable{
                 	}                	
             	}else{
             		stmt = conn.prepareStatement(query);
-                	stmt = bindValueToStatement(stmt, 1,params.keySet().toArray(), params);
+                	stmt = bindValueToStatement(stmt, 1,getProperties(params), convertToHashMap(params));
                 	affectedRows = stmt.executeUpdate();
             	}
             	if(!conn.getAutoCommit())
@@ -705,7 +704,7 @@ public class SQLExecutor implements Serializable{
     public Integer[] executeParameterizedInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
-    		, List<Map<String, Parameter>> params)
+    		, List<List<Property>> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -714,7 +713,7 @@ public class SQLExecutor implements Serializable{
     	
     	List<Integer> affectedRows = new ArrayList<Integer>();
         PreparedStatement stmt=null;
-        Object[] keySet = params.get(0).keySet().toArray();
+        Object[] keySet = getProperties(params.get(0));
         String query = SQLBuilder.createInsertQuery(tableName, keySet);
         
         try{ 
@@ -724,8 +723,8 @@ public class SQLExecutor implements Serializable{
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 	int batchCount = 1;
-            		for (Map<String, Parameter> row : params) {
-                		stmt = bindValueToStatement(stmt, 1, keySet, row);
+            		for (List<Property> row : params) {
+                		stmt = bindValueToStatement(stmt, 1, keySet, convertToHashMap(row));
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
                 			stmt.executeBatch();
@@ -743,8 +742,8 @@ public class SQLExecutor implements Serializable{
             		stmt = conn.prepareStatement(query);
             		int batchCount = 1;
             		List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-            		for (Map<String, Parameter> row : params) {
-                		stmt = bindValueToStatement(stmt, 1, keySet, row);
+            		for (List<Property> row : params) {
+                		stmt = bindValueToStatement(stmt, 1, keySet, convertToHashMap(row));
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
                 			batchUpdatedRowsCount.add(stmt.executeBatch());
@@ -830,7 +829,7 @@ public class SQLExecutor implements Serializable{
     		,String param
     		,String whereParam
     		,ComparisonType type
-    		,Parameter property)
+    		,Property property)
     throws SQLException{
     	
         ResultSet rs = null;
@@ -840,8 +839,8 @@ public class SQLExecutor implements Serializable{
         try{
             if(conn != null){
                 pstmt = conn.prepareStatement(query);
-                Map<String, Parameter> val = new HashMap<String, Parameter>();
-                val.put(property.getProperty(), property);
+                Map<String, Property> val = new HashMap<String, Property>();
+                val.put(property.getKey(), property);
                 pstmt = bindValueToStatement(pstmt
                 		, 1
                 		,new Object[]{whereParam}
@@ -866,7 +865,7 @@ public class SQLExecutor implements Serializable{
     		,String param
     		,Logic logic
     		,Map<String, ComparisonType> operators
-    		,Map<String, Parameter> whereClause)
+    		,List<Property> whereClause)
     throws SQLException{
     	
         ResultSet rs = null;
@@ -879,8 +878,8 @@ public class SQLExecutor implements Serializable{
                 
                 pstmt = bindValueToStatement(pstmt
                 		, 1
-                		,whereClause.keySet().toArray()
-                		, whereClause);
+                		, getProperties(whereClause)
+                		, convertToHashMap(whereClause));
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
                     rowCount = rs.getInt(1);                   
@@ -945,17 +944,17 @@ public class SQLExecutor implements Serializable{
     public ResultSet executeSelect(String table
     		, String[]projectionParams
     		, Logic whereLogic    		
-    		, Map<String, Parameter> whereClause)
+    		, List<Property> whereClause)
     throws SQLException,IllegalArgumentException{
     	
         PreparedStatement stmt = null;
         ResultSet rst=null;
-        String query = SQLBuilder.createSelectQuery(table, projectionParams, whereLogic, whereClause.keySet().toArray(new String[]{}));
+        String query = SQLBuilder.createSelectQuery(table, projectionParams, whereLogic, getProperties(whereClause));
         try{
         	
             if(conn != null && !conn.isClosed()){
             	stmt = conn.prepareStatement(query,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
-            	stmt = bindValueToStatement(stmt, 1,whereClause.keySet().toArray(new String[]{}), whereClause);
+            	stmt = bindValueToStatement(stmt, 1, getProperties(whereClause), convertToHashMap(whereClause));
         		rst = stmt.executeQuery();
             }            
         }catch(SQLException exp){            
@@ -985,7 +984,7 @@ public class SQLExecutor implements Serializable{
     		, String[]projectionParams
     		, Logic whereLogic
     		, Map<String, ComparisonType> operators
-    		, Map<String, Parameter> whereClause)
+    		, List<Property> whereClause)
     throws SQLException,IllegalArgumentException{
     	
         PreparedStatement stmt = null;
@@ -995,7 +994,7 @@ public class SQLExecutor implements Serializable{
         	
             if(conn != null && !conn.isClosed()){
                 stmt = conn.prepareStatement(query,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
-                stmt = bindValueToStatement(stmt, 1,operators.keySet().toArray(), whereClause);
+                stmt = bindValueToStatement(stmt, 1,getProperties(whereClause), convertToHashMap(whereClause));
                 rst = stmt.executeQuery();                 
             }            
         }catch(SQLException exp){            
@@ -1013,9 +1012,9 @@ public class SQLExecutor implements Serializable{
 	 * @param rst
 	 * @return
 	 */
-	public List<Map<String,Parameter>> convertToMaps(ResultSet rst){
+	public List<Map<String,Property>> convertToMaps(ResultSet rst){
 		
-		List<Map<String,Parameter>> result = new ArrayList<Map<String, Parameter>>();
+		List<Map<String,Property>> result = new ArrayList<Map<String, Property>>();
 		
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
@@ -1028,14 +1027,14 @@ public class SQLExecutor implements Serializable{
 			
 			while(rst.next()){ //For each Row
 				
-				Map<String, Parameter> row = new HashMap<String, Parameter>(numCol);
+				Map<String, Property> row = new HashMap<String, Property>(numCol);
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
 					
 					String key = rsmd.getColumnName(x);
 					DataType type = convertDataType(rsmd.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
 					
-					Parameter property = new Parameter(key, value, type);
+					Property property = new Property(key, value, type);
 					row.put(key, property);
 				}
 				result.add(row);
@@ -1049,13 +1048,13 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<Map<String,Parameter>> convertToMaps(ResultSet rst, List<String> paramProperties){
+	public List<Map<String,Property>> convertToMaps(ResultSet rst, List<String> paramProperties){
 		
 		if(paramProperties == null || paramProperties.size() <= 0){
             return convertToMaps(rst);
         }
 		
-		List<Map<String,Parameter>> result = new ArrayList<Map<String, Parameter>>();
+		List<Map<String,Property>> result = new ArrayList<Map<String, Property>>();
 		
 		try{
 			
@@ -1073,7 +1072,7 @@ public class SQLExecutor implements Serializable{
 			
 			while(rst.next()){ //For each Row
 				
-				Map<String, Parameter> row = new HashMap<String, Parameter>(columnIndecies.size());
+				Map<String, Property> row = new HashMap<String, Property>(columnIndecies.size());
 				for(int x : columnIndecies){ //For each column in the paramProperties
 
 					String key = rsmd.getColumnName(x);
@@ -1081,7 +1080,7 @@ public class SQLExecutor implements Serializable{
 					DataType type = convertDataType(rsmd
 							.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
-					Parameter property = new Parameter(key, value, type);
+					Property property = new Property(key, value, type);
 					row.put(key, property);
 
 				}
@@ -1097,9 +1096,9 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<List<Parameter>> convertToLists(ResultSet rst){
+	public List<List<Property>> convertToLists(ResultSet rst){
 		
-		List<List<Parameter>> result = new ArrayList<List<Parameter>>();
+		List<List<Property>> result = new ArrayList<List<Property>>();
 		
 		try{
 			
@@ -1112,14 +1111,14 @@ public class SQLExecutor implements Serializable{
 			int numCol = rsmd.getColumnCount();
 			
 			while(rst.next()){ //For each Row
-				List<Parameter> row = new ArrayList<Parameter>(numCol);
+				List<Property> row = new ArrayList<Property>(numCol);
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
 					
 					String key = rsmd.getColumnName(x);
 					DataType type = convertDataType(rsmd.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
 					
-					Parameter property = new Parameter(key, value, type);
+					Property property = new Property(key, value, type);
 					row.add((x - 1), property);
 				}
 				result.add(row);
@@ -1133,13 +1132,13 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<List<Parameter>> convertToLists(ResultSet rst, List<String> paramProperties){
+	public List<List<Property>> convertToLists(ResultSet rst, List<String> paramProperties){
 		
 		if(paramProperties == null || paramProperties.size() <= 0){
             return convertToLists(rst);
         }
 		
-		List<List<Parameter>> result = new ArrayList<List<Parameter>>();
+		List<List<Property>> result = new ArrayList<List<Property>>();
 		
 		try{
 			
@@ -1156,7 +1155,7 @@ public class SQLExecutor implements Serializable{
             }
 			
 			while(rst.next()){ //For each Row
-				List<Parameter> row = new ArrayList<Parameter>(columnIndecies.size());
+				List<Property> row = new ArrayList<Property>(columnIndecies.size());
 				for(int x : columnIndecies){ //For each column in the paramProperties
 
 					String key = rsmd.getColumnName(x);
@@ -1164,7 +1163,7 @@ public class SQLExecutor implements Serializable{
 					DataType type = convertDataType(rsmd
 							.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
-					Parameter property = new Parameter(key, value, type);
+					Property property = new Property(key, value, type);
 					row.add(property);
 
 				}
@@ -1494,7 +1493,7 @@ public class SQLExecutor implements Serializable{
                     DataType type = convertDataType(rsmd.getColumnTypeName(x));
                     Object value = getValueFromResultSet(type, rst, x);
                     if(!isObjectType){
-                        Parameter property = new Parameter(key, value, type);
+                        Property property = new Property(key, value, type);
                         row.put(key, property);
                     }else{
                         row.put(key, value);
@@ -1516,7 +1515,7 @@ public class SQLExecutor implements Serializable{
                                 DataType type = convertDataType(rsmd.getColumnTypeName(x));
                                 Object value = getValueFromResultSet(type, rst, x);
                                 if(!isObjectType){
-                                    Parameter property = new Parameter(key, value, type);
+                                    Property property = new Property(key, value, type);
                                     row.put(key, property);
                                 }else{
                                     row.put(key, value);
@@ -1602,52 +1601,29 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public Map<String,Object> changeColumnPropertyNamesX(List<String> newColumns, List<String> crosColumns, Map<String,Object> dataMap){
-        
-        Map<String,Object> nXRow = new HashMap<String, Object>(dataMap.size() <= 0 ? 1 : dataMap.size());
-        
-        if(dataMap.size() > 0 && newColumns.size() == crosColumns.size()){
-            for(int index = 0; index < newColumns.size(); index++){
-                String key = newColumns.get(index);
-                String crosKey = crosColumns.get(index);
-                if(dataMap.containsKey(crosKey)){
-                    Object n = dataMap.get(crosKey);
-                    if (n instanceof Parameter) {
-                        Parameter m = (Parameter)n;
-                        n = new Parameter(key, m.getValue(), m.getType());
-                    }
-                    nXRow.put(key, n);
-                }
-            }
+	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Private Methods>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+    
+    private String[] getProperties(List<Property> listOfParam){
+    	//Before Java 8
+        List<String> result = new ArrayList<String>();
+        for (Property x : listOfParam) {
+            result.add(x.getKey());
         }
-        
-        return nXRow;
+    	return result.toArray(new String[]{});
     }
     
-    public Map<String,Parameter> changeColumnPropertyNames(List<String> newColumns, List<String> crosColumns, Map<String, Parameter> dataMap){
-        
-        Map<String,Parameter> nXRow = new HashMap<String, Parameter>(dataMap.size() <= 0 ? 1 : dataMap.size());
-        if (dataMap.size() > 0) {
-            
-            if (newColumns.size() == crosColumns.size()) {
-                for (int index = 0; index < newColumns.size(); index++) {
-                    String key = newColumns.get(index);
-                    String crosKey = crosColumns.get(index);
-                    if (dataMap.containsKey(crosKey)) {
-                        Parameter m = dataMap.get(crosKey);
-                        Parameter n = new Parameter(key, m.getValue(),
-                                m.getType());
-                        nXRow.put(key, n);
-                    }
-                }
-            }
-        }
-        return nXRow;
+    private Map<String, Property> convertToHashMap(List<Property> listOfParam){
+    	Map<String, Property> result = new HashMap<String, Property>();
+    	for (Property parameter : listOfParam) {
+			result.put(parameter.getKey(), parameter);
+		}
+    	return result;
     }
 	
-	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Private Methods>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-	
-	private PreparedStatement bindValueToStatement(PreparedStatement stmt, int startIndex,Object[] params, Map<String, Parameter> paramValues)
+	private PreparedStatement bindValueToStatement(PreparedStatement stmt
+			, int startIndex
+			, Object[] params
+			, Map<String, Property> paramValues)
     throws SQLException,IllegalArgumentException{
     	
     	try{
@@ -1662,7 +1638,7 @@ public class SQLExecutor implements Serializable{
             		}
             		for (Object param : params) {
             			
-            			Parameter property = paramValues.get(param.toString());
+            			Property property = paramValues.get(param.toString());
 
             			switch (property.getType()) {
 	            			case ParamDataTypeString:

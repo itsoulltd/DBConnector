@@ -5,10 +5,10 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
-import com.it.soul.lab.sql.EnumDefinitions.Logic;
+import com.it.soul.lab.util.EnumDefinitions.Logic;
 
 
-public interface GenericServiceInterface<T> {
+public interface ORMServiceProtocol<T> {
 
 	public Class<T> getEntityType();
 	public String getEntity();

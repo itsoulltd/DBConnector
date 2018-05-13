@@ -2,7 +2,7 @@ package com.it.soul.lab.service;
 
 import javax.persistence.EntityManager;
 
-public abstract class Service<T> {
+public abstract class AbstractService<T> {
 
 	private static final String _TAG = "Service";
 	@SuppressWarnings("unused")
@@ -12,11 +12,11 @@ public abstract class Service<T> {
 	private String entity = null;
 	private Class<T> entityType = null;
 	
-	public Service(){
+	public AbstractService(){
 		
 	}
 	
-	public Service(EntityManager manager, String entity, Class<T> type){
+	public AbstractService(EntityManager manager, String entity, Class<T> type){
 		
 		this.entityManager = manager;
 		this.entity = entity;

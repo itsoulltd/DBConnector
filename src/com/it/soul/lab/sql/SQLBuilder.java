@@ -1,12 +1,12 @@
 package com.it.soul.lab.sql;
 
-import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.sql.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.sql.EnumDefinitions.DataType;
-import com.it.soul.lab.sql.EnumDefinitions.Logic;
+import com.it.soul.lab.util.EnumDefinitions;
+import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.util.EnumDefinitions.DataType;
+import com.it.soul.lab.util.EnumDefinitions.Logic;
 
 public class SQLBuilder {
 	
@@ -25,7 +25,7 @@ public class SQLBuilder {
 	 * @param value
 	 * @return
 	 */
-	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Parameter paramValue){
+	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue){
 		
 		StringBuilder builder = new StringBuilder("Select ");
 		
@@ -35,13 +35,13 @@ public class SQLBuilder {
 		
 		if(whereParam != null && paramValue != null){
 			builder.append(" Where " + whereParam +" "+ EnumDefinitions.convertOperator(type) +" ");
-			if(paramValue.type == DataType.ParamDataTypeBoolean 
-					|| paramValue.type == DataType.ParamDataTypeInt
-					|| paramValue.type == DataType.ParamDataTypeDouble
-					|| paramValue.type == DataType.ParamDataTypeFloat) {
-				builder.append(paramValue.value);
+			if(paramValue.getType() == DataType.ParamDataTypeBoolean 
+					|| paramValue.getType() == DataType.ParamDataTypeInt
+					|| paramValue.getType() == DataType.ParamDataTypeDouble
+					|| paramValue.getType() == DataType.ParamDataTypeFloat) {
+				builder.append(paramValue.getValue());
 			}else{
-				builder.append("'"+paramValue.value+"'");
+				builder.append("'"+paramValue.getValue()+"'");
 			}
 		}
 		
@@ -110,7 +110,7 @@ public class SQLBuilder {
 	 * @param value
 	 * @return
 	 */
-	public static String createDistinctFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Parameter paramValue)
+	public static String createDistinctFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue)
 	throws IllegalArgumentException {
 		
 		StringBuilder builder = new StringBuilder("Select ");
@@ -125,13 +125,13 @@ public class SQLBuilder {
 		
 		if(whereParam != null && paramValue != null){
 			builder.append(" Where " + whereParam +" "+ EnumDefinitions.convertOperator(type) +" ");
-			if(paramValue.type == DataType.ParamDataTypeBoolean 
-					|| paramValue.type == DataType.ParamDataTypeInt
-					|| paramValue.type == DataType.ParamDataTypeDouble
-					|| paramValue.type == DataType.ParamDataTypeFloat) {
-				builder.append(paramValue.value);
+			if(paramValue.getType() == DataType.ParamDataTypeBoolean 
+					|| paramValue.getType() == DataType.ParamDataTypeInt
+					|| paramValue.getType() == DataType.ParamDataTypeDouble
+					|| paramValue.getType() == DataType.ParamDataTypeFloat) {
+				builder.append(paramValue.getValue());
 			}else{
-				builder.append("'"+paramValue.value+"'");
+				builder.append("'"+paramValue.getValue()+"'");
 			}
 		}
 		
@@ -456,7 +456,7 @@ public class SQLBuilder {
 	 * @param insertParams
 	 * @return
 	 */
-	public static String createInsertQuery(String tableName, Map<String, Parameter> insertParams){
+	public static String createInsertQuery(String tableName, Map<String, Property> insertParams){
 		
 		//Checking Illegal Arguments
 		try{
@@ -476,7 +476,7 @@ public class SQLBuilder {
 		if(insertParams != null && insertParams.size() > 0){
 			
 			int count = 0;
-			for( Entry<String,Parameter> ent : insertParams.entrySet()){
+			for( Entry<String,Property> ent : insertParams.entrySet()){
 				
 				if(ent.getKey().trim().equals("")){
 					continue;
@@ -489,7 +489,7 @@ public class SQLBuilder {
 				
 				pqlBuffer.append( ent.getKey() );
 				
-				Parameter val = ent.getValue();
+				Property val = ent.getValue();
 				if(val.getType() == DataType.ParamDataTypeBoolean 
     					|| val.getType() == DataType.ParamDataTypeInt
     					|| val.getType() == DataType.ParamDataTypeDouble
@@ -627,89 +627,4 @@ public class SQLBuilder {
 		return result;
 	}
 	
-	/**
-     * 
-     */
-    public static class Parameter{
-    	
-    	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    	private String property;
-    	private DataType type;
-    	private Object value;
-    	
-    	public Parameter(Object value, DataType type){
-    		
-    		this.property = "";
-    		this.type = type;
-    		
-    		//TODO Regx type value validation is required.
-    		if(value instanceof java.util.Date || value instanceof java.sql.Date){
-    			value = getFormattedDateString(value);
-    			this.type = DataType.ParamDataTypeString;
-    		}
-    		
-    		this.value = value;
-    	}
-    	
-    	public Parameter(String property, Object value, DataType type){
-    		this(value,type);
-    		this.property = property;
-    	}
-    	
-    	@Override
-    	public boolean equals(Object obj) {
-    		
-    		if(obj instanceof Parameter){
-    			boolean isSame = false;
-    			Parameter compareble = (Parameter)obj;
-    			if(this.getProperty() == compareble.getProperty()){
-    				isSame = true;
-    			}
-    			return isSame;
-    		}else{
-    			return false;
-    		}
-    	}
-
-		public Object getValue() {
-			return value;
-		}
-
-		public void setValue(Object value) {
-			this.value = value;
-		}
-
-		public String getProperty() {
-			return property;
-		}
-
-		public void setProperty(String property) {
-			this.property = property;
-		}
-
-		public DataType getType() {
-			return type;
-		}
-		
-		private String getFormattedDateString(Object date) {
-
-			String result = null;
-
-			SimpleDateFormat formatter = new SimpleDateFormat(SQL_DATE_FORMAT);
-			try {
-				if (date != null 
-						&& ((date instanceof java.util.Date) 
-								|| (date instanceof java.sql.Date))) {
-
-					result = formatter.format(date);
-				}
-			} catch (Exception ex) {
-				result = null;
-				ex.printStackTrace();
-			}
-
-			return result;
-		}
-
-    }//End ParamProperties
 }

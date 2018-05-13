@@ -1,4 +1,4 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.service;
 
 import java.io.Serializable;
 import java.util.Properties;
