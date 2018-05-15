@@ -24,3 +24,11 @@ bin/com/it/soul/lab/util/EnumDefinitions.class
 bin/com/it/soul/lab/util/ImageUtil$ImageEncodeType.class
 bin/com/it/soul/lab/util/ImageUtil.class
 bin/com/it/soul/lab/util/ResourcesLocator.class
+bin/com/it/soul/lab/sql/SQLQuery$BuilderBase.class
+bin/com/it/soul/lab/sql/SQLQuery$ColumnsBuilder.class
+bin/com/it/soul/lab/sql/SQLQuery$TableBuilder.class
+bin/com/it/soul/lab/sql/SQLQuery$WhereClauseBuilder.class
+bin/com/it/soul/lab/sql/SQLQuery$BuilderBase.class
+bin/com/it/soul/lab/sql/SQLQuery$ColumnsBuilder.class
+bin/com/it/soul/lab/sql/SQLQuery$TableBuilder.class
+bin/com/it/soul/lab/sql/SQLQuery$WhereClauseBuilder.class
