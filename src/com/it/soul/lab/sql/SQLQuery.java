@@ -16,7 +16,24 @@ public class SQLQuery {
 		Delete
 	}
 	
-	public static class Builder{
+	public static interface BuilderBase{
+		public SQLQuery build();
+	}
+	
+	public static interface ColumnsBuilder extends BuilderBase{
+		public TableBuilder columns(String... name);
+	}
+	
+	public static interface TableBuilder extends BuilderBase{
+		public WhereClauseBuilder table(String name);
+	}
+	
+	public static interface WhereClauseBuilder extends BuilderBase{
+		public BuilderBase whereParams(Logic logic, String... name);
+		public BuilderBase whereParams(Logic logic, Compare... comps);
+	}
+	
+	public static class Builder implements ColumnsBuilder, TableBuilder, WhereClauseBuilder{
 		
 		private QueryType tempType = QueryType.Select;
 		private SQLQuery tempQuery;
@@ -51,20 +68,20 @@ public class SQLQuery {
 			return temp;
 		}
 		
-		public Builder table(String name){
+		public WhereClauseBuilder table(String name){
 			tempQuery.setTableName(name);
 			return this;
 		}
-		public Builder columns(String... name){
+		public TableBuilder columns(String... name){
 			tempQuery.setColumns(name);
 			return this;
 		}
-		public Builder whereParams(Logic logic, String... name){
+		public BuilderBase whereParams(Logic logic, String... name){
 			tempQuery.setLogic(logic);
 			tempQuery.setWhereParams(name);
 			return this;
 		}
-		public Builder whereParams(Logic logic, Compare... comps){
+		public BuilderBase whereParams(Logic logic, Compare... comps){
 			tempQuery.setLogic(logic);
 			List<Compare> items = new ArrayList<Compare>(Arrays.asList(comps));
 			tempQuery.setWhereCompareParams(items);
@@ -141,6 +158,7 @@ public class SQLQuery {
 	private List<Compare> whereCompareParams;
 	
 	/////////////////////////////////////////SQLSelectQuery/////////////////////////////////////////////////
+	//TODO: Following classes must be re-located in packages as subclass of SQLQuery.
 	
 	public static class SQLSelectQuery extends SQLQuery{
 		
@@ -149,7 +167,7 @@ public class SQLQuery {
 		@Override
 		public String queryString() throws IllegalArgumentException{
 			super.queryString();
-			return createSelectQuery(getTableName(), getColumns());
+			return pqlBuffer.toString();
 		}
 		
 		@Override
@@ -187,12 +205,11 @@ public class SQLQuery {
 			if(whereParams != null 
 					&& whereParams.length > 0
 					&& !isAllParamEmpty(whereParams)){
+				
 				if(pqlBuffer.length() > 0){
 					pqlBuffer.append(" WHERE ");
-					
 					int count = 0;
 					for(String param : whereParams){
-						
 						if(param.trim().equals("")){
 							continue;
 						}
@@ -214,7 +231,6 @@ public class SQLQuery {
 				
 				if(pqlBuffer.length() > 0){
 					pqlBuffer.append(" WHERE ");
-					
 					int count = 0;
 					for(Compare param : whereParams){
 						
