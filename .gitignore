@@ -32,4 +32,7 @@ bin/com/it/soul/lab/sql/SQLQuery$BuilderBase.class
 bin/com/it/soul/lab/sql/SQLQuery$ColumnsBuilder.class
 bin/com/it/soul/lab/sql/SQLQuery$TableBuilder.class
 bin/com/it/soul/lab/sql/SQLQuery$WhereClauseBuilder.class
+bin/com/it/soul/lab/sql/JPQLBuilders.class
+bin/com/it/soul/lab/sql/SQLBuilder.class
+bin/com/it/soul/lab/sql/SQLExecutor.class
 /.classpath
