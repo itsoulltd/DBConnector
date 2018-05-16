@@ -3,6 +3,8 @@ package com.it.soul.lab.sql;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.it.soul.lab.util.EnumDefinitions;
 import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
@@ -26,22 +28,32 @@ public class SQLQuery {
 	
 	public static interface ColumnsBuilder extends BuilderBase{
 		public TableBuilder columns(String... name);
+		public InsertBuilder into(String name);
+		public WhereClauseBuilder from(String name);
 	}
 	
 	public static interface TableBuilder extends BuilderBase{
-		public WhereClauseBuilder table(String name);
+		public WhereClauseBuilder fromTable(String name);
+		public ScalerClauseBuilder on(String name);
+	}
+	
+	public static interface InsertBuilder extends BuilderBase{
+		public BuilderBase values(Property...properties);
 	}
 	
 	public static interface WhereClauseBuilder extends BuilderBase{
 		public BuilderBase whereParams(Logic logic, String... name);
 		public BuilderBase whereParams(Logic logic, Compare... comps);
+	}
+	
+	public static interface ScalerClauseBuilder extends WhereClauseBuilder{
 		public BuilderBase countClause(Property prop, Compare comps);
 		public BuilderBase countClause(Logic logic, Compare... comps);
 		public BuilderBase distinctClause(Property prop, Compare comps);
 		public BuilderBase distinctClause(Logic logic, Compare... comps);
 	}
 	
-	public static class Builder implements ColumnsBuilder, TableBuilder, WhereClauseBuilder{
+	public static class Builder implements ColumnsBuilder, TableBuilder, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder{
 		
 		private QueryType tempType = QueryType.Select;
 		private SQLQuery tempQuery;
@@ -82,7 +94,7 @@ public class SQLQuery {
 			return temp;
 		}
 		
-		public WhereClauseBuilder table(String name){
+		public WhereClauseBuilder fromTable(String name){
 			tempQuery.setTableName(name);
 			return this;
 		}
@@ -99,6 +111,13 @@ public class SQLQuery {
 			tempQuery.setLogic(logic);
 			List<Compare> items = new ArrayList<Compare>(Arrays.asList(comps));
 			tempQuery.setWhereCompareParams(items);
+			return this;
+		}
+		@Override
+		public ScalerClauseBuilder on(String name) {
+			if(tempQuery instanceof SQLCountQuery){
+				((SQLCountQuery)tempQuery).setTableName(name);
+			}
 			return this;
 		}
 		@Override
@@ -126,6 +145,31 @@ public class SQLQuery {
 		public BuilderBase distinctClause(Logic logic, Compare... comps) {
 			if(tempQuery instanceof SQLDistinctQuery){
 				((SQLDistinctQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
+			}
+			return this;
+		}
+		@Override
+		public InsertBuilder into(String name) {
+			if(tempQuery instanceof SQLInsertQuery){
+				((SQLInsertQuery)tempQuery).setTableName(name);
+			}
+			return this;
+		}
+		@Override
+		public BuilderBase values(Property... properties) {
+			if(tempQuery instanceof SQLInsertQuery){
+				try{
+					((SQLInsertQuery)tempQuery).setProperties(Arrays.asList(properties));
+				}catch(IllegalArgumentException are){
+					System.out.println(are.getMessage());
+				}
+			}
+			return this;
+		}
+		@Override
+		public WhereClauseBuilder from(String name) {
+			if(tempQuery instanceof SQLDeleteQuery){
+				((SQLDeleteQuery)tempQuery).setTableName(name);
 			}
 			return this;
 		}
@@ -504,7 +548,102 @@ public class SQLQuery {
 	
 /////////////////////////////////////SQLUpdateQuery/////////////////////////////////////////////
 	
-	public static class SQLUpdateQuery extends SQLQuery{
+	public static class SQLUpdateQuery extends SQLSelectQuery{
+		
+		private StringBuffer pqlBuffer = new StringBuffer("UPDATE ");
+		private StringBuffer paramBuffer = new StringBuffer(" ");
+		
+		@Override
+		public String queryString() throws IllegalArgumentException {
+			super.queryString();
+			return pqlBuffer.toString() + paramBuffer.toString();
+		}
+		
+		@Override
+		public void setColumns(String[] columns) {
+			super.setColumns(columns);
+			if(getColumns() != null && getColumns().length > 0){
+				int count = 0;
+				for(String column : getColumns()){
+					if(column.trim().equals("")){continue;}
+					if(count++ != 0){paramBuffer.append(", ");}
+					paramBuffer.append( column + " = " + MARKER);
+				}
+			}
+		}
+		
+		@Override
+		public void setTableName(String tableName) {
+			super.setTableName(tableName);
+			pqlBuffer.append(getTableName() + " SET ");
+		}
+		
+		@Override
+		public void setWhereCompareParams(List<Compare> whereParams) {
+			super.setWhereCompareParams(whereParams);
+		}
+
+		@Override
+		public void setWhereParams(String[] whereParams) {
+			super.setWhereParams(whereParams);
+		}
+		
+		public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, Map<String,ComparisonType> whereParams){
+			
+			//Checking Illegal Arguments
+			try{
+				if(tableName == null || tableName.trim().equals("")){
+					throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
+				}
+				if(isAllParamEmpty(setParams)){
+					throw new IllegalArgumentException("All Empty Parameters!!! You nuts (:D");
+				}
+			}catch(IllegalArgumentException iex){
+				throw iex;
+			}
+			
+			StringBuffer pqlBuffer = new StringBuffer("UPDATE " + tableName + " SET ");
+			
+			if(setParams != null && setParams.length > 0){
+				
+				int count = 0;
+				for(String str : setParams){
+					
+					if(str.trim().equals("")){
+						continue;
+					}
+					if(count++ != 0){
+						pqlBuffer.append(", ");
+					}
+					
+					pqlBuffer.append( str + " = " + MARKER);
+				}
+			}
+			
+			if(whereParams != null 
+					&& whereParams.size() > 0
+					&& !isAllParamEmpty(whereParams.keySet().toArray())){
+				
+				if(pqlBuffer.length() > 0){
+					pqlBuffer.append(" WHERE ");
+					
+					int count = 0;
+					for(Entry<String,ComparisonType> param : whereParams.entrySet()){
+						
+						if(param.getKey().trim().equals("")){
+							continue;
+						}
+						if(count++ != 0){
+							pqlBuffer.append( " " + whereLogic.name() + " ");
+						}
+						
+						pqlBuffer.append( param.getKey() + EnumDefinitions.convertOperator(param.getValue()) + MARKER);
+					}
+				}
+			}
+			
+			return pqlBuffer.toString();
+		}
 		
 	}
 	
@@ -512,12 +651,184 @@ public class SQLQuery {
 	
 	public static class SQLInsertQuery extends SQLQuery{
 		
+		private StringBuffer pqlBuffer = new StringBuffer("INSERT INTO ");
+		private StringBuffer paramBuffer = new StringBuffer(" ( ");
+		private StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
+		
+		@Override
+		public String queryString() throws IllegalArgumentException {
+			super.queryString();
+			return pqlBuffer.toString() + paramBuffer.toString() + valueBuffer.toString();
+		}
+		
+		@Override
+		public void setTableName(String tableName) {
+			super.setTableName(tableName);
+			pqlBuffer.append(getTableName());
+		}
+		
+		public void setProperties(List<Property> props) throws IllegalArgumentException{
+			if(props == null || props.size() == 0){
+				throw new IllegalArgumentException("In Properties can't be null or zero.");
+			}
+			int count = 0;
+			for (Property prop : props) {
+				if(prop.getKey().trim().equals("")){ continue; }
+				if(count != 0){ paramBuffer.append(", "); valueBuffer.append(", "); }
+				paramBuffer.append( prop.getKey() );
+				Property val = prop;
+				if(val.getValue() != null && val.getType() != null){
+					if(val.getType() == DataType.ParamDataTypeBoolean 
+	    					|| val.getType() == DataType.ParamDataTypeInt
+	    					|| val.getType() == DataType.ParamDataTypeDouble
+	    					|| val.getType() == DataType.ParamDataTypeFloat) {
+						valueBuffer.append(val.getValue().toString());
+					}else{
+						valueBuffer.append("'"+val.getValue().toString()+"'");
+					}
+				}else{
+					valueBuffer.append(MARKER);
+				}
+				if(count == (props.size() - 1)){ paramBuffer.append(")"); valueBuffer.append(")"); }
+				count++;
+			}
+		}
+		
+		public static String createInsertQuery(String tableName, RowSet properties){
+			
+			//Checking Illegal Arguments
+			try{
+				if(tableName == null || tableName.trim().equals("")){
+					throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
+				}
+				if(isAllParamEmpty(properties.getProperties().toArray())){
+					throw new IllegalArgumentException("All Empty Parameters!!! You nuts (:D");
+				}
+			}catch(IllegalArgumentException iex){
+				throw iex;
+			}
+			
+			StringBuffer pqlBuffer = new StringBuffer("INSERT INTO " + tableName + " ( " );
+			StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
+			
+			if(properties != null && properties.size() > 0){
+				
+				int count = 0;
+				for( Entry<String,Property> ent : properties.keyValueMap().entrySet()){
+					
+					if(ent.getKey().trim().equals("")){
+						continue;
+					}
+					
+					if(count != 0){
+						pqlBuffer.append(", ");
+						valueBuffer.append(", ");
+					}
+					
+					pqlBuffer.append( ent.getKey() );
+					
+					Property val = ent.getValue();
+					if(val.getValue() != null && val.getType() != null){
+						if(val.getType() == DataType.ParamDataTypeBoolean 
+		    					|| val.getType() == DataType.ParamDataTypeInt
+		    					|| val.getType() == DataType.ParamDataTypeDouble
+		    					|| val.getType() == DataType.ParamDataTypeFloat) {
+							valueBuffer.append(val.getValue().toString());
+						}else{
+							valueBuffer.append("'"+val.getValue().toString()+"'");
+						}
+					}else{
+						valueBuffer.append(MARKER);
+					}
+					
+					if(count == (properties.size() - 1)){
+						pqlBuffer.append(") ");
+						valueBuffer.append(")");
+					}
+					count++;
+				}
+			}
+			
+			return pqlBuffer.toString() + valueBuffer.toString();
+		}
+		
 	}
 	
 //////////////////////////////////SQLDeleteQuery//////////////////////////////////////////////////
 	
-	public static class SQLDeleteQuery extends SQLQuery{
+	public static class SQLDeleteQuery extends SQLSelectQuery{
 		
+		private StringBuffer pqlBuffer = new StringBuffer("DELETE FROM ");
+		
+		@Override
+		public String queryString() throws IllegalArgumentException {
+			super.queryString();
+			return pqlBuffer.toString();
+		}
+		
+		@Override
+		public void setTableName(String tableName) {
+			super.setTableName(tableName);
+			pqlBuffer.append(getTableName() + " ");
+		}
+		
+		@Override
+		public void setColumns(String[] columns) {
+			//
+		}
+		
+		@Override
+		public void setWhereCompareParams(List<Compare> whereParams) {
+			super.setWhereCompareParams(whereParams);
+		}
+
+		@Override
+		public void setWhereParams(String[] whereParams) {
+			super.setWhereParams(whereParams);
+		}
+		
+		public static String createDeleteQuery(String tableName ,Logic whereLogic ,List<Compare> whereParams)
+				throws IllegalArgumentException{
+
+			//Checking Illegal Arguments
+			try{
+				if(tableName == null || tableName.trim().equals("")){
+					throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
+				}
+			}catch(IllegalArgumentException iex){
+				throw iex;
+			}
+
+			//Query Builders
+			StringBuffer pqlBuffer = new StringBuffer("DELETE FROM "+ tableName + " " );
+
+			if(whereParams != null 
+					&& whereParams.size() > 0
+					&& !isAllParamEmpty(whereParams.toArray())){
+
+				if(pqlBuffer.length() > 0){
+
+					pqlBuffer.append( " WHERE ");
+
+					int count = 0;
+					for(Compare ent : whereParams){
+
+						if(ent.getProperty().trim().equals("")){
+							continue;
+						}
+						if(count++ != 0){
+							pqlBuffer.append( " " + whereLogic.name() + " ");
+						}
+
+						pqlBuffer.append( ent.getProperty() + " " +EnumDefinitions.convertOperator(ent.getType())+" " + MARKER);
+					}
+				}
+			}
+
+			//
+			return pqlBuffer.toString();
+		}
+
 	}
 
 }

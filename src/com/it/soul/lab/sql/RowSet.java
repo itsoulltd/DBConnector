@@ -68,4 +68,7 @@ public class RowSet {
         }
         return nXRow;
     }
+    public int size(){
+    	return items.size();
+    }
 }

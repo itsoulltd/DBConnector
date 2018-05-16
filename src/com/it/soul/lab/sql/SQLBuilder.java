@@ -285,6 +285,7 @@ public class SQLBuilder {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){
 		
 		//Checking Illegal Arguments
@@ -350,6 +351,7 @@ public class SQLBuilder {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, Map<String,ComparisonType> whereParams){
 		
 		//Checking Illegal Arguments
@@ -413,6 +415,7 @@ public class SQLBuilder {
 	 * @param insertParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createInsertQuery(String tableName, Object[]insertParams){
 		
 		//Checking Illegal Arguments
@@ -463,6 +466,7 @@ public class SQLBuilder {
 	 * @param insertParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createInsertQuery(String tableName, Map<String, Property> insertParams){
 		
 		//Checking Illegal Arguments
@@ -525,6 +529,7 @@ public class SQLBuilder {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
+	@Deprecated
 	public static String createDeleteQuery(String tableName ,Logic whereLogic ,String...whereParams)
 	throws IllegalArgumentException{
 		
@@ -575,6 +580,7 @@ public class SQLBuilder {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
+	@Deprecated
 	public static String createDeleteQuery(String tableName ,Logic whereLogic ,Map<String, ComparisonType> whereParams)
 	throws IllegalArgumentException{
 		

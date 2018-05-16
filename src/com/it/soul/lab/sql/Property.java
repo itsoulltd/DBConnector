@@ -5,23 +5,28 @@ import com.it.soul.lab.util.EnumDefinitions.DataType;
 
 public class Property {
 	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private String key;
-	private DataType type;
-	private Object value;
+	private String key = "";
+	private DataType type = null;
+	private Object value = null;
 	
 	public Property(Object value, DataType type){
-		this.key = "";
 		this.type = type;
-		//TODO Regx type value validation is required.
-		if(value instanceof java.util.Date || value instanceof java.sql.Date){
-			value = getFormattedDateString(value);
-			this.type = DataType.ParamDataTypeString;
+		if (value != null){
+			//TODO Regx type value validation is required.
+			if(value instanceof java.util.Date || value instanceof java.sql.Date){
+				value = getFormattedDateString(value);
+				this.type = DataType.ParamDataTypeString;
+			}
 		}
 		this.value = value;
 	}
 	
 	public Property(String key, Object value, DataType type){
 		this(value,type);
+		this.key = key;
+	}
+	
+	public Property(String key){
 		this.key = key;
 	}
 	
