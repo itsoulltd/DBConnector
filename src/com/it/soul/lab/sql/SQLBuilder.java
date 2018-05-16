@@ -25,6 +25,7 @@ public class SQLBuilder {
 	 * @param value
 	 * @return
 	 */
+	@Deprecated
 	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue){
 		
 		StringBuilder builder = new StringBuilder("Select ");
@@ -55,6 +56,7 @@ public class SQLBuilder {
 	 * @param type
 	 * @return
 	 */
+	@Deprecated
 	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type){
 
 		StringBuilder builder = new StringBuilder("Select ");
@@ -78,6 +80,7 @@ public class SQLBuilder {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createCountFunctionQuery(String tableName, String param, Logic logic,Map<String, ComparisonType> whereParams){
 
 		StringBuilder builder = new StringBuilder("Select ");
@@ -110,6 +113,7 @@ public class SQLBuilder {
 	 * @param value
 	 * @return
 	 */
+	@Deprecated
 	public static String createDistinctFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue)
 	throws IllegalArgumentException {
 		
@@ -144,6 +148,7 @@ public class SQLBuilder {
 	 * @param projectionParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String...projectionParams)
 	throws IllegalArgumentException{
 		
@@ -192,6 +197,7 @@ public class SQLBuilder {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, String[] whereParams)
 	throws IllegalArgumentException{
 		
@@ -235,6 +241,7 @@ public class SQLBuilder {
 	 * @param whereParams 
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String, ComparisonType> whereParams)
 	throws IllegalArgumentException{
 		

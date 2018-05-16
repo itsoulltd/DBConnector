@@ -5,12 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.it.soul.lab.util.EnumDefinitions;
+import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.util.EnumDefinitions.DataType;
 import com.it.soul.lab.util.EnumDefinitions.Logic;
 
 public class SQLQuery {
 	
 	public enum QueryType{
 		Select,
+		Count,
+		Distinct,
 		Insert,
 		Update,
 		Delete
@@ -31,6 +35,10 @@ public class SQLQuery {
 	public static interface WhereClauseBuilder extends BuilderBase{
 		public BuilderBase whereParams(Logic logic, String... name);
 		public BuilderBase whereParams(Logic logic, Compare... comps);
+		public BuilderBase countClause(Property prop, Compare comps);
+		public BuilderBase countClause(Logic logic, Compare... comps);
+		public BuilderBase distinctClause(Property prop, Compare comps);
+		public BuilderBase distinctClause(Logic logic, Compare... comps);
 	}
 	
 	public static class Builder implements ColumnsBuilder, TableBuilder, WhereClauseBuilder{
@@ -52,6 +60,12 @@ public class SQLQuery {
 		private SQLQuery factory(QueryType type){
 			SQLQuery temp = null;
 			switch (type) {
+			case Count:
+				temp = new SQLCountQuery();
+				break;
+			case Distinct:
+				temp = new SQLDistinctQuery();
+				break;
 			case Delete:
 				temp = new SQLDeleteQuery();
 				break;
@@ -85,6 +99,34 @@ public class SQLQuery {
 			tempQuery.setLogic(logic);
 			List<Compare> items = new ArrayList<Compare>(Arrays.asList(comps));
 			tempQuery.setWhereCompareParams(items);
+			return this;
+		}
+		@Override
+		public BuilderBase countClause(Property prop, Compare comps) {
+			if(tempQuery instanceof SQLCountQuery){
+				((SQLCountQuery)tempQuery).setCountClouse(prop, comps);
+			}
+			return this;
+		}
+		@Override
+		public BuilderBase countClause(Logic logic, Compare... comps) {
+			if(tempQuery instanceof SQLCountQuery){
+				((SQLCountQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
+			}
+			return this;
+		}
+		@Override
+		public BuilderBase distinctClause(Property prop, Compare comps) {
+			if(tempQuery instanceof SQLDistinctQuery){
+				((SQLDistinctQuery)tempQuery).setCountClouse(prop, comps);
+			}
+			return this;
+		}
+		@Override
+		public BuilderBase distinctClause(Logic logic, Compare... comps) {
+			if(tempQuery instanceof SQLDistinctQuery){
+				((SQLDistinctQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
+			}
 			return this;
 		}
 	}
@@ -156,6 +198,124 @@ public class SQLQuery {
 	private String[] whereParams;
 	private Logic logic;
 	private List<Compare> whereCompareParams;
+	
+	/////////////////////////////////////////SQLCountQuery/////////////////////////////////////////////////
+	
+	public static class SQLDistinctQuery extends SQLCountQuery{
+		@Override
+		protected void prepareColumnsBuffers() {
+			if(getColumns() != null && getColumns().length > 0){
+				String firstParam = getColumns()[0];
+				pqlBuffer.append(DISTINCT_FUNC+"(" + firstParam + ")");
+			}else{
+				pqlBuffer.append(DISTINCT_FUNC+"(" + "*" + ")");
+			}
+		}
+	}
+	
+	public static class SQLCountQuery extends SQLQuery{
+
+		protected StringBuffer pqlBuffer = new StringBuffer("SELECT ");
+
+		@Override
+		public String queryString() throws IllegalArgumentException{
+			super.queryString();
+			return pqlBuffer.toString();
+		}
+		
+		@Override
+		public void setColumns(String[] columns) {
+			super.setColumns(columns);
+			prepareColumnsBuffers();
+		}
+		
+		protected void prepareColumnsBuffers(){
+			if(getColumns() != null && getColumns().length > 0){
+				String firstParam = getColumns()[0];
+				pqlBuffer.append(COUNT_FUNC+"(" + firstParam + ")");
+			}else{
+				pqlBuffer.append(COUNT_FUNC+"(" + "*" + ")");
+			}
+		}
+		
+		@Override
+		public void setTableName(String tableName) {
+			super.setTableName(tableName);
+			pqlBuffer.append(" From " + tableName + " ");
+		}
+		
+		public void setCountClouse(Property prop, Compare comps){
+			if(prop != null){
+				pqlBuffer.append("Where " + prop.getKey() +" "+ EnumDefinitions.convertOperator(comps.getType()) +" ");
+				if(prop.getType() == DataType.ParamDataTypeBoolean 
+						|| prop.getType() == DataType.ParamDataTypeInt
+						|| prop.getType() == DataType.ParamDataTypeDouble
+						|| prop.getType() == DataType.ParamDataTypeFloat) {
+					pqlBuffer.append(prop.getValue());
+				}else{
+					pqlBuffer.append("'" + prop.getValue() + "'");
+				}
+			}
+		}
+		
+		public void setCountClouse(Logic logic, List<Compare> whereParams){
+			if(whereParams != null && whereParams.size() > 0){
+				pqlBuffer.append("Where " );
+				int count = 0;
+				for (Compare ent : whereParams) {
+					if(count++ != 0)
+						pqlBuffer.append(" "+ logic.name() +" ");
+					pqlBuffer.append(ent.getProperty()+ " " 
+							+ EnumDefinitions.convertOperator(ent.getType()) + " ?");
+				}    			
+			}
+		}
+		
+		public static String createCountFunctionQuery(String tableName, String param, Logic logic, List<Compare> whereParams){
+
+			param = (param != null && param.length()>=1) ? param : "*";
+			
+			StringBuilder builder = new StringBuilder("SELECT ");
+			builder.append(COUNT_FUNC+"(" + param + ")");
+			builder.append(" From " + tableName + " ");
+
+			if(whereParams != null && whereParams.size() > 0){
+				builder.append("Where " );
+				int count = 0;
+				for (Compare ent : whereParams) {
+					if(count++ != 0)
+						builder.append(" "+ logic.name() +" ");
+					builder.append(ent.getProperty() + " " 
+							+ EnumDefinitions.convertOperator(ent.getType()) + " ?");
+				}    			
+			}
+			return builder.toString();
+		}
+
+		public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue){
+
+			param = (param != null && param.length()>=1) ? param : "*";
+
+			StringBuilder builder = new StringBuilder("SELECT ");
+			builder.append(COUNT_FUNC+"(" + param + ")");
+			builder.append(" From " + tableName + " ");
+
+			if(whereParam != null && paramValue != null){
+				builder.append("Where " + whereParam +" "+ EnumDefinitions.convertOperator(type) +" ");
+				if(paramValue.getType() == DataType.ParamDataTypeBoolean 
+						|| paramValue.getType() == DataType.ParamDataTypeInt
+						|| paramValue.getType() == DataType.ParamDataTypeDouble
+						|| paramValue.getType() == DataType.ParamDataTypeFloat) {
+					builder.append(paramValue.getValue());
+				}else{
+					builder.append("'"+paramValue.getValue()+"'");
+				}
+			}
+
+			return builder.toString();
+		}
+
+	}
 	
 	/////////////////////////////////////////SQLSelectQuery/////////////////////////////////////////////////
 	//TODO: Following classes must be re-located in packages as subclass of SQLQuery.
