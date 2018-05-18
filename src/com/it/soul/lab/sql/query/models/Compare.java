@@ -1,6 +1,7 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.sql.query.models;
 
-import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+
 
 public class Compare {
 	public Compare(String property, ComparisonType type){

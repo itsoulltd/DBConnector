@@ -1,4 +1,4 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.sql.query.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;

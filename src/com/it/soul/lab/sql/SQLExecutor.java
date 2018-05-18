@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.util.EnumDefinitions.DataType;
-import com.it.soul.lab.util.EnumDefinitions.Logic;
+import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.DataType;
+import com.it.soul.lab.sql.query.SQLQuery.Logic;
 
 public class SQLExecutor implements Serializable{
 
@@ -1641,48 +1642,48 @@ public class SQLExecutor implements Serializable{
             			Property property = paramValues.get(param.toString());
 
             			switch (property.getType()) {
-	            			case ParamDataTypeString:
+	            			case STRING:
 	            				stmt.setString(index++, (property.getValue() != null) ? property.getValue().toString().trim() : null);
 	            				break;
-	            			case ParamDataTypeInt:
+	            			case INT:
 	            				if(property.getValue() != null){
 	            					stmt.setInt(index++, (Integer)property.getValue());
 	            				}else{
 	            					stmt.setNull(index++, java.sql.Types.INTEGER);
 	            				}
 	            				break;
-	            			case ParamDataTypeBoolean:
+	            			case BOOL:
 	            				if(property.getValue() != null){
                                     stmt.setBoolean(index++, (Boolean)property.getValue());
                                 }else{
                                     stmt.setNull(index++, java.sql.Types.BOOLEAN);
                                 }
 	            				break;
-	            			case ParamDataTypeFloat:
+	            			case FLOAT:
 	            				if(property.getValue() != null){
 	            					stmt.setFloat(index++, (Float)property.getValue());
 	            				}else{
 	            					stmt.setNull(index++, java.sql.Types.FLOAT);
 	            				}
 	            				break;
-	            			case ParamDataTypeDouble:
+	            			case DOUBLE:
 	            				if(property.getValue() != null){
 	            					stmt.setDouble(index++, (Double)property.getValue());
 	            				}else{
 	            					stmt.setNull(index++, java.sql.Types.DOUBLE);
 	            				}
 	            				break;
-	            			case ParamDataTypeSQLDate:
+	            			case SQLDATETIME:
 	            				stmt.setDate(index++, (property.getValue() != null) ?(Date)property.getValue() : null);
 	            				break;
-	            			case ParamDataTypeBlob:
+	            			case BLOB:
 	            				if(property.getValue() != null){
 	            					stmt.setBlob(index++, (Blob)property.getValue());
 	            				}else{
 	            					stmt.setNull(index++, java.sql.Types.BLOB);
 	            				}
 	            				break;
-	            			case ParamDataTypeByteArray:
+	            			case BYTEARRAY:
 	            				if(property.getValue() != null){
                                     stmt.setBytes(index++, (byte[])property.getValue());
                                 }else{
@@ -1710,25 +1711,25 @@ public class SQLExecutor implements Serializable{
 		Object value = null;
 		switch (type) {
 
-		case ParamDataTypeInt:
+		case INT:
 			value = new Integer(rst.getInt(index));
 			break;
-		case ParamDataTypeDouble:
+		case DOUBLE:
 			value = new Double(rst.getDouble(index));
 			break;
-		case ParamDataTypeFloat:
+		case FLOAT:
 			value = new Float(rst.getFloat(index));
 			break;
-		case ParamDataTypeString:
+		case STRING:
 			value = rst.getString(index);
 			break;
-		case ParamDataTypeBoolean:
+		case BOOL:
 			value = new Boolean(rst.getBoolean(index));
 			break;
-		case ParamDataTypeSQLDate:
+		case SQLDATETIME:
 			value = rst.getDate(index);
 			break;
-		case ParamDataTypeByteArray:
+		case BYTEARRAY:
 			byte[] arr = rst.getBytes(index); 
 			value = arr;
 			break;
@@ -1748,35 +1749,35 @@ public class SQLExecutor implements Serializable{
 				|| trimedType.equals("VARCHAR")
 				|| trimedType.equals("LONGVARCHAR")){
 			
-			return DataType.ParamDataTypeString;
+			return DataType.STRING;
 			
 		}
 		else if(trimedType.equals("INTEGER") 
 				|| trimedType.equals("BIGINT")
 				|| trimedType.equals("SMALLINT")){
-			return DataType.ParamDataTypeInt;
+			return DataType.INT;
 			
 		}
 		else if(trimedType.equals("DATE") 
 				|| trimedType.equals("TIME")
 				|| trimedType.equals("TIMESTAMP")){
-			return DataType.ParamDataTypeSQLDate;
+			return DataType.SQLDATETIME;
 			
 		}else if(trimedType.equals("FLOAT")){
-			return DataType.ParamDataTypeFloat;
+			return DataType.FLOAT;
 		}
 		else if(trimedType.equals("DOUBLE")){
-			return DataType.ParamDataTypeDouble;
+			return DataType.DOUBLE;
 		}
 		else if(trimedType.equals("BIT") 
 				|| trimedType.equals("TINYINT")){
-			return DataType.ParamDataTypeBoolean;
+			return DataType.BOOL;
 		}
 		else if(trimedType.equals("BINARY") || trimedType.equals("VARBINARY") || trimedType.equals("LONGVARBINARY")){
-			return DataType.ParamDataTypeByteArray;
+			return DataType.BYTEARRAY;
 		}
 		else{
-			return DataType.ParamDataTypeObject;
+			return DataType.OBJECT;
 		}
 		
 	}

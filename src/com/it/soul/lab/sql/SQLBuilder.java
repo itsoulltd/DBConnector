@@ -3,10 +3,10 @@ package com.it.soul.lab.sql;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.util.EnumDefinitions;
-import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.util.EnumDefinitions.DataType;
-import com.it.soul.lab.util.EnumDefinitions.Logic;
+import com.it.soul.lab.sql.query.SQLQuery;
+import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Logic;
 
 public class SQLBuilder {
 	
@@ -35,11 +35,11 @@ public class SQLBuilder {
 		builder.append(" From " + tableName + " ");
 		
 		if(whereParam != null && paramValue != null){
-			builder.append(" Where " + whereParam +" "+ EnumDefinitions.convertOperator(type) +" ");
-			if(paramValue.getType() == DataType.ParamDataTypeBoolean 
-					|| paramValue.getType() == DataType.ParamDataTypeInt
-					|| paramValue.getType() == DataType.ParamDataTypeDouble
-					|| paramValue.getType() == DataType.ParamDataTypeFloat) {
+			builder.append(" Where " + whereParam +" "+ type.toString() +" ");
+			if(paramValue.getType() == SQLQuery.DataType.BOOL 
+					|| paramValue.getType() == SQLQuery.DataType.INT
+					|| paramValue.getType() == SQLQuery.DataType.DOUBLE
+					|| paramValue.getType() == SQLQuery.DataType.FLOAT) {
 				builder.append(paramValue.getValue());
 			}else{
 				builder.append("'"+paramValue.getValue()+"'");
@@ -68,7 +68,7 @@ public class SQLBuilder {
 		if(whereParam != null){
 			builder.append(" Where " 
 					+ whereParam +" "
-					+ EnumDefinitions.convertOperator(type) +" ?");
+					+  type.toString() +" ?");
 		}
 
 		return builder.toString();
@@ -97,7 +97,7 @@ public class SQLBuilder {
 				if(count++ != 0)
 					builder.append(" "+ logic.name() +" ");
 				builder.append(ent.getKey()+ " " 
-						+ EnumDefinitions.convertOperator(ent.getValue()) + " ?");
+						+ ent.getValue().toString() + " ?");
 			}    			
 		}
 
@@ -128,11 +128,11 @@ public class SQLBuilder {
 		builder.append(" From " + tableName + " ");
 		
 		if(whereParam != null && paramValue != null){
-			builder.append(" Where " + whereParam +" "+ EnumDefinitions.convertOperator(type) +" ");
-			if(paramValue.getType() == DataType.ParamDataTypeBoolean 
-					|| paramValue.getType() == DataType.ParamDataTypeInt
-					|| paramValue.getType() == DataType.ParamDataTypeDouble
-					|| paramValue.getType() == DataType.ParamDataTypeFloat) {
+			builder.append(" Where " + whereParam +" "+ type.toString() +" ");
+			if(paramValue.getType() == SQLQuery.DataType.BOOL 
+					|| paramValue.getType() == SQLQuery.DataType.INT
+					|| paramValue.getType() == SQLQuery.DataType.DOUBLE
+					|| paramValue.getType() == SQLQuery.DataType.FLOAT) {
 				builder.append(paramValue.getValue());
 			}else{
 				builder.append("'"+paramValue.getValue()+"'");
@@ -269,7 +269,7 @@ public class SQLBuilder {
 					if(count++ != 0){
 						pqlBuffer.append( " " + whereLogic.name() + " ");
 					}
-					pqlBuffer.append( QUIENTIFIER + "." + param.getKey() + " " + EnumDefinitions.convertOperator(param.getValue()) + " " + marker);
+					pqlBuffer.append( QUIENTIFIER + "." + param.getKey() + " " +  param.getValue().toString() + " " + marker);
 				}
 			}
 		}
@@ -401,7 +401,7 @@ public class SQLBuilder {
 						pqlBuffer.append( " " + whereLogic.name() + " ");
 					}
 					
-					pqlBuffer.append( param.getKey() + EnumDefinitions.convertOperator(param.getValue()) + marker);
+					pqlBuffer.append( param.getKey() +  param.getValue().toString() + marker);
 				}
 			}
 		}
@@ -501,10 +501,10 @@ public class SQLBuilder {
 				pqlBuffer.append( ent.getKey() );
 				
 				Property val = ent.getValue();
-				if(val.getType() == DataType.ParamDataTypeBoolean 
-    					|| val.getType() == DataType.ParamDataTypeInt
-    					|| val.getType() == DataType.ParamDataTypeDouble
-    					|| val.getType() == DataType.ParamDataTypeFloat) {
+				if(val.getType() == SQLQuery.DataType.BOOL 
+    					|| val.getType() == SQLQuery.DataType.INT
+    					|| val.getType() == SQLQuery.DataType.DOUBLE
+    					|| val.getType() == SQLQuery.DataType.FLOAT) {
 					valueBuffer.append(val.getValue().toString());
 				}else{
 					valueBuffer.append("'"+val.getValue().toString()+"'");
@@ -614,7 +614,7 @@ public class SQLBuilder {
 						pqlBuffer.append( " " + whereLogic.name() + " ");
 					}
 					
-					pqlBuffer.append( ent.getKey() + " " +EnumDefinitions.convertOperator(ent.getValue())+" " + marker);
+					pqlBuffer.append( ent.getKey() + " " + ent.getValue().toString() +" " + marker);
 				}
 			}
 		}

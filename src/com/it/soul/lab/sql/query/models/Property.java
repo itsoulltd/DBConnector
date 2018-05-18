@@ -1,7 +1,7 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.sql.query.models;
 
 import java.text.SimpleDateFormat;
-import com.it.soul.lab.util.EnumDefinitions.DataType;
+import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
 public class Property {
 	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -15,7 +15,7 @@ public class Property {
 			//TODO Regx type value validation is required.
 			if(value instanceof java.util.Date || value instanceof java.sql.Date){
 				value = getFormattedDateString(value);
-				this.type = DataType.ParamDataTypeString;
+				this.type = DataType.STRING;
 			}
 		}
 		this.value = value;

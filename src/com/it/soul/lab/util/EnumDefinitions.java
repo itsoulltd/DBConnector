@@ -9,20 +9,21 @@ public class EnumDefinitions {
 	 * Don't change The current order of the enumerations. If needed then add new type to the end. 
 	 *
 	 */
-	
+	@Deprecated
 	public static enum DataType{
-    	ParamDataTypeInt,
-    	ParamDataTypeFloat,
-    	ParamDataTypeDouble,
-    	ParamDataTypeBoolean,
-    	ParamDataTypeString,
-    	ParamDataTypeSQLDate,
-    	ParamDataTypeBlob,
-    	ParamDataTypeByteArray,
-    	ParamDataTypeObject
+    	INT,
+    	FLOAT,
+    	DOUBLE,
+    	BOOL,
+    	STRING,
+    	SQLDATETIME,
+    	BLOB,
+    	BYTEARRAY,
+    	OBJECT
     }
-    
+    @Deprecated
     public static enum ComparisonType{
+    	
     	IsEqual,
     	IsNotEqual,
     	IsGreater,
@@ -32,14 +33,52 @@ public class EnumDefinitions {
     	IN,
     	NOT_IN,
     	LIKE,
-    	NOT_LIKE
+    	NOT_LIKE;
+    	
+    	public String toString(){
+
+    		String eq = "=";
+    		switch (this) {
+    		case IsNotEqual:
+    			eq = "!=";
+    			break;
+    		case IsGreater:
+    			eq = ">";
+    			break;
+    		case IsGreaterOrEqual:
+    			eq = ">=";
+    			break;
+    		case IsSmaller:
+    			eq = "<";
+    			break;
+    		case IsSmallerOrEqual:
+    			eq = "<=";
+    			break;
+    		case IN:
+    			eq = "IN";
+    			break;
+    		case NOT_IN:
+    			eq = "NOT IN";
+    			break;
+    		case LIKE:
+    			eq = "LIKE";
+    			break;
+    		case NOT_LIKE:
+    			eq = "NOT LIKE";
+    		default:
+    			break;
+    		}
+    		return eq;
+    	}
     }
     
+    @Deprecated
     public static enum Logic{
     	AND,
     	OR
     }
     
+    @Deprecated
     public static String convertOperator(ComparisonType type){
 		
 		String eq = "=";
