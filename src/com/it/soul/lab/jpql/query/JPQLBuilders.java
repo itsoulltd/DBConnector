@@ -1,13 +1,11 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.jpql.query;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Logic;
 
-import com.it.soul.lab.util.EnumDefinitions;
-import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.util.EnumDefinitions.Logic;
-
-
+@Deprecated
 public class JPQLBuilders {
 	
 	private static final char QUIENTIFIER = 'e';
@@ -135,7 +133,7 @@ public class JPQLBuilders {
 				if(count++ != 0){
 					pqlBuffer.append( " " + whereLogic.name() + " ");
 				}
-				pqlBuffer.append( QUIENTIFIER + "." + param.getKey()+ " " + EnumDefinitions.convertOperator(param.getValue()) + " :" + param.getKey());
+				pqlBuffer.append( QUIENTIFIER + "." + param.getKey()+ " " + param.getValue().toString() + " :" + param.getKey());
 			}
 		}
 		//

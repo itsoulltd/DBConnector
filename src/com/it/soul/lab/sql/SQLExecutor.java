@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.it.soul.lab.sql.query.SQLBuilder;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;

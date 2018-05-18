@@ -18,9 +18,9 @@ import javax.persistence.QueryTimeoutException;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 
-import com.it.soul.lab.sql.JPQLBuilders;
-import com.it.soul.lab.util.EnumDefinitions.ComparisonType;
-import com.it.soul.lab.util.EnumDefinitions.Logic;
+import com.it.soul.lab.jpql.query.JPQLBuilders;
+import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Logic;
 
 public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {
 

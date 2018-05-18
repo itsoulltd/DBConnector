@@ -1,13 +1,13 @@
-package com.it.soul.lab.sql;
+package com.it.soul.lab.sql.query;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.sql.query.SQLQuery;
-import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.models.Property;
 
+@Deprecated
 public class SQLBuilder {
 	
 	private static final char QUIENTIFIER = 'e';
