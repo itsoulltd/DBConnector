@@ -29,11 +29,11 @@ public class SQLQuery {
 	public static interface ColumnsBuilder extends BuilderBase{
 		public TableBuilder columns(String... name);
 		public InsertBuilder into(String name);
-		public WhereClauseBuilder from(String name);
+		public WhereClauseBuilder rowsFrom(String name);
 	}
 	
 	public static interface TableBuilder extends BuilderBase{
-		public WhereClauseBuilder fromTable(String name);
+		public WhereClauseBuilder from(String name);
 		public ScalerClauseBuilder on(String name);
 	}
 	
@@ -94,7 +94,7 @@ public class SQLQuery {
 			return temp;
 		}
 		
-		public WhereClauseBuilder fromTable(String name){
+		public WhereClauseBuilder from(String name){
 			tempQuery.setTableName(name);
 			return this;
 		}
@@ -167,7 +167,7 @@ public class SQLQuery {
 			return this;
 		}
 		@Override
-		public WhereClauseBuilder from(String name) {
+		public WhereClauseBuilder rowsFrom(String name) {
 			if(tempQuery instanceof SQLDeleteQuery){
 				((SQLDeleteQuery)tempQuery).setTableName(name);
 			}
