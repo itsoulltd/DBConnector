@@ -16,6 +16,7 @@ public class JPQLBuilders {
 	 * @param projectionParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String[]projectionParams)
 	throws IllegalArgumentException{
 		
@@ -65,6 +66,7 @@ public class JPQLBuilders {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, String[] whereParams)
 	throws IllegalArgumentException{
 		
@@ -106,6 +108,7 @@ public class JPQLBuilders {
 	 * @param whereParams must be a HashMap<String,String> where key="parameter" and value="Comparison operator e.g. '<=', '!=', '<', '=' "
 	 * @return
 	 */
+	@Deprecated
 	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String,ComparisonType> whereParams)
 	throws IllegalArgumentException{
 		
@@ -148,6 +151,7 @@ public class JPQLBuilders {
 	 * @param whereParams
 	 * @return
 	 */
+	@Deprecated
 	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){
 		
 		//Checking Illegal Arguments

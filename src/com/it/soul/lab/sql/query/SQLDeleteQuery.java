@@ -51,7 +51,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 		}
 	}
 	
-	public static String createDeleteQuery(String tableName ,Logic whereLogic ,List<Compare> whereParams)
+	public static String create(String tableName ,Logic whereLogic ,List<Compare> whereParams)
 			throws IllegalArgumentException{
 
 		//Checking Illegal Arguments
@@ -59,9 +59,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 			if(tableName == null || tableName.trim().equals("")){
 				throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
 			}
-		}catch(IllegalArgumentException iex){
-			throw iex;
-		}
+		}catch(IllegalArgumentException iex){throw iex;}
 
 		//Query Builders
 		StringBuffer pqlBuffer = new StringBuffer("DELETE FROM "+ tableName);

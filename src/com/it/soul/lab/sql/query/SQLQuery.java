@@ -2,6 +2,7 @@ package com.it.soul.lab.sql.query;
 
 
 import java.util.List;
+
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
 import com.it.soul.lab.sql.query.models.Compare;
 
@@ -82,6 +83,11 @@ public class SQLQuery {
 			throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
 		}
 		return "";
+	}
+	
+	@Override
+	public String toString() {
+		return queryString();
 	}
 	
 	private String tableName;

@@ -1,15 +1,13 @@
 package com.it.soul.lab.sql.query;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.it.soul.lab.sql.query.models.Compare;
 
 public class SQLUpdateQuery extends SQLSelectQuery{
 	
-	private StringBuffer paramBuffer;
-	private StringBuffer whereBuffer;
+	protected StringBuffer paramBuffer;
+	protected StringBuffer whereBuffer;
 	
 	public SQLUpdateQuery() {
 		this.pqlBuffer = new StringBuffer("UPDATE ");
@@ -68,7 +66,11 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 		}
 	}
 	
-	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, Map<String,ComparisonType> whereParams){
+	public static String create(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){
+		return SQLUpdateQuery.create(tableName, setParams, whereLogic, Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+	}
+	
+	public static String create(String tableName, String[]setParams, Logic whereLogic, List<Compare> whereParams){
 		
 		//Checking Illegal Arguments
 		try{
@@ -94,15 +96,15 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 		
 		if(whereParams != null 
 				&& whereParams.size() > 0
-				&& !isAllParamEmpty(whereParams.keySet().toArray())){
+				&& !isAllParamEmpty(whereParams.toArray())){
 			
 			if(pqlBuffer.length() > 0){
 				pqlBuffer.append(" WHERE ");
 				int count = 0;
-				for(Entry<String,ComparisonType> param : whereParams.entrySet()){
-					if(param.getKey().trim().equals("")){continue;}
+				for(Compare param : whereParams){
+					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
-					pqlBuffer.append( param.getKey() + param.getValue().toString() + MARKER);
+					pqlBuffer.append( param.getProperty() + param.getType().toString() + MARKER);
 				}
 			}
 		}
