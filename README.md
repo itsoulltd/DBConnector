@@ -2,26 +2,26 @@
 Some usefull java util classes for database programming.
  How to Connect To DataBase
  
- 			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","towhid@123");
+ 			ConnectDatabase db = new ConnectDatabase("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/testDB","root","root");
 			Connection conn = db.getConnection();
 			
 			SQLExecutor exe = new SQLExecutor(conn);
 			
-			String query = SQLBuilder.createSelectQuery("Passenger"); //"Select * From Passenger"
-			ResultSet set = exe.executeSelect(query);
+			Compare compWith = new Compare("name", ComparisonType.IsEqual);
+			compWith.setPropertyValue("sohana", DataType.STRING);
+			
+			SQLSelectQuery qc = (SQLSelectQuery) new SQLQuery.Builder(QueryType.Select)
+																.columns()
+																.from("Passenger")
+																.whereParams(Logic.AND, compWith)
+																.build();
+			ResultSet set = exe.executeSelect(qc);
 			
 			List<Map<String,Object>> x = exe.convertToKeyValuePaire(set);
 			exe.displayCollection(x);
 			
 			Map<Object,Map<String,Object>> x2 = exe.convertToIndexedKeyValuePaire(set, "id");
 			exe.displayCollection(x2);
-			
-			String[] projectionParams = {"id","name"};
-			Map<String, Parameter> whereClause = new HashMap<String, SQLBuilder.Parameter>();
-			whereClause.put("name", new Parameter("name", "sohana", DataType.ParamDataTypeString));
-			ResultSet set2 = exe.executeSelect("Passenger", projectionParams, null, whereClause);
-			List<Map<String,Object>> x4 = exe.convertToKeyValuePaire(set2);
-			exe.displayCollection(x4);
 			
 			exe.close();
 			
