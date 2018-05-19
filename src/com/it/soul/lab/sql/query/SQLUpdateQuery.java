@@ -3,11 +3,14 @@ package com.it.soul.lab.sql.query;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.Property;
 
 public class SQLUpdateQuery extends SQLSelectQuery{
 	
 	protected StringBuffer paramBuffer;
 	protected StringBuffer whereBuffer;
+	private Properties properties;
 	
 	public SQLUpdateQuery() {
 		this.pqlBuffer = new StringBuffer("UPDATE ");
@@ -36,6 +39,21 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 				paramBuffer.append( column + " = " + MARKER);
 			}
 		}
+	}
+	
+	public Properties getProperties() {
+		return properties;
+	}
+	
+	public void setProperties(List<Property> props) throws IllegalArgumentException{
+		if(props == null || props.size() == 0){
+			throw new IllegalArgumentException("In Properties can't be null or zero.");
+		}
+		properties = new Properties();
+		for (Property property : props) {
+			properties.add(property);
+		}
+		super.setColumns(properties.getKeys());
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package com.it.soul.lab.sql.query;
 
 import java.util.List;
 import java.util.Map.Entry;
+
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.Properties;
 
@@ -22,6 +23,14 @@ public class SQLInsertQuery extends SQLQuery{
 	public void setTableName(String tableName) {
 		super.setTableName(tableName);
 		pqlBuffer.append(getTableName());
+	}
+	
+	@Override
+	public String[] getColumns() {
+		if (properties == null){
+			return super.getColumns();
+		}
+		return properties.getKeys();
 	}
 	
 	public void setProperties(List<Property> props) throws IllegalArgumentException{

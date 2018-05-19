@@ -13,8 +13,8 @@ public class SQLBuilder {
 	private static final char QUIENTIFIER = 'e';
 	private static final char STARIC = '*';
 	private static final char marker = '?';
-	private static final String COUNT_FUNC = "COUNT";
-	private static final String DISTINCT_FUNC = "DISTINCT";
+	private static final String COUNT_FUNC = "Count";//"COUNT";
+	private static final String DISTINCT_FUNC = "Distinct";//"DISTINCT";
 	
 	/**
 	 * 
@@ -162,7 +162,7 @@ public class SQLBuilder {
 		}
 		
 		//Query Builders
-		StringBuffer pqlBuffer = new StringBuffer("SELECT ");
+		StringBuffer pqlBuffer = new StringBuffer("Select ");
 		if(projectionParams != null && projectionParams.length > 0){
 			
 			int count = 0;
@@ -184,7 +184,7 @@ public class SQLBuilder {
 			
 			pqlBuffer.append(QUIENTIFIER + "." + STARIC);
 		}
-		pqlBuffer.append(" FROM "+ tableName + " " + QUIENTIFIER);
+		pqlBuffer.append(" From "+ tableName + " " + QUIENTIFIER);
 		//
 		return pqlBuffer.toString();
 	}
@@ -214,7 +214,7 @@ public class SQLBuilder {
 				&& !isAllParamEmpty(whereParams)){
 			
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
+				pqlBuffer.append(" Where ");
 				
 				int count = 0;
 				for(String param : whereParams){
@@ -258,7 +258,7 @@ public class SQLBuilder {
 				&& !isAllParamEmpty(whereParams.keySet().toArray())){
 			
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
+				pqlBuffer.append(" Where ");
 				
 				int count = 0;
 				for(Entry<String, ComparisonType> param : whereParams.entrySet()){
@@ -300,7 +300,7 @@ public class SQLBuilder {
 			throw iex;
 		}
 		
-		StringBuffer pqlBuffer = new StringBuffer("UPDATE " + tableName + " SET ");
+		StringBuffer pqlBuffer = new StringBuffer("Update " + tableName + " Set ");
 		
 		if(setParams != null && setParams.length > 0){
 			
@@ -323,7 +323,7 @@ public class SQLBuilder {
 				&& !isAllParamEmpty(whereParams)){
 			
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
+				pqlBuffer.append(" Where ");
 				
 				int count = 0;
 				for(String param : whereParams){
@@ -366,7 +366,7 @@ public class SQLBuilder {
 			throw iex;
 		}
 		
-		StringBuffer pqlBuffer = new StringBuffer("UPDATE " + tableName + " SET ");
+		StringBuffer pqlBuffer = new StringBuffer("Update " + tableName + " Set ");
 		
 		if(setParams != null && setParams.length > 0){
 			
@@ -389,7 +389,7 @@ public class SQLBuilder {
 				&& !isAllParamEmpty(whereParams.keySet().toArray())){
 			
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
+				pqlBuffer.append(" Where ");
 				
 				int count = 0;
 				for(Entry<String,ComparisonType> param : whereParams.entrySet()){
@@ -430,8 +430,8 @@ public class SQLBuilder {
 			throw iex;
 		}
 		
-		StringBuffer pqlBuffer = new StringBuffer("INSERT INTO " + tableName + " ( " );
-		StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
+		StringBuffer pqlBuffer = new StringBuffer("Insert Into " + tableName + " ( " );
+		StringBuffer valueBuffer = new StringBuffer(" Values ( ");
 		
 		if(insertParams != null && insertParams.length > 0){
 			
@@ -481,8 +481,8 @@ public class SQLBuilder {
 			throw iex;
 		}
 		
-		StringBuffer pqlBuffer = new StringBuffer("INSERT INTO " + tableName + " ( " );
-		StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
+		StringBuffer pqlBuffer = new StringBuffer("Insert Into " + tableName + " ( " );
+		StringBuffer valueBuffer = new StringBuffer(" Values ( ");
 		
 		if(insertParams != null && insertParams.size() > 0){
 			
@@ -544,7 +544,7 @@ public class SQLBuilder {
 		
 		//Query Builders
 		//StringBuffer pqlBuffer = new StringBuffer("DELETE FROM "+ tableName + " " + QUIENTIFIER );
-		StringBuffer pqlBuffer = new StringBuffer("DELETE FROM "+ tableName + " " );
+		StringBuffer pqlBuffer = new StringBuffer("Delete From "+ tableName + " " );
 		
 		if(whereParams != null 
 				&& whereParams.length > 0
@@ -552,7 +552,7 @@ public class SQLBuilder {
 			
 			if(pqlBuffer.length() > 0){
 				
-				pqlBuffer.append( " WHERE ");
+				pqlBuffer.append( " Where ");
 				
 				int count = 0;
 				for(String param : whereParams){
@@ -594,7 +594,7 @@ public class SQLBuilder {
 		}
 		
 		//Query Builders
-		StringBuffer pqlBuffer = new StringBuffer("DELETE FROM "+ tableName + " " );
+		StringBuffer pqlBuffer = new StringBuffer("Delete From "+ tableName + " " );
 		
 		if(whereParams != null 
 				&& whereParams.size() > 0
@@ -602,7 +602,7 @@ public class SQLBuilder {
 			
 			if(pqlBuffer.length() > 0){
 				
-				pqlBuffer.append( " WHERE ");
+				pqlBuffer.append( " Where ");
 				
 				int count = 0;
 				for(Entry<String,ComparisonType> ent : whereParams.entrySet()){

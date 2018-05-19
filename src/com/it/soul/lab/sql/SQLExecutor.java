@@ -283,6 +283,54 @@ public class SQLExecutor implements Serializable{
     
     /**
      * 
+     * @param query
+     * @return
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int executeUpdate(SQLUpdateQuery query) throws SQLException,Exception{
+    	
+    	Properties setParameter = query.getProperties();
+    	
+    	if(setParameter == null 
+    			|| setParameter.size() <= 0){
+    		throw new Exception("Set Parameter Should not be bull or empty!!!");
+		}
+    	
+        int rowUpdated = 0;
+        PreparedStatement stmt=null;
+        String queryStr = query.toString();
+        String [] whereKeySet = query.getWhereCompareProperties().getKeys();
+        
+        try{ 
+            if(conn != null){
+                stmt = conn.prepareStatement(queryStr);
+                
+                int length = setParameter.size();
+                stmt = bindValueToStatement(stmt, 1, setParameter.getKeys(), setParameter.keyValueMap());
+                if(whereKeySet != null)
+                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereCompareProperties().keyValueMap());
+                
+                rowUpdated = stmt.executeUpdate();
+                if(!conn.getAutoCommit())
+                	conn.commit(); 
+            }            
+        }catch(SQLException exp){
+        	if(!conn.getAutoCommit())
+        		conn.rollback();
+            throw exp;
+        }catch (IllegalArgumentException e) {
+        	 
+            throw e;
+		}finally{
+        	if(stmt != null)
+        		stmt.close();
+        }
+        return rowUpdated;		
+    }
+    
+    /**
+     * 
      * @param batchSize
      * @param queryC
      * @param updateProperties

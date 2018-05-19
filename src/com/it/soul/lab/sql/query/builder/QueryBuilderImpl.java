@@ -133,4 +133,15 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		}
 		return this;
 	}
+	@Override
+	public TableBuilder set(Property... properties) {
+		if (tempQuery instanceof SQLUpdateQuery){
+			try{
+				((SQLUpdateQuery)tempQuery).setProperties(Arrays.asList(properties));
+			}catch(IllegalArgumentException are){
+				System.out.println(are.getMessage());
+			}
+		}
+		return this;
+	}
 }

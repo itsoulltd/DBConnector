@@ -5,11 +5,11 @@ import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
 public class Property {
 	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private String key = "";
+	private String key = null;
 	private DataType type = null;
 	private Object value = null;
 	
-	public Property(Object value, DataType type){
+	private Property(Object value, DataType type){
 		this.type = type;
 		if (value != null){
 			//TODO Regx type value validation is required.
@@ -27,7 +27,11 @@ public class Property {
 	}
 	
 	public Property(String key){
-		this.key = key;
+		this(key, null, null);
+	}
+	
+	public Property(String key, String value){
+		this(key, value, DataType.STRING);
 	}
 	
 	@Override
