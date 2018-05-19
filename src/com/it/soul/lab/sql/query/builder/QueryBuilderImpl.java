@@ -1,6 +1,5 @@
 package com.it.soul.lab.sql.query.builder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,10 +8,10 @@ import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLDistinctQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
-import com.it.soul.lab.sql.query.SQLSelectQuery;
-import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.SQLSelectQuery;
+import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Compare;
 import com.it.soul.lab.sql.query.models.Property;
 
@@ -69,7 +68,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	}
 	public QueryBuilder whereParams(Logic logic, Compare... comps){
 		tempQuery.setLogic(logic);
-		List<Compare> items = new ArrayList<Compare>(Arrays.asList(comps));
+		List<Compare> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
 		return this;
 	}
@@ -90,6 +89,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	@Override
 	public QueryBuilder countClause(Logic logic, Compare... comps) {
 		if(tempQuery instanceof SQLCountQuery){
+			tempQuery.setLogic(logic);
 			((SQLCountQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
 		}
 		return this;

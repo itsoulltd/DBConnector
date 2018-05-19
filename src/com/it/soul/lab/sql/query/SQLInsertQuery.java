@@ -3,13 +3,14 @@ package com.it.soul.lab.sql.query;
 import java.util.List;
 import java.util.Map.Entry;
 import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.models.RowSet;
+import com.it.soul.lab.sql.query.models.Properties;
 
 public class SQLInsertQuery extends SQLQuery{
 	
 	private StringBuffer pqlBuffer = new StringBuffer("INSERT INTO ");
 	private StringBuffer paramBuffer = new StringBuffer(" ( ");
 	private StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
+	private Properties properties;
 	
 	@Override
 	public String queryString() throws IllegalArgumentException {
@@ -27,9 +28,11 @@ public class SQLInsertQuery extends SQLQuery{
 		if(props == null || props.size() == 0){
 			throw new IllegalArgumentException("In Properties can't be null or zero.");
 		}
+		this.properties = new Properties();
 		int count = 0;
 		for (Property prop : props) {
 			if(prop.getKey().trim().equals("")){ continue; }
+			this.properties.add(prop);
 			if(count != 0){ paramBuffer.append(", "); valueBuffer.append(", "); }
 			paramBuffer.append( prop.getKey() );
 			Property val = prop;
@@ -50,7 +53,7 @@ public class SQLInsertQuery extends SQLQuery{
 		}
 	}
 	
-	public static String createInsertQuery(String tableName, RowSet properties){
+	public static String createInsertQuery(String tableName, Properties properties){
 		
 		//Checking Illegal Arguments
 		try{
@@ -106,6 +109,10 @@ public class SQLInsertQuery extends SQLQuery{
 		}
 		
 		return pqlBuffer.toString() + valueBuffer.toString();
+	}
+
+	public Properties getProperties() {
+		return properties;
 	}
 	
 }

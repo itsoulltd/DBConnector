@@ -15,11 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.it.soul.lab.sql.query.SQLBuilder;
-import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLCountQuery;
+import com.it.soul.lab.sql.query.SQLDeleteQuery;
+import com.it.soul.lab.sql.query.SQLInsertQuery;
+import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
-import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.SQLSelectQuery;
+import com.it.soul.lab.sql.query.SQLUpdateQuery;
+import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.Property;
 
 public class SQLExecutor implements Serializable{
 
@@ -39,15 +44,11 @@ public class SQLExecutor implements Serializable{
      */
     private List<Statement> statementHolder = null;
     
-    public List<Statement> getStatementHolder() {
+    private List<Statement> getStatementHolder() {
     	if(null == statementHolder){
     		statementHolder = new ArrayList<Statement>();
     	}
 		return statementHolder;
-	}
-
-	public void setStatementHolder(List<Statement> statementHolder) {
-		this.statementHolder = statementHolder;
 	}
 	
 	public void close(){
@@ -233,19 +234,14 @@ public class SQLExecutor implements Serializable{
     
     /**
      * 
-     * @param conn
-     * @param tableName
-     * @param setParams
-     * @param whereLogic
-     * @param operators
-     * @param whereClause
-     * @return int as affected row count 
+     * @param query
+     * @param setParameter
+     * @return
      * @throws SQLException
+     * @throws Exception
      */
-    public int executeUpdate(String tableName
-    		, List<Property> setParameter
-    		, Logic whereLogic
-    		, List<Property> whereClause)
+    public int executeUpdate(SQLUpdateQuery query
+    		, Properties setParameter)
     throws SQLException,Exception{
     	
     	if(setParameter == null 
@@ -255,22 +251,17 @@ public class SQLExecutor implements Serializable{
     	
         int rowUpdated = 0;
         PreparedStatement stmt=null;
-        String query = null;
-        String [] whereKeySet = null;
-        if(whereClause != null && whereClause.size() > 0){
-        	whereKeySet = getProperties(whereClause);
-        	query = SQLBuilder.createUpdateQuery(tableName, getProperties(setParameter), whereLogic, whereKeySet);
-        }else{
-        	query = SQLBuilder.createUpdateQuery(tableName, getProperties(setParameter), whereLogic, new String[]{});
-        }
+        String queryStr = query.toString();
+        String [] whereKeySet = query.getWhereCompareProperties().getKeys();
+        
         try{ 
             if(conn != null){
-                stmt = conn.prepareStatement(query);
+                stmt = conn.prepareStatement(queryStr);
                 
                 int length = setParameter.size();
-                stmt = bindValueToStatement(stmt, 1, getProperties(setParameter), convertToHashMap(setParameter));
+                stmt = bindValueToStatement(stmt, 1, setParameter.getKeys(), setParameter.keyValueMap());
                 if(whereKeySet != null)
-                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, convertToHashMap(whereClause));
+                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereCompareProperties().keyValueMap());
                 
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
@@ -290,32 +281,33 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
-    @Deprecated
+    /**
+     * 
+     * @param batchSize
+     * @param queryC
+     * @param updateProperties
+     * @param whereClause
+     * @return
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     * @throws Exception
+     */
     public Integer[] executeUpdate(int batchSize
-    		, String tableName
-    		, List<Map<String, Property>> setParameter
-    		, Logic whereLogic
-    		, Map<String, Property> whereClause)
+    		, SQLUpdateQuery queryC
+    		, List<Properties> updateProperties
+    		, List<Properties> whereClause)
     throws SQLException,IllegalArgumentException,Exception{
     	
-    	if(setParameter == null 
-    			|| setParameter.size() <= 0
-    			|| whereClause == null
-    			|| whereClause.size() <= 0){
+    	if(updateProperties == null 
+    			|| updateProperties.size() <= 0){
     		throw new Exception("Set Parameter Should not be bull or empty!!!");
 		}
     	
     	List<Integer> affectedRows = new ArrayList<Integer>();
         PreparedStatement stmt=null;
-        String[] keySet = setParameter.get(0).keySet().toArray(new String[]{});
-        String query = null;
-        String[] whereKeySet = null;
-        whereKeySet = whereClause.keySet().toArray(new String[]{});
-        query = SQLBuilder.createUpdateQuery(tableName
-        		, keySet
-        		, whereLogic
-        		, whereKeySet);
-        
+        String[] keySet = updateProperties.get(0).getKeys();
+        String[] whereKeySet = queryC.getWhereParams();
+        String query = queryC.toString();
         
         try{ 
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
@@ -325,89 +317,17 @@ public class SQLExecutor implements Serializable{
                 int length = keySet.length;
                 stmt = conn.prepareStatement(query);
         		int batchCount = 1;
-        		for (Map<String, Property> row : setParameter) {
-            		stmt = bindValueToStatement(stmt, 1, keySet, row);
-            		stmt = bindValueToStatement(stmt, length+1, whereKeySet, whereClause);
-            		stmt.addBatch();
-            		if((++batchCount % batchSize) == 0){
-            			batchUpdatedRowsCount.add(stmt.executeBatch());
-            		}
-				}
-        		if(setParameter.size() % batchSize != 0)
-        			batchUpdatedRowsCount.add(stmt.executeBatch());
-        		
-        		for (int[] rr  : batchUpdatedRowsCount) {
-            		for(int i = 0; i < rr.length ; i++){
-                		affectedRows.add(rr[i]);
-                	}
-				}
-            	
-            	if(!conn.getAutoCommit())
-            		conn.commit(); 
-            }            
-        }catch(SQLException exp){
-        	
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
-            throw exp;
-        }catch(IllegalArgumentException iel){
-        	throw iel;
-        }finally{
-        	if(stmt != null)
-        		stmt.close();
-        	conn.setAutoCommit(true);
-        }
-        return affectedRows.toArray(new Integer[]{});		
-    }
-    
-    public Integer[] executeUpdate(int batchSize
-    		, String tableName
-    		, List<List<Property>> setParameter
-    		, Logic whereLogic
-    		, List<List<Property>> whereClause)
-    throws SQLException,IllegalArgumentException,Exception{
-    	
-    	if(setParameter == null 
-    			|| setParameter.size() <= 0
-    			|| whereClause == null
-    			|| whereClause.size() <= 0){
-    		throw new Exception("Set Parameter Should not be bull or empty!!!");
-		}
-    	
-    	List<Integer> affectedRows = new ArrayList<Integer>();
-        PreparedStatement stmt=null;
-        String[] keySet = getProperties(setParameter.get(0));
-        String query = null;
-        String[] whereKeySet = null;
-        whereKeySet = getProperties(whereClause.get(0));
-        query = SQLBuilder.createUpdateQuery(tableName
-        		, keySet
-        		, whereLogic
-        		, whereKeySet);
-        
-        
-        try{ 
-        	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
-            if(conn != null){
-                conn.setAutoCommit(false);
-                List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-                int length = keySet.length;
-                stmt = conn.prepareStatement(query);
-        		int batchCount = 1;
-        		for (int index = 0; index < setParameter.size(); index++) {
-					Map<String, Property> row = convertToHashMap(setParameter
-							.get(index));
-					Map<String, Property> rowWhere = convertToHashMap(whereClause
-							.get(index));
+        		for (int index = 0; index < updateProperties.size(); index++) {
+					Map<String, Property> row = updateProperties.get(index).keyValueMap();
+					Map<String, Property> rowWhere = whereClause.get(index).keyValueMap();
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
-					stmt = bindValueToStatement(stmt, length + 1,
-							whereKeySet, rowWhere);
+					stmt = bindValueToStatement(stmt, length + 1, whereKeySet, rowWhere);
 					stmt.addBatch();
 					if ((++batchCount % batchSize) == 0) {
 						batchUpdatedRowsCount.add(stmt.executeBatch());
 					}
 				}
-				if(setParameter.size() % batchSize != 0)
+				if(updateProperties.size() % batchSize != 0)
         			batchUpdatedRowsCount.add(stmt.executeBatch());
         		
         		for (int[] rr  : batchUpdatedRowsCount) {
@@ -442,32 +362,25 @@ public class SQLExecutor implements Serializable{
     
     /**
      * 
-     * @param conn
-     * @param tableName
-     * @param whereLogic
-     * @param operators
-     * @param paramValues
+     * @param dQuery
      * @return
      * @throws SQLException
      * @throws Exception
      */
-    public int executeDelete(String tableName
-    		, Logic whereLogic
-    		, Map<String, ComparisonType> operators
-    		, List<Property> whereClause)
+    public int executeDelete(SQLDeleteQuery dQuery)
     throws SQLException,Exception{
     	
-    	if(whereClause == null || whereClause.size() <= 0){
+    	if(dQuery.getWhereCompareParams() == null || dQuery.getWhereCompareParams().size() <= 0){
     		throw new Exception("Where parameter should not be null or empty!!!");
     	}
     	
         int rowUpdated = 0;
         PreparedStatement stmt=null;
-        String query = SQLBuilder.createDeleteQuery(tableName, whereLogic, operators);
+        String query = dQuery.toString();
         try{ 
             if(conn != null){
                 stmt = conn.prepareStatement(query);
-                stmt = bindValueToStatement(stmt, 1, getProperties(whereClause), convertToHashMap(whereClause));
+                stmt = bindValueToStatement(stmt, 1, dQuery.getWhereParams(), dQuery.getWhereCompareProperties().keyValueMap());
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
                 	conn.commit(); 
@@ -486,30 +399,37 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
+    /**
+     * 
+     * @param batchSize
+     * @param dQuery
+     * @param whereClause
+     * @return
+     * @throws SQLException
+     * @throws Exception
+     */
     public int executeDelete(int batchSize
-    		, String tableName
-    		, Logic whereLogic
-    		, Map<String, ComparisonType> operators
-    		, List<List<Property>> whereClause)
+    		, SQLDeleteQuery dQuery
+    		, List<Properties> whereClause)
     throws SQLException,Exception{
     	
-    	if(whereClause == null || whereClause.size() <= 0){
+    	if(dQuery.getWhereParams() == null || dQuery.getWhereParams().length <= 0){
     		throw new Exception("Where parameter should not be null or empty!!!");
     	}
     	
         int rowUpdated = 0;
         PreparedStatement stmt=null;
-        String query = SQLBuilder.createDeleteQuery(tableName, whereLogic, operators);
-        String[] whereKeySet = getProperties(whereClause.get(0));
+        String query = dQuery.toString();
+        String[] whereKeySet = whereClause.get(0).getKeys();
         try{
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
             if(conn != null){
             	conn.setAutoCommit(false);
                 int batchCount = 1;
                 stmt = conn.prepareStatement(query);
-            	for (List<Property> paramValue: whereClause) {
+            	for (Properties paramValue: whereClause) {
             		
-                    stmt = bindValueToStatement(stmt, 1, whereKeySet, convertToHashMap(paramValue));
+                    stmt = bindValueToStatement(stmt, 1, whereKeySet, paramValue.keyValueMap());
                     stmt.addBatch();
 					if ((++batchCount % batchSize) == 0) {
 						stmt.executeBatch();
@@ -591,27 +511,27 @@ public class SQLExecutor implements Serializable{
         return lastIncrementedID;		
     }
     
+    
     /**
      * 
-     * @param conn
-     * @param tableName
-     * @param params
-     * @return int as affected row count
+     * @param isAutoGenaretedId
+     * @param iQuery
+     * @return
      * @throws SQLException
      * @throws IllegalArgumentException
+     * @throws Exception
      */
     public int executeInsert(boolean isAutoGenaretedId
-    		, String tableName
-    		, List<Property> params)
+    		, SQLInsertQuery iQuery)
     throws SQLException,IllegalArgumentException,Exception{
     	
-    	if(params == null || params.size() <= 0){
+    	if(iQuery.getColumns() == null || iQuery.getColumns().length <= 0){
     		throw new Exception("Parameter should not be null or empty!!!");
     	}
     	
     	int affectedRows = 0;
         PreparedStatement stmt=null;        
-        String query = SQLBuilder.createInsertQuery(tableName, getProperties(params));
+        String query = iQuery.toString();
         try{ 
         	
             if(conn != null){
@@ -644,28 +564,28 @@ public class SQLExecutor implements Serializable{
         }
         return affectedRows;		
     }
+    
+    
     /**
      * 
-     * @param conn
      * @param isAutoGenaretedId
-     * @param tableName
-     * @param params
+     * @param iQuery
      * @return
      * @throws SQLException
      * @throws IllegalArgumentException
+     * @throws Exception
      */
     public int executeParameterizedInsert(boolean isAutoGenaretedId
-    		, String tableName
-    		, List<Property> params)
+    		, SQLInsertQuery iQuery)
     throws SQLException,IllegalArgumentException,Exception{
     	
-    	if(params == null || params.size() <= 0){
+    	if(iQuery.getColumns() == null || iQuery.getColumns().length <= 0){
     		throw new Exception("Parameter should not be null or empty!!!");
     	}
     	
     	int affectedRows = 0;
         PreparedStatement stmt=null;
-        String query = SQLBuilder.createInsertQuery(tableName, getProperties(params));
+        String query = iQuery.toString();
         
         try{ 
         	
@@ -673,7 +593,7 @@ public class SQLExecutor implements Serializable{
                 
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,	Statement.RETURN_GENERATED_KEYS);
-                	stmt = bindValueToStatement(stmt, 1,getProperties(params), convertToHashMap(params));
+                	stmt = bindValueToStatement(stmt, 1,iQuery.getProperties().getKeys(), iQuery.getProperties().keyValueMap());
                 	stmt.executeUpdate();
                 	ResultSet set = stmt.getGeneratedKeys();
                 	if(set != null && set.next()){
@@ -681,7 +601,7 @@ public class SQLExecutor implements Serializable{
                 	}                	
             	}else{
             		stmt = conn.prepareStatement(query);
-                	stmt = bindValueToStatement(stmt, 1,getProperties(params), convertToHashMap(params));
+                	stmt = bindValueToStatement(stmt, 1, iQuery.getProperties().getKeys(), iQuery.getProperties().keyValueMap());
                 	affectedRows = stmt.executeUpdate();
             	}
             	if(!conn.getAutoCommit())
@@ -702,11 +622,21 @@ public class SQLExecutor implements Serializable{
         return affectedRows;		
     }
     
-  
+    /**
+     * 
+     * @param isAutoGenaretedId
+     * @param batchSize
+     * @param iQuery
+     * @param params
+     * @return
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     * @throws Exception
+     */
     public Integer[] executeParameterizedInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
-    		, List<List<Property>> params)
+    		, List<Properties> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -715,8 +645,16 @@ public class SQLExecutor implements Serializable{
     	
     	List<Integer> affectedRows = new ArrayList<Integer>();
         PreparedStatement stmt=null;
-        Object[] keySet = getProperties(params.get(0));
-        String query = SQLBuilder.createInsertQuery(tableName, keySet);
+        /**
+         * Object[] keySet = iQuery.getProperties().getKeys();
+         * String query = iQuery.toString();
+         * 
+         * 
+         */
+        Object[] keySet = params.get(0).getKeys();
+        Property[] values = (Property[]) params.get(0).getProperties().toArray(new Property[0]);
+        SQLInsertQuery iQuery = (SQLInsertQuery) new SQLQuery.Builder(QueryType.Insert).into(tableName).values(values).build();
+        String query = iQuery.toString();
         
         try{ 
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
@@ -725,8 +663,8 @@ public class SQLExecutor implements Serializable{
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 	int batchCount = 1;
-            		for (List<Property> row : params) {
-                		stmt = bindValueToStatement(stmt, 1, keySet, convertToHashMap(row));
+            		for (Properties row : params) {
+                		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
                 			stmt.executeBatch();
@@ -744,8 +682,8 @@ public class SQLExecutor implements Serializable{
             		stmt = conn.prepareStatement(query);
             		int batchCount = 1;
             		List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-            		for (List<Property> row : params) {
-                		stmt = bindValueToStatement(stmt, 1, keySet, convertToHashMap(row));
+            		for (Properties row : params) {
+                		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
                 			batchUpdatedRowsCount.add(stmt.executeBatch());
@@ -818,70 +756,26 @@ public class SQLExecutor implements Serializable{
     
     /**
      * 
-     * @param conn
-     * @param tableName
-     * @param param
-     * @param whereParam
-     * @param type
-     * @param property
+     * @param cQuery
      * @return
      * @throws SQLException
      */
-    public int getRowCount(String tableName
-    		,String param
-    		,String whereParam
-    		,ComparisonType type
-    		,Property property)
+    public int getRowCount(SQLCountQuery cQuery)
     throws SQLException{
     	
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         int rowCount = 0;
-        String query = SQLBuilder.createCountFunctionQuery(tableName, param, whereParam, type);
-        try{
-            if(conn != null){
-                pstmt = conn.prepareStatement(query);
-                Map<String, Property> val = new HashMap<String, Property>();
-                val.put(property.getKey(), property);
-                pstmt = bindValueToStatement(pstmt
-                		, 1
-                		,new Object[]{whereParam}
-                		, val);
-                rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    rowCount = rs.getInt(1);                   
-                } else {
-                     rowCount=0;
-                }
-            }            
-        }catch(SQLException e){
-            throw e;
-        }finally{
-        	if(pstmt != null)
-        		pstmt.close();
-        }
-        return rowCount;
-     }
-    
-    public int getRowCount(String tableName
-    		,String param
-    		,Logic logic
-    		,Map<String, ComparisonType> operators
-    		,List<Property> whereClause)
-    throws SQLException{
-    	
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        int rowCount = 0;
-        String query = SQLBuilder.createCountFunctionQuery(tableName, param, logic,operators);
+        String query = cQuery.toString();
+        Properties whereClause = cQuery.getWhereCompareProperties();
         try{
             if(conn != null){
                 pstmt = conn.prepareStatement(query);
                 
                 pstmt = bindValueToStatement(pstmt
                 		, 1
-                		, getProperties(whereClause)
-                		, convertToHashMap(whereClause));
+                		, whereClause.getKeys()
+                		, whereClause.keyValueMap());
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
                     rowCount = rs.getInt(1);                   
@@ -932,72 +826,24 @@ public class SQLExecutor implements Serializable{
     
     /**
      * 
-     * @param conn
-     * @param table
-     * @param projectionParams
-     * @param whereLogic
-     * @param operators
-     * @param whereClause. Entry example like, key=>"ParamName1", Value=>ParamProperties("ParamName1","value",ParamDataTypeString) 
-     * OR like, key=>"ParamName2", Value=>ParamProperties("ParamName2","value",ParamDataTypeInt)  
-     * @return ResultSet
+     * @param query
+     * @return
      * @throws SQLException
      * @throws IllegalArgumentException
      */
-    public ResultSet executeSelect(String table
-    		, String[]projectionParams
-    		, Logic whereLogic    		
-    		, List<Property> whereClause)
-    throws SQLException,IllegalArgumentException{
-    	
-        PreparedStatement stmt = null;
-        ResultSet rst=null;
-        String query = SQLBuilder.createSelectQuery(table, projectionParams, whereLogic, getProperties(whereClause));
-        try{
-        	
-            if(conn != null && !conn.isClosed()){
-            	stmt = conn.prepareStatement(query,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
-            	stmt = bindValueToStatement(stmt, 1, getProperties(whereClause), convertToHashMap(whereClause));
-        		rst = stmt.executeQuery();
-            }            
-        }catch(SQLException exp){            
-            throw exp;
-        }catch(IllegalArgumentException iel){
-        	throw iel;
-        }finally{
-        	getStatementHolder().add(stmt);
-        }
-        return rst;           
-    }
     
-    /**
-     * 
-     * @param conn
-     * @param table
-     * @param projectionParams
-     * @param whereLogic
-     * @param operators 
-     * @param whereClause, Parameter should be Entry example like, key=>"ParamName1", Value=>ParamProperties("ParamName1","value",ParamDataTypeString) 
-     * OR like, key=>"ParamName2", Value=>ParamProperties("ParamName2","value",ParamDataTypeInt)
-     * @return ResultSet
-     * @throws SQLException
-     * @throws IllegalArgumentException
-     */
-    public ResultSet executeSelect(String table
-    		, String[]projectionParams
-    		, Logic whereLogic
-    		, Map<String, ComparisonType> operators
-    		, List<Property> whereClause)
+    public ResultSet executeSelect(SQLSelectQuery query)
     throws SQLException,IllegalArgumentException{
     	
         PreparedStatement stmt = null;
         ResultSet rst=null;
-        String query = SQLBuilder.createSelectQuery(table, projectionParams, whereLogic, operators);
+        String queryStr = query.toString();
+        Properties whereClause = query.getWhereCompareProperties();
         try{
-        	
             if(conn != null && !conn.isClosed()){
-                stmt = conn.prepareStatement(query,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
-                stmt = bindValueToStatement(stmt, 1,getProperties(whereClause), convertToHashMap(whereClause));
-                rst = stmt.executeQuery();                 
+            	stmt = conn.prepareStatement(queryStr,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
+            	stmt = bindValueToStatement(stmt, 1, whereClause.getKeys(), whereClause.keyValueMap());
+        		rst = stmt.executeQuery();
             }            
         }catch(SQLException exp){            
             throw exp;
@@ -1604,23 +1450,6 @@ public class SQLExecutor implements Serializable{
 	}
 	
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Private Methods>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
-    
-    private String[] getProperties(List<Property> listOfParam){
-    	//Before Java 8
-        List<String> result = new ArrayList<String>();
-        for (Property x : listOfParam) {
-            result.add(x.getKey());
-        }
-    	return result.toArray(new String[]{});
-    }
-    
-    private Map<String, Property> convertToHashMap(List<Property> listOfParam){
-    	Map<String, Property> result = new HashMap<String, Property>();
-    	for (Property parameter : listOfParam) {
-			result.put(parameter.getKey(), parameter);
-		}
-    	return result;
-    }
 	
 	private PreparedStatement bindValueToStatement(PreparedStatement stmt
 			, int startIndex

@@ -1,10 +1,12 @@
 package com.it.soul.lab.sql.query;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Properties;
 
 public class SQLQuery {
 	
@@ -28,6 +30,10 @@ public class SQLQuery {
 	public List<Compare> getWhereCompareParams() {
 		return whereCompareParams;
 	}
+	
+	public Properties getWhereCompareProperties() {
+		return Compare.convertToProperties(whereCompareParams);
+	}
 
 	public void setWhereCompareParams(List<Compare> whereCompareParams) {
 		this.whereCompareParams = whereCompareParams;
@@ -49,10 +55,19 @@ public class SQLQuery {
 	}
 	
 	public String[] getWhereParams() {
+		if (whereParams == null && whereCompareParams != null) {
+			return getWhereCompareProperties().getKeys();
+		}
 		return whereParams;
 	}
 	public void setWhereParams(String[] whereParams) {
 		this.whereParams = whereParams;
+		if(whereCompareParams == null){
+			whereCompareParams = new ArrayList<Compare>();
+			for (String params : whereParams) {
+				whereCompareParams.add(new Compare(params, ComparisonType.IsEqual));
+			}
+		}
 	}
 	public String getTableName() {
 		return tableName;

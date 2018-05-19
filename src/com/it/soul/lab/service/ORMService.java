@@ -18,9 +18,11 @@ import javax.persistence.QueryTimeoutException;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 
-import com.it.soul.lab.jpql.query.JPQLBuilders;
+import com.it.soul.lab.jpql.query.JPQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.models.Compare;
 
 public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {
 
@@ -45,8 +47,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		try{
 			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), null);
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), null);
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns().from(getEntity()).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
 		}
 		catch(QueryTimeoutException e){
@@ -82,8 +85,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		try{
 			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames);
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames);
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
 		}
 		catch(QueryTimeoutException e){
@@ -120,8 +124,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		try{
 			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getResultList();
 		}
@@ -159,8 +164,10 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		try{
 			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, keyValuePair.keySet().toArray(new String[]{}));
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, keyValuePair.keySet().toArray(new String[]{}));
+			String[] whereParams = keyValuePair.keySet().toArray(new String[]{});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereParams).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			for (Entry<String,Object> item : keyValuePair.entrySet()) {
 				query.setParameter(item.getKey(), item.getValue());
 			}
@@ -199,8 +206,17 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		try{
 			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, operators);
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//new way
+			String[] whereParams = keyValuePair.keySet().toArray(new String[0]);
+			List<Compare> compares = new ArrayList<Compare>();
+			for (String string : whereParams) {
+				compares.add(new Compare(string, operators.get(string)));
+			}
+			Compare[] whereCompares = compares.toArray(new Compare[0]);
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereCompares).build();
+			//
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, operators);
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			for (Entry<String,Object> item : keyValuePair.entrySet()) {
 				query.setParameter(item.getKey(), item.getValue());
 			}
@@ -239,9 +255,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		
 		try{
-			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), null, Logic.AND, new String[]{searchKey});
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), null, Logic.AND, new String[]{searchKey});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns().from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getSingleResult();
 			
@@ -285,9 +301,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		}
 		
 		try{
-			
-			String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
-			TypedQuery<T> query = getEntityManager().createQuery(jpql, getEntityType());
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getSingleResult();
 			

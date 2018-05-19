@@ -50,6 +50,7 @@ public class SQLCountQuery extends SQLQuery{
 	}
 	
 	public void setCountClouse(Logic logic, List<Compare> whereParams){
+		super.setWhereCompareParams(whereParams);
 		if(whereParams != null && whereParams.size() > 0){
 			pqlBuffer.append("Where " );
 			int count = 0;

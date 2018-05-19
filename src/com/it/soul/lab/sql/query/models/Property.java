@@ -59,7 +59,10 @@ public class Property {
 	public DataType getType() {
 		return type;
 	}
-	
+	public void setType(DataType type) {
+		this.type = type;
+	}
+
 	private String getFormattedDateString(Object date) {
 		String result = null;
 		SimpleDateFormat formatter = new SimpleDateFormat(SQL_DATE_FORMAT);

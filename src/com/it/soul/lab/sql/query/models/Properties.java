@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RowSet {
+public class Properties {
 	private List<Property> items = new ArrayList<Property>();
-	public RowSet add(Property prop){
+	public Properties add(Property prop){
 		if (items.contains(prop)){
 			return this;
 		}
