@@ -19,9 +19,10 @@ public class Compare {
 	public ComparisonType getType() {
 		return type;
 	}
-	public void setPropertyValue(Object value, DataType type){
+	public Compare setPropertyValue(Object value, DataType type){
 		this.valueProperty.setValue(value);
 		this.valueProperty.setType(type);
+		return this;
 	}
 	public Property getValueProperty() {
 		return valueProperty;

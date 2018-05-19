@@ -7,8 +7,7 @@ Some usefull java util classes for database programming.
 			
 			SQLExecutor exe = new SQLExecutor(conn);
 			
-			Compare compWith = new Compare("name", ComparisonType.IsEqual);
-			compWith.setPropertyValue("sohana", DataType.STRING);
+			Compare compWith = new Compare("name", ComparisonType.IsEqual).setPropertyValue("sohana", DataType.STRING);
 			
 			SQLSelectQuery qc = (SQLSelectQuery) new SQLQuery.Builder(QueryType.Select)
 																.columns()
