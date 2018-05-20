@@ -240,6 +240,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws Exception
      */
+    @Deprecated
     public int executeUpdate(SQLUpdateQuery query
     		, Properties setParameter)
     throws SQLException,Exception{
@@ -290,10 +291,9 @@ public class SQLExecutor implements Serializable{
      */
     public int executeUpdate(SQLUpdateQuery query) throws SQLException,Exception{
     	
-    	Properties setParameter = query.getProperties();
-    	
-    	if(setParameter == null 
-    			|| setParameter.size() <= 0){
+    	Properties setProperties = query.getProperties();
+    	if(setProperties == null 
+    			|| setProperties.size() <= 0){
     		throw new Exception("Set Parameter Should not be bull or empty!!!");
 		}
     	
@@ -306,8 +306,8 @@ public class SQLExecutor implements Serializable{
             if(conn != null){
                 stmt = conn.prepareStatement(queryStr);
                 
-                int length = setParameter.size();
-                stmt = bindValueToStatement(stmt, 1, setParameter.getKeys(), setParameter.keyValueMap());
+                int length = setProperties.size();
+                stmt = bindValueToStatement(stmt, 1, setProperties.getKeys(), setProperties.keyValueMap());
                 if(whereKeySet != null)
                 	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereCompareProperties().keyValueMap());
                 
@@ -319,10 +319,8 @@ public class SQLExecutor implements Serializable{
         	if(!conn.getAutoCommit())
         		conn.rollback();
             throw exp;
-        }catch (IllegalArgumentException e) {
-        	 
-            throw e;
-		}finally{
+        }catch (IllegalArgumentException e) { throw e;}
+        finally{
         	if(stmt != null)
         		stmt.close();
         }
@@ -352,9 +350,7 @@ public class SQLExecutor implements Serializable{
 		}
     	
     	List<Integer> affectedRows = new ArrayList<Integer>();
-        PreparedStatement stmt=null;
-        String[] keySet = updateProperties.get(0).getKeys();
-        String[] whereKeySet = queryC.getWhereParams();
+        PreparedStatement stmt = null;
         String query = queryC.toString();
         
         try{ 
@@ -362,14 +358,20 @@ public class SQLExecutor implements Serializable{
             if(conn != null){
                 conn.setAutoCommit(false);
                 List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-                int length = keySet.length;
+                
                 stmt = conn.prepareStatement(query);
         		int batchCount = 1;
         		for (int index = 0; index < updateProperties.size(); index++) {
+        			
+        			String[] keySet = updateProperties.get(index).getKeys();
 					Map<String, Property> row = updateProperties.get(index).keyValueMap();
-					Map<String, Property> rowWhere = whereClause.get(index).keyValueMap();
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
+					
+					int length = keySet.length;
+					String[] whereKeySet = whereClause.get(index).getKeys();
+					Map<String, Property> rowWhere = whereClause.get(index).keyValueMap();
 					stmt = bindValueToStatement(stmt, length + 1, whereKeySet, rowWhere);
+					
 					stmt.addBatch();
 					if ((++batchCount % batchSize) == 0) {
 						batchUpdatedRowsCount.add(stmt.executeBatch());
@@ -696,11 +698,13 @@ public class SQLExecutor implements Serializable{
         /**
          * Object[] keySet = iQuery.getProperties().getKeys();
          * String query = iQuery.toString();
-         * 
-         * 
          */
         Object[] keySet = params.get(0).getKeys();
-        Property[] values = (Property[]) params.get(0).getProperties().toArray(new Property[0]);
+        List<Property> nValues = new ArrayList<Property>();
+        for (Property property : params.get(0).getProperties()) {
+			nValues.add(new Property(property.getKey()));
+		}
+        Property[] values = (Property[]) nValues.toArray(new Property[0]);
         SQLInsertQuery iQuery = (SQLInsertQuery) new SQLQuery.Builder(QueryType.Insert).into(tableName).values(values).build();
         String query = iQuery.toString();
         
