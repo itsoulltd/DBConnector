@@ -62,12 +62,14 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	public QueryBuilder whereParams(Logic logic, String... name){
-		tempQuery.setLogic(logic);
+		if (logic == null){tempQuery.setLogic(Logic.AND);}
+		else {tempQuery.setLogic(logic);}
 		tempQuery.setWhereParams(name);
 		return this;
 	}
 	public QueryBuilder whereParams(Logic logic, Compare... comps){
-		tempQuery.setLogic(logic);
+		if (logic == null){tempQuery.setLogic(Logic.AND);}
+		else {tempQuery.setLogic(logic);}
 		List<Compare> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
 		return this;
@@ -89,6 +91,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	@Override
 	public QueryBuilder countClause(Logic logic, Compare... comps) {
 		if(tempQuery instanceof SQLCountQuery){
+			if (logic == null){logic = Logic.AND;}
 			tempQuery.setLogic(logic);
 			((SQLCountQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
 		}
@@ -104,6 +107,8 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	@Override
 	public QueryBuilder distinctClause(Logic logic, Compare... comps) {
 		if(tempQuery instanceof SQLDistinctQuery){
+			if (logic == null){logic = Logic.AND;}
+			tempQuery.setLogic(logic);
 			((SQLDistinctQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
 		}
 		return this;
