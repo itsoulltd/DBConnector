@@ -7,7 +7,7 @@ import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
 
-public class Compare {
+public class Compare implements LogicExpression{
 	public Compare(String property, ComparisonType type){
 		this.property = property;
 		this.type = type;
@@ -28,6 +28,7 @@ public class Compare {
 		return valueProperty;
 	}
 
+	protected static final char MARKER = '?';
 	private String property;
 	private ComparisonType type;
 	private Property valueProperty;
@@ -46,5 +47,30 @@ public class Compare {
 			props.add(compare.getValueProperty());
 		}
 		return props;
+	}
+	public String toString(){
+		return getProperty() + " " + type.toString() + " " + getPropertyValue(valueProperty);
+	}
+	private String getPropertyValue(Property val){
+		if(val.getValue() != null && val.getType() != null){
+			if(val.getType() == DataType.BOOL 
+					|| val.getType() == DataType.INT
+					|| val.getType() == DataType.DOUBLE
+					|| val.getType() == DataType.FLOAT) {
+				return val.getValue().toString();
+			}else{
+				return "'"+val.getValue().toString()+"'";
+			}
+		}else{
+			return  String.valueOf(MARKER);
+		}
+	}
+	@Override
+	public String express() {
+		return getProperty() + " " + type.toString() + " " + MARKER;
+	}
+	@Override
+	public Compare[] resolveCompares() {
+		return new Compare[] {this};
 	}
 }

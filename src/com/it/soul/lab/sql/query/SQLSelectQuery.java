@@ -1,7 +1,9 @@
 package com.it.soul.lab.sql.query;
 
 import java.util.List;
+
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.LogicExpression;
 
 public class SQLSelectQuery extends SQLQuery{
 	
@@ -29,12 +31,12 @@ public class SQLSelectQuery extends SQLQuery{
 			for(String str : getColumns()){
 				if(str.trim().equals("")){continue;}
 				if(count++ != 0){pqlBuffer.append(", ");}
-				pqlBuffer.append( QUIENTIFIER + "." + str);
+				pqlBuffer.append( /*QUIENTIFIER + "." +*/ str);
 			}
 			//If all passed parameter is empty
-			if(count == 0){pqlBuffer.append(QUIENTIFIER + "." + STARIC);}
+			if(count == 0){pqlBuffer.append(/*QUIENTIFIER + "." +*/ STARIC);}
 		}else{
-			pqlBuffer.append(QUIENTIFIER + "." + STARIC);
+			pqlBuffer.append(/*QUIENTIFIER + "." +*/ STARIC);
 		}
 	}
 	
@@ -45,7 +47,7 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	protected void prepareTableName(String name){
-		pqlBuffer.append(" FROM "+ name + " " + QUIENTIFIER);
+		pqlBuffer.append(" FROM "+ name + " " /*+ QUIENTIFIER*/);
 	}
 	
 	@Override
@@ -53,25 +55,8 @@ public class SQLSelectQuery extends SQLQuery{
 		super.setWhereParams(whereParams);
 		prepareWhereParams(whereParams);
 	}
-
-	/**
-	 * @param whereParams
-	 */
+	
 	protected void prepareWhereParams(String[] whereParams) {
-		/*if(whereParams != null 
-				&& whereParams.length > 0
-				&& !isAllParamEmpty(whereParams)){
-			
-			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
-				int count = 0;
-				for(String param : whereParams){
-					if(param.trim().equals("")){continue;}
-					if(count++ != 0){pqlBuffer.append( " " + getLogic().name() + " ");}
-					pqlBuffer.append( QUIENTIFIER + "." + param + " = " + MARKER);
-				}
-			}
-		}*/
 		prepareWhereParams(Compare.createListFrom(whereParams, ComparisonType.IsEqual));
 	}
 	
@@ -80,10 +65,7 @@ public class SQLSelectQuery extends SQLQuery{
 		super.setWhereCompareParams(whereParams);
 		prepareWhereParams(whereParams);
 	}
-
-	/**
-	 * @param whereParams
-	 */
+	
 	protected void prepareWhereParams(List<Compare> whereParams) {
 		if(whereParams != null 
 				&& whereParams.size() > 0
@@ -95,10 +77,20 @@ public class SQLSelectQuery extends SQLQuery{
 				for(Compare param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + getLogic().name() + " ");}
-					pqlBuffer.append( QUIENTIFIER + "." + param.getProperty() + " " + param.getType().toString() + " " + MARKER);
+					pqlBuffer.append( /*QUIENTIFIER + "." +*/ param.getProperty() + " " + param.getType().toString() + " " + MARKER);
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void setWhereExpression(LogicExpression whereExpression) {
+		super.setWhereExpression(whereExpression);
+		prepareWhereExpression(whereExpression);
+	}
+	
+	protected void prepareWhereExpression(LogicExpression whereExpression){
+		pqlBuffer.append(whereExpression.express());
 	}
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, List<Compare> whereParams)
@@ -119,7 +111,7 @@ public class SQLSelectQuery extends SQLQuery{
 				for(Compare param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
-					pqlBuffer.append( QUIENTIFIER + "." + param.getProperty() + " " + param.getType().toString() + " " + MARKER);
+					pqlBuffer.append( /*QUIENTIFIER + "." +*/ param.getProperty() + " " + param.getType().toString() + " " + MARKER);
 				}
 			}
 		}
@@ -129,27 +121,6 @@ public class SQLSelectQuery extends SQLQuery{
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, String[] whereParams)
 			throws IllegalArgumentException{
-		//Query Builders
-		/*StringBuffer pqlBuffer = null;
-		try{ pqlBuffer = new StringBuffer(create(tableName, projectionParams)); }
-		catch(IllegalArgumentException iex){throw iex;}
-
-		if(whereParams != null 
-				&& whereParams.length > 0
-				&& !isAllParamEmpty(whereParams)){
-
-			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
-				int count = 0;
-				for(String param : whereParams){
-					if(param.trim().equals("")){continue;}
-					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
-					pqlBuffer.append( QUIENTIFIER + "." + param + " = " + MARKER);
-				}
-			}
-		}
-		return pqlBuffer.toString();*/
-		
 		return SQLSelectQuery.create(tableName, projectionParams, whereLogic, Compare.createListFrom(whereParams, ComparisonType.IsEqual));
 	}
 	

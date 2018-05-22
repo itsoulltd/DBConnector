@@ -13,6 +13,7 @@ import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder{
@@ -89,27 +90,9 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	@Override
-	public QueryBuilder countClause(Logic logic, Compare... comps) {
-		if(tempQuery instanceof SQLCountQuery){
-			if (logic == null){logic = Logic.AND;}
-			tempQuery.setLogic(logic);
-			((SQLCountQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
-		}
-		return this;
-	}
-	@Override
 	public QueryBuilder distinctClause(Property prop, Compare comps) {
 		if(tempQuery instanceof SQLDistinctQuery){
 			((SQLDistinctQuery)tempQuery).setCountClouse(prop, comps);
-		}
-		return this;
-	}
-	@Override
-	public QueryBuilder distinctClause(Logic logic, Compare... comps) {
-		if(tempQuery instanceof SQLDistinctQuery){
-			if (logic == null){logic = Logic.AND;}
-			tempQuery.setLogic(logic);
-			((SQLDistinctQuery)tempQuery).setCountClouse(logic, Arrays.asList(comps));
 		}
 		return this;
 	}
@@ -147,6 +130,11 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 				System.out.println(are.getMessage());
 			}
 		}
+		return this;
+	}
+	@Override
+	public QueryBuilder whereExpression(LogicExpression expression) {
+		tempQuery.setWhereExpression(expression); 
 		return this;
 	}
 }

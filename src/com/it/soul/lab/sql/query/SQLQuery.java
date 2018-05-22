@@ -2,10 +2,12 @@ package com.it.soul.lab.sql.query;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Properties;
 
 public class SQLQuery {
@@ -26,6 +28,16 @@ public class SQLQuery {
 	}
 	
 	//////////////////////////////////SQLQuery///////////////////////////////////////////
+	
+	public LogicExpression getWhereExpression() {
+		return whereExpression;
+	}
+
+	public void setWhereExpression(LogicExpression whereExpression) {
+		this.whereExpression = whereExpression;
+		Compare[] comps = whereExpression.resolveCompares();
+		this.whereCompareParams = Arrays.asList(comps);
+	}
 	
 	public List<Compare> getWhereCompareParams() {
 		return whereCompareParams;
@@ -110,6 +122,7 @@ public class SQLQuery {
 	private String[] whereParams;
 	private Logic logic;
 	private List<Compare> whereCompareParams;
+	private LogicExpression whereExpression;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////SQLQuery-Enums//////////////////////////////////////////////
