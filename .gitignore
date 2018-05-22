@@ -73,3 +73,7 @@ bin/com/it/soul/lab/sql/query/builder/ScalerClauseBuilder.class
 bin/com/it/soul/lab/sql/query/builder/TableBuilder.class
 bin/com/it/soul/lab/sql/query/builder/WhereClauseBuilder.class
 bin/com/it/soul/lab/jpql/query/JPQLQuery$Builder.class
+bin/com/it/soul/lab/sql/query/models/AndExpression.class
+bin/com/it/soul/lab/sql/query/models/LogicExpression.class
+bin/com/it/soul/lab/sql/query/models/NotExpression.class
+bin/com/it/soul/lab/sql/query/models/OrExpression.class
