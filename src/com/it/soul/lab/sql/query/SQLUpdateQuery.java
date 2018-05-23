@@ -87,7 +87,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		whereBuffer.append(whereExpression.express());
+		whereBuffer.append("WHERE " + whereExpression.express());
 	}
 	
 	public static String create(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){

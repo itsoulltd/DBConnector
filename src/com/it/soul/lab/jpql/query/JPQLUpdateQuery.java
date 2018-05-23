@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.LogicExpression;
 
 public class JPQLUpdateQuery extends SQLUpdateQuery {
 	
@@ -47,5 +48,8 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 		}
 	}
 	
-	
+	@Override
+	protected void prepareWhereExpression(LogicExpression whereExpression) {
+		prepareWhereParams(getWhereCompareParams());
+	}
 }

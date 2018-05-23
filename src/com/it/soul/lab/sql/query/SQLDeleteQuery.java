@@ -20,7 +20,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareTableName(String name) {
-		pqlBuffer.append(getTableName());
+		pqlBuffer.append(name + " ");
 	}
 	
 	@Override
@@ -40,7 +40,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 				&& !isAllParamEmpty(whereParams.toArray())){
 
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append( " WHERE ");
+				pqlBuffer.append( "WHERE ");
 				int count = 0;
 				for(Compare ent : whereParams){
 					if(ent.getProperty().trim().equals("")){continue;}

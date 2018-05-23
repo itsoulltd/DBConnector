@@ -31,12 +31,12 @@ public class SQLSelectQuery extends SQLQuery{
 			for(String str : getColumns()){
 				if(str.trim().equals("")){continue;}
 				if(count++ != 0){pqlBuffer.append(", ");}
-				pqlBuffer.append( /*QUIENTIFIER + "." +*/ str);
+				pqlBuffer.append(str);
 			}
 			//If all passed parameter is empty
-			if(count == 0){pqlBuffer.append(/*QUIENTIFIER + "." +*/ STARIC);}
+			if(count == 0){pqlBuffer.append(STARIC);}
 		}else{
-			pqlBuffer.append(/*QUIENTIFIER + "." +*/ STARIC);
+			pqlBuffer.append(STARIC);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	protected void prepareTableName(String name){
-		pqlBuffer.append(" FROM "+ name + " " /*+ QUIENTIFIER*/);
+		pqlBuffer.append(" FROM "+ name + " ");
 	}
 	
 	@Override
@@ -77,7 +77,7 @@ public class SQLSelectQuery extends SQLQuery{
 				for(Compare param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + getLogic().name() + " ");}
-					pqlBuffer.append( /*QUIENTIFIER + "." +*/ param.getProperty() + " " + param.getType().toString() + " " + MARKER);
+					pqlBuffer.append(param.getProperty() + " " + param.getType().toString() + " " + MARKER);
 				}
 			}
 		}
@@ -90,7 +90,7 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	protected void prepareWhereExpression(LogicExpression whereExpression){
-		pqlBuffer.append(whereExpression.express());
+		pqlBuffer.append("WHERE " + whereExpression.express());
 	}
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, List<Compare> whereParams)
@@ -111,7 +111,7 @@ public class SQLSelectQuery extends SQLQuery{
 				for(Compare param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
-					pqlBuffer.append( /*QUIENTIFIER + "." +*/ param.getProperty() + " " + param.getType().toString() + " " + MARKER);
+					pqlBuffer.append(param.getProperty() + " " + param.getType().toString() + " " + MARKER);
 				}
 			}
 		}
