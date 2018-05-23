@@ -18,7 +18,7 @@ public class JPQLSelectQuery extends SQLSelectQuery {
 	
 	@Override
 	protected void prepareTableName(String name) {
-		super.prepareTableName(name);
+		pqlBuffer.append(" FROM "+ name + " " + QUIENTIFIER);
 	}
 	
 	@Override

@@ -54,7 +54,7 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 		for (Compare comp : resolved) {
 			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
 		}
-		whereBuffer.append(" WHERE " + whereExpression.express());
+		whereBuffer.append("WHERE " + whereExpression.express());
 		for (Compare comp : resolved) {
 			comp.setQuientifier(' ');
 		}
