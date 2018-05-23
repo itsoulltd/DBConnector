@@ -27,11 +27,21 @@ public class Compare implements LogicExpression{
 	public Property getValueProperty() {
 		return valueProperty;
 	}
+	public Compare setQuientifier(char quientifier){
+		this.quientifier = quientifier;
+		return this;
+	}
+	public Compare setMarker(String marker){
+		this.expressMarker = marker;
+		return this;
+	}
 
 	protected static final char MARKER = '?';
 	private String property;
 	private ComparisonType type;
 	private Property valueProperty;
+	private char quientifier = ' '; //Default is empty space
+	private String expressMarker = String.valueOf(MARKER);
 	
 	public static List<Compare> createListFrom(String[] names, ComparisonType type){
 		List<Compare> resutls = new ArrayList<Compare>();
@@ -49,7 +59,8 @@ public class Compare implements LogicExpression{
 		return props;
 	}
 	public String toString(){
-		return getProperty() + " " + type.toString() + " " + getPropertyValue(valueProperty);
+		if (Character.isWhitespace(quientifier) == false) {return  quientifier+ "." + getProperty() + " " + type.toString() + " " + getPropertyValue(valueProperty);}
+		else {return getProperty() + " " + type.toString() + " " + getPropertyValue(valueProperty);}
 	}
 	private String getPropertyValue(Property val){
 		if(val.getValue() != null && val.getType() != null){
@@ -67,7 +78,8 @@ public class Compare implements LogicExpression{
 	}
 	@Override
 	public String express() {
-		return getProperty() + " " + type.toString() + " " + MARKER;
+		if (Character.isWhitespace(quientifier) == false) {return quientifier+ "." + getProperty() + " " + type.toString() + " " + expressMarker;}
+		else {return getProperty() + " " + type.toString() + " " + MARKER;}
 	}
 	@Override
 	public Compare[] resolveCompares() {

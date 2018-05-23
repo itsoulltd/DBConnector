@@ -63,7 +63,14 @@ public class JPQLSelectQuery extends SQLSelectQuery {
 	
 	@Override
 	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		prepareWhereParams(getWhereCompareParams());
+		Compare[] resolved = whereExpression.resolveCompares();
+		for (Compare comp : resolved) {
+			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
+		}
+		pqlBuffer.append(" WHERE " + whereExpression.express());
+		for (Compare comp : resolved) {
+			comp.setQuientifier(' ');
+		}
 	}
 	
 }

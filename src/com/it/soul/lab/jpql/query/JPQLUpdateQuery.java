@@ -50,6 +50,13 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 	
 	@Override
 	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		prepareWhereParams(getWhereCompareParams());
+		Compare[] resolved = whereExpression.resolveCompares();
+		for (Compare comp : resolved) {
+			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
+		}
+		whereBuffer.append(" WHERE " + whereExpression.express());
+		for (Compare comp : resolved) {
+			comp.setQuientifier(' ');
+		}
 	}
 }
