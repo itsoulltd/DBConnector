@@ -63,14 +63,12 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	public QueryBuilder whereParams(Logic logic, String... name){
-		if (logic == null){tempQuery.setLogic(Logic.AND);}
-		else {tempQuery.setLogic(logic);}
+		if (logic != null){tempQuery.setLogic(logic);}
 		tempQuery.setWhereParams(name);
 		return this;
 	}
 	public QueryBuilder whereParams(Logic logic, Compare... comps){
-		if (logic == null){tempQuery.setLogic(Logic.AND);}
-		else {tempQuery.setLogic(logic);}
+		if (logic != null){tempQuery.setLogic(logic);}
 		List<Compare> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
 		return this;

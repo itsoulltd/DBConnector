@@ -120,7 +120,7 @@ public class SQLQuery {
 	private String tableName;
 	private String[] columns;
 	private String[] whereParams;
-	private Logic logic;
+	private Logic logic = Logic.AND;
 	private List<Compare> whereCompareParams;
 	private LogicExpression whereExpression;
 	
