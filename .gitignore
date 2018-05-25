@@ -82,3 +82,10 @@ bin/com/it/soul/lab/connect/DBConnection$JDBCDriver.class
 bin/com/it/soul/lab/connect/DBConnection.class
 bin/com/it/soul/lab/connect/DBConnectionPool.class
 bin/com/it/soul/lab/service/ORMController.class
+bin/com/it/soul/lab/connect/DBConnection$DriverClass.class
+bin/com/it/soul/lab/sql/query/SQLQuery$Operator.class
+bin/com/it/soul/lab/sql/query/SQLScalerQuery$ScalerType.class
+bin/com/it/soul/lab/sql/query/SQLScalerQuery.class
+bin/com/it/soul/lab/sql/query/models/Expression.class
+bin/com/it/soul/lab/unit/test/QueryBuilderTest.class
+bin/com/it/soul/lab/unit/test/QueryExecutionTest.class
