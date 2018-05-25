@@ -77,3 +77,8 @@ bin/com/it/soul/lab/sql/query/models/AndExpression.class
 bin/com/it/soul/lab/sql/query/models/LogicExpression.class
 bin/com/it/soul/lab/sql/query/models/NotExpression.class
 bin/com/it/soul/lab/sql/query/models/OrExpression.class
+bin/com/it/soul/lab/connect/DBConnection$Builder.class
+bin/com/it/soul/lab/connect/DBConnection$JDBCDriver.class
+bin/com/it/soul/lab/connect/DBConnection.class
+bin/com/it/soul/lab/connect/DBConnectionPool.class
+bin/com/it/soul/lab/service/ORMController.class
