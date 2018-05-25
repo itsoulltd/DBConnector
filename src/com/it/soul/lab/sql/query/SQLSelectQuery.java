@@ -57,7 +57,7 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.EQUAL));
 	}
 	
 	@Override
@@ -121,7 +121,7 @@ public class SQLSelectQuery extends SQLQuery{
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, String[] whereParams)
 			throws IllegalArgumentException{
-		return SQLSelectQuery.create(tableName, projectionParams, whereLogic, Expression.createListFrom(whereParams, Operator.IsEqual));
+		return SQLSelectQuery.create(tableName, projectionParams, whereLogic, Expression.createListFrom(whereParams, Operator.EQUAL));
 	}
 	
 	public static String create(String tableName, String...projectionParams)

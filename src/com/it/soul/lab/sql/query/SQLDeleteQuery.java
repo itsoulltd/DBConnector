@@ -30,7 +30,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.EQUAL));
 	}
 	
 	@Override

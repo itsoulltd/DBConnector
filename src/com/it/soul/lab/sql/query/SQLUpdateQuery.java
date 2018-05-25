@@ -64,7 +64,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.EQUAL));
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	}
 	
 	public static String create(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){
-		return SQLUpdateQuery.create(tableName, setParams, whereLogic, Expression.createListFrom(whereParams, Operator.IsEqual));
+		return SQLUpdateQuery.create(tableName, setParams, whereLogic, Expression.createListFrom(whereParams, Operator.EQUAL));
 	}
 	
 	public static String create(String tableName, String[]setParams, Logic whereLogic, List<Expression> whereParams){

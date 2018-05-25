@@ -77,7 +77,7 @@ public class SQLQuery {
 		if(whereCompareParams == null){
 			whereCompareParams = new ArrayList<Expression>();
 			for (String params : whereParams) {
-				whereCompareParams.add(new Expression(params, Operator.IsEqual));
+				whereCompareParams.add(new Expression(params, Operator.EQUAL));
 			}
 		}
 	}
@@ -150,12 +150,12 @@ public class SQLQuery {
     
     public static enum Operator{
     	
-    	IsEqual,
-    	IsNotEqual,
-    	IsGreater,
-    	IsGreaterOrEqual,
-    	IsSmaller,
-    	IsSmallerOrEqual,
+    	EQUAL,
+    	NOTEQUAL,
+    	GREATER_THAN,
+    	GREATER_THAN_OR_EQUAL,
+    	LESS_THAN,
+    	LESS_THAN_OR_EQUAL,
     	IN,
     	NOT_IN,
     	LIKE,
@@ -165,19 +165,19 @@ public class SQLQuery {
 
     		String eq = "=";
     		switch (this) {
-    		case IsNotEqual:
+    		case NOTEQUAL:
     			eq = "!=";
     			break;
-    		case IsGreater:
+    		case GREATER_THAN:
     			eq = ">";
     			break;
-    		case IsGreaterOrEqual:
+    		case GREATER_THAN_OR_EQUAL:
     			eq = ">=";
     			break;
-    		case IsSmaller:
+    		case LESS_THAN:
     			eq = "<";
     			break;
-    		case IsSmallerOrEqual:
+    		case LESS_THAN_OR_EQUAL:
     			eq = "<=";
     			break;
     		case IN:
