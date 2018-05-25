@@ -8,11 +8,11 @@ import java.sql.SQLException;
 
 public class DBConnection implements Serializable{
 	
-	public static enum JDBCDriver{
+	public static enum DriverClass{
 		MYSQL,
-		PostgraySQL,
+		PostgraySQLv7,
 		DB2,
-		Oracle,
+		OracleOCI9i,
 		SQLServer;
 		
 		public String toString(){
@@ -21,7 +21,20 @@ public class DBConnection implements Serializable{
 			case MYSQL:
 				result = "com.mysql.jdbc.Driver";
 				break;
+			case PostgraySQLv7:
+				result = "org.postgresql.Driver";
+				break;
+			case DB2:
+				result = "COM.ibm.db2.jdbc.app.DB2Driver";
+				break;
+			case OracleOCI9i:
+				result = "oracle.jdbc.driver.OracleDriver";
+				break;
+			case SQLServer:
+				result = "com.microsoft.jdbc.sqlserver.SQLServerDriver";
+				break;
 			default:
+				result = "sun.jdbc.odbc.JdbcOdbcDriver";
 				break;
 			}
 			return result;
@@ -35,7 +48,7 @@ public class DBConnection implements Serializable{
 			dbConnection = new DBConnection();
 			dbConnection.serverUrl = connectionURL;
 		}
-		public Builder driver(JDBCDriver driver){
+		public Builder driver(DriverClass driver){
 			dbConnection.driver = driver.toString();
 			return this;
 		}

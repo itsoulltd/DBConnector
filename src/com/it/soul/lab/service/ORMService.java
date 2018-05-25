@@ -19,10 +19,10 @@ import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
-import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 
 public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {
 
@@ -196,7 +196,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	public Collection<T> findAll(Map<String, Object> keyValuePair,
-			Logic whereLogic, Map<String, ComparisonType> operators, String[] propertyNames) throws Exception {
+			Logic whereLogic, Map<String, Operator> operators, String[] propertyNames) throws Exception {
 		
 		List<T> result = null;
 		
@@ -208,11 +208,11 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			
 			//new way
 			String[] whereParams = keyValuePair.keySet().toArray(new String[0]);
-			List<Compare> compares = new ArrayList<Compare>();
+			List<Expression> compares = new ArrayList<Expression>();
 			for (String string : whereParams) {
-				compares.add(new Compare(string, operators.get(string)));
+				compares.add(new Expression(string, operators.get(string)));
 			}
-			Compare[] whereCompares = compares.toArray(new Compare[0]);
+			Expression[] whereCompares = compares.toArray(new Expression[0]);
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.Select).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereCompares).build();
 			//
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, operators);

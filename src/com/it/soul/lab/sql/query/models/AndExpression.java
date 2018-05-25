@@ -25,11 +25,11 @@ public class AndExpression implements LogicExpression {
 	}
 	
 	@Override
-	public Compare[] resolveCompares() {
-		List<Compare> comps = new ArrayList<Compare>();
+	public Expression[] resolveCompares() {
+		List<Expression> comps = new ArrayList<Expression>();
 		comps.addAll(Arrays.asList(lhr.resolveCompares()));
 		comps.addAll(Arrays.asList(rhr.resolveCompares()));
-		return comps.toArray(new Compare[0]);
+		return comps.toArray(new Expression[0]);
 	}
 
 }

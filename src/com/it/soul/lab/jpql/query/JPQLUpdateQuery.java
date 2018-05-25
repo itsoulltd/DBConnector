@@ -3,7 +3,7 @@ package com.it.soul.lab.jpql.query;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 
 public class JPQLUpdateQuery extends SQLUpdateQuery {
@@ -27,11 +27,11 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 	
 	@Override
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
 	@Override
-	protected void prepareWhereParams(List<Compare> whereParams) {
+	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null 
 				&& whereParams.size() > 0
 				&& !isAllParamEmpty(whereParams.toArray())) {
@@ -39,7 +39,7 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 			if(whereBuffer.length() > 0){
 				whereBuffer.append("WHERE ");
 				int count = 0;
-				for(Compare param : whereParams){
+				for(Expression param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){whereBuffer.append( " " + getLogic().name() + " ");}
 					whereBuffer.append( QUIENTIFIER + "." + param.getProperty() + " " + param.getType().toString() + " " + ":" + param.getProperty());
@@ -50,12 +50,12 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 	
 	@Override
 	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		Compare[] resolved = whereExpression.resolveCompares();
-		for (Compare comp : resolved) {
+		Expression[] resolved = whereExpression.resolveCompares();
+		for (Expression comp : resolved) {
 			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
 		}
 		whereBuffer.append("WHERE " + whereExpression.express());
-		for (Compare comp : resolved) {
+		for (Expression comp : resolved) {
 			comp.setQuientifier(' ');
 		}
 	}

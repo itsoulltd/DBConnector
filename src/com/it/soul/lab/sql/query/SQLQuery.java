@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Properties;
 
@@ -35,19 +35,19 @@ public class SQLQuery {
 
 	public void setWhereExpression(LogicExpression whereExpression) {
 		this.whereExpression = whereExpression;
-		Compare[] comps = whereExpression.resolveCompares();
+		Expression[] comps = whereExpression.resolveCompares();
 		this.whereCompareParams = Arrays.asList(comps);
 	}
 	
-	public List<Compare> getWhereCompareParams() {
+	public List<Expression> getWhereCompareParams() {
 		return whereCompareParams;
 	}
 	
 	public Properties getWhereCompareProperties() {
-		return Compare.convertToProperties(whereCompareParams);
+		return Expression.convertToProperties(whereCompareParams);
 	}
 
-	public void setWhereCompareParams(List<Compare> whereCompareParams) {
+	public void setWhereCompareParams(List<Expression> whereCompareParams) {
 		this.whereCompareParams = whereCompareParams;
 	}
 
@@ -75,9 +75,9 @@ public class SQLQuery {
 	public void setWhereParams(String[] whereParams) {
 		this.whereParams = whereParams;
 		if(whereCompareParams == null){
-			whereCompareParams = new ArrayList<Compare>();
+			whereCompareParams = new ArrayList<Expression>();
 			for (String params : whereParams) {
-				whereCompareParams.add(new Compare(params, ComparisonType.IsEqual));
+				whereCompareParams.add(new Expression(params, Operator.IsEqual));
 			}
 		}
 	}
@@ -114,14 +114,14 @@ public class SQLQuery {
 	
 	@Override
 	public String toString() {
-		return queryString();
+		return queryString().trim();
 	}
 	
 	private String tableName;
 	private String[] columns;
 	private String[] whereParams;
 	private Logic logic = Logic.AND;
-	private List<Compare> whereCompareParams;
+	private List<Expression> whereCompareParams;
 	private LogicExpression whereExpression;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ public class SQLQuery {
     	OBJECT
     }
     
-    public static enum ComparisonType{
+    public static enum Operator{
     	
     	IsEqual,
     	IsNotEqual,

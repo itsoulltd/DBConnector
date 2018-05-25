@@ -12,7 +12,7 @@ import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Property;
 
@@ -67,9 +67,9 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		tempQuery.setWhereParams(name);
 		return this;
 	}
-	public QueryBuilder whereParams(Logic logic, Compare... comps){
+	public QueryBuilder whereParams(Logic logic, Expression... comps){
 		if (logic != null){tempQuery.setLogic(logic);}
-		List<Compare> items = Arrays.asList(comps);
+		List<Expression> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
 		return this;
 	}
@@ -81,14 +81,14 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	@Override
-	public QueryBuilder countClause(Property prop, Compare comps) {
+	public QueryBuilder countClause(Property prop, Expression comps) {
 		if(tempQuery instanceof SQLCountQuery){
 			((SQLCountQuery)tempQuery).setCountClouse(prop, comps);
 		}
 		return this;
 	}
 	@Override
-	public QueryBuilder distinctClause(Property prop, Compare comps) {
+	public QueryBuilder distinctClause(Property prop, Expression comps) {
 		if(tempQuery instanceof SQLDistinctQuery){
 			((SQLDistinctQuery)tempQuery).setCountClouse(prop, comps);
 		}
@@ -131,7 +131,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	@Override
-	public QueryBuilder whereExpression(LogicExpression expression) {
+	public QueryBuilder where(LogicExpression expression) {
 		tempQuery.setWhereExpression(expression); 
 		return this;
 	}

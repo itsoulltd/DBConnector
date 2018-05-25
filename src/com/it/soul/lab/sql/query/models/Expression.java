@@ -3,12 +3,11 @@ package com.it.soul.lab.sql.query.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
-
-public class Compare implements LogicExpression{
-	public Compare(String property, ComparisonType type){
+public class Expression implements LogicExpression{
+	public Expression(String property, Operator type){
 		this.property = property;
 		this.type = type;
 		this.valueProperty = new Property(property);
@@ -16,10 +15,10 @@ public class Compare implements LogicExpression{
 	public String getProperty() {
 		return property;
 	}
-	public ComparisonType getType() {
+	public Operator getType() {
 		return type;
 	}
-	public Compare setPropertyValue(Object value, DataType type){
+	public Expression setPropertyValue(Object value, DataType type){
 		this.valueProperty.setValue(value);
 		this.valueProperty.setType(type);
 		return this;
@@ -27,33 +26,33 @@ public class Compare implements LogicExpression{
 	public Property getValueProperty() {
 		return valueProperty;
 	}
-	public Compare setQuientifier(char quientifier){
+	public Expression setQuientifier(char quientifier){
 		this.quientifier = quientifier;
 		return this;
 	}
-	public Compare setMarker(String marker){
+	public Expression setMarker(String marker){
 		this.expressMarker = marker;
 		return this;
 	}
 
 	protected static final char MARKER = '?';
 	private String property;
-	private ComparisonType type;
+	private Operator type;
 	private Property valueProperty;
 	private char quientifier = ' '; //Default is empty space
 	private String expressMarker = String.valueOf(MARKER);
 	
-	public static List<Compare> createListFrom(String[] names, ComparisonType type){
-		List<Compare> resutls = new ArrayList<Compare>();
+	public static List<Expression> createListFrom(String[] names, Operator type){
+		List<Expression> resutls = new ArrayList<Expression>();
 		for (String name : names) {
-			resutls.add(new Compare(name, type));
+			resutls.add(new Expression(name, type));
 		}
 		return resutls;
 	}
 	
-	public static Properties convertToProperties(List<Compare> coms){
+	public static Properties convertToProperties(List<Expression> coms){
 		Properties props = new Properties();
-		for (Compare compare : coms) {
+		for (Expression compare : coms) {
 			props.add(compare.getValueProperty());
 		}
 		return props;
@@ -82,7 +81,7 @@ public class Compare implements LogicExpression{
 		else {return getProperty() + " " + type.toString() + " " + MARKER;}
 	}
 	@Override
-	public Compare[] resolveCompares() {
-		return new Compare[] {this};
+	public Expression[] resolveCompares() {
+		return new Expression[] {this};
 	}
 }

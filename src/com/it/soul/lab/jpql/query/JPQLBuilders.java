@@ -2,7 +2,7 @@ package com.it.soul.lab.jpql.query;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 
 @Deprecated
@@ -109,7 +109,7 @@ public class JPQLBuilders {
 	 * @return
 	 */
 	@Deprecated
-	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String,ComparisonType> whereParams)
+	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String,Operator> whereParams)
 	throws IllegalArgumentException{
 		
 		//Query Builders
@@ -128,7 +128,7 @@ public class JPQLBuilders {
 			pqlBuffer.append(" WHERE ");
 			
 			int count = 0;
-			for( Entry<String, ComparisonType> param : whereParams.entrySet()){
+			for( Entry<String, Operator> param : whereParams.entrySet()){
 				
 				if(param.getKey().trim().equals("")){
 					continue;

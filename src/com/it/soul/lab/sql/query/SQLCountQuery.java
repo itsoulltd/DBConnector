@@ -2,7 +2,7 @@ package com.it.soul.lab.sql.query;
 
 import java.util.List;
 
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class SQLCountQuery extends SQLSelectQuery{
@@ -36,7 +36,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		pqlBuffer.append(" From " + name + " ");
 	}
 	
-	public void setCountClouse(Property prop, Compare comps){
+	public void setCountClouse(Property prop, Expression comps){
 		if(prop != null){
 			pqlBuffer.append("Where " + prop.getKey() +" "+ comps.getType().toString() +" ");
 			if(prop.getType() == DataType.BOOL 
@@ -51,11 +51,11 @@ public class SQLCountQuery extends SQLSelectQuery{
 	}
 	
 	@Override
-	protected void prepareWhereParams(List<Compare> whereParams) {
+	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null && whereParams.size() > 0){
 			pqlBuffer.append("Where " );
 			int count = 0;
-			for (Compare ent : whereParams) {
+			for (Expression ent : whereParams) {
 				if(count++ != 0)
 					pqlBuffer.append(" "+ getLogic().name() +" ");
 				pqlBuffer.append(ent.getProperty()+ " " 
@@ -64,7 +64,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		}
 	}
 	
-	public static String createCountFunctionQuery(String tableName, String param, Logic logic, List<Compare> whereParams){
+	public static String createCountFunctionQuery(String tableName, String param, Logic logic, List<Expression> whereParams){
 
 		param = (param != null && param.length()>=1) ? param : "*";
 		
@@ -75,7 +75,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		if(whereParams != null && whereParams.size() > 0){
 			builder.append("Where " );
 			int count = 0;
-			for (Compare ent : whereParams) {
+			for (Expression ent : whereParams) {
 				if(count++ != 0)
 					builder.append(" "+ logic.name() +" ");
 				builder.append(ent.getProperty() + " " 
@@ -85,7 +85,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		return builder.toString();
 	}
 
-	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue){
+	public static String createCountFunctionQuery(String tableName, String param, String whereParam,Operator type, Property paramValue){
 
 		param = (param != null && param.length()>=1) ? param : "*";
 

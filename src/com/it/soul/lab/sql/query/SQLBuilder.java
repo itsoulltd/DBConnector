@@ -3,7 +3,7 @@ package com.it.soul.lab.sql.query;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.sql.query.SQLQuery.ComparisonType;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.models.Property;
 
@@ -26,7 +26,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue){
+	public static String createCountFunctionQuery(String tableName, String param, String whereParam,Operator type, Property paramValue){
 		
 		StringBuilder builder = new StringBuilder("Select ");
 		
@@ -57,7 +57,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createCountFunctionQuery(String tableName, String param, String whereParam,ComparisonType type){
+	public static String createCountFunctionQuery(String tableName, String param, String whereParam,Operator type){
 
 		StringBuilder builder = new StringBuilder("Select ");
 
@@ -81,7 +81,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createCountFunctionQuery(String tableName, String param, Logic logic,Map<String, ComparisonType> whereParams){
+	public static String createCountFunctionQuery(String tableName, String param, Logic logic,Map<String, Operator> whereParams){
 
 		StringBuilder builder = new StringBuilder("Select ");
 
@@ -92,7 +92,7 @@ public class SQLBuilder {
 		if(whereParams != null && whereParams.size() > 0){
 			builder.append(" Where " );
 			int count = 0;
-			for (Entry<String,ComparisonType> ent : whereParams.entrySet()) {
+			for (Entry<String,Operator> ent : whereParams.entrySet()) {
 				
 				if(count++ != 0)
 					builder.append(" "+ logic.name() +" ");
@@ -114,7 +114,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createDistinctFunctionQuery(String tableName, String param, String whereParam,ComparisonType type, Property paramValue)
+	public static String createDistinctFunctionQuery(String tableName, String param, String whereParam,Operator type, Property paramValue)
 	throws IllegalArgumentException {
 		
 		StringBuilder builder = new StringBuilder("Select ");
@@ -242,7 +242,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String, ComparisonType> whereParams)
+	public static String createSelectQuery(String tableName, String[]projectionParams, Logic whereLogic, Map<String, Operator> whereParams)
 	throws IllegalArgumentException{
 		
 		//Query Builders
@@ -261,7 +261,7 @@ public class SQLBuilder {
 				pqlBuffer.append(" Where ");
 				
 				int count = 0;
-				for(Entry<String, ComparisonType> param : whereParams.entrySet()){
+				for(Entry<String, Operator> param : whereParams.entrySet()){
 					
 					if(param.getKey().trim().equals("")){
 						continue;
@@ -352,7 +352,7 @@ public class SQLBuilder {
 	 * @return
 	 */
 	@Deprecated
-	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, Map<String,ComparisonType> whereParams){
+	public static String createUpdateQuery(String tableName, String[]setParams, Logic whereLogic, Map<String,Operator> whereParams){
 		
 		//Checking Illegal Arguments
 		try{
@@ -392,7 +392,7 @@ public class SQLBuilder {
 				pqlBuffer.append(" Where ");
 				
 				int count = 0;
-				for(Entry<String,ComparisonType> param : whereParams.entrySet()){
+				for(Entry<String,Operator> param : whereParams.entrySet()){
 					
 					if(param.getKey().trim().equals("")){
 						continue;
@@ -581,7 +581,7 @@ public class SQLBuilder {
 	 * @throws IllegalArgumentException
 	 */
 	@Deprecated
-	public static String createDeleteQuery(String tableName ,Logic whereLogic ,Map<String, ComparisonType> whereParams)
+	public static String createDeleteQuery(String tableName ,Logic whereLogic ,Map<String, Operator> whereParams)
 	throws IllegalArgumentException{
 		
 		//Checking Illegal Arguments
@@ -605,7 +605,7 @@ public class SQLBuilder {
 				pqlBuffer.append( " Where ");
 				
 				int count = 0;
-				for(Entry<String,ComparisonType> ent : whereParams.entrySet()){
+				for(Entry<String,Operator> ent : whereParams.entrySet()){
 					
 					if(ent.getKey().trim().equals("")){
 						continue;

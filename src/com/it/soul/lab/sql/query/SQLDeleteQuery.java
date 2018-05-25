@@ -2,7 +2,7 @@ package com.it.soul.lab.sql.query;
 
 import java.util.List;
 
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 
 public class SQLDeleteQuery extends SQLSelectQuery{
 	
@@ -30,11 +30,11 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
 	@Override
-	protected void prepareWhereParams(List<Compare> whereParams) {
+	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null 
 				&& whereParams.size() > 0
 				&& !isAllParamEmpty(whereParams.toArray())){
@@ -42,7 +42,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 			if(pqlBuffer.length() > 0){
 				pqlBuffer.append( "WHERE ");
 				int count = 0;
-				for(Compare ent : whereParams){
+				for(Expression ent : whereParams){
 					if(ent.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + getLogic().name() + " ");}
 					pqlBuffer.append( ent.getProperty() + " " + ent.getType().toString() + " " + MARKER);
@@ -51,7 +51,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 		}
 	}
 	
-	public static String create(String tableName ,Logic whereLogic ,List<Compare> whereParams)
+	public static String create(String tableName ,Logic whereLogic ,List<Expression> whereParams)
 			throws IllegalArgumentException{
 
 		//Checking Illegal Arguments
@@ -70,7 +70,7 @@ public class SQLDeleteQuery extends SQLSelectQuery{
 			if(pqlBuffer.length() > 0){
 				pqlBuffer.append( " WHERE ");
 				int count = 0;
-				for(Compare ent : whereParams){
+				for(Expression ent : whereParams){
 					if(ent.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
 					pqlBuffer.append( ent.getProperty() + " " + ent.getType().toString() +" " + MARKER);

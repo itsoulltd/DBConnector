@@ -2,7 +2,7 @@ package com.it.soul.lab.sql.query;
 
 import java.util.List;
 
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Properties;
 import com.it.soul.lab.sql.query.models.Property;
@@ -64,11 +64,11 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
 	@Override
-	protected void prepareWhereParams(List<Compare> whereParams) {
+	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null 
 				&& whereParams.size() > 0
 				&& !isAllParamEmpty(whereParams.toArray())){
@@ -76,7 +76,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 			if(whereBuffer.length() > 0){
 				whereBuffer.append("WHERE ");
 				int count = 0;
-				for(Compare param : whereParams){
+				for(Expression param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){whereBuffer.append( " " + getLogic().name() + " ");}
 					whereBuffer.append( param.getProperty() + " " + param.getType().toString() + " " + MARKER);
@@ -91,10 +91,10 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	}
 	
 	public static String create(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){
-		return SQLUpdateQuery.create(tableName, setParams, whereLogic, Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		return SQLUpdateQuery.create(tableName, setParams, whereLogic, Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
-	public static String create(String tableName, String[]setParams, Logic whereLogic, List<Compare> whereParams){
+	public static String create(String tableName, String[]setParams, Logic whereLogic, List<Expression> whereParams){
 		
 		//Checking Illegal Arguments
 		try{
@@ -125,7 +125,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 			if(pqlBuffer.length() > 0){
 				pqlBuffer.append(" WHERE ");
 				int count = 0;
-				for(Compare param : whereParams){
+				for(Expression param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
 					pqlBuffer.append( param.getProperty() + param.getType().toString() + MARKER);

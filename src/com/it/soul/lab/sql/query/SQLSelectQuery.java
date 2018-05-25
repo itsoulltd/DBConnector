@@ -2,7 +2,7 @@ package com.it.soul.lab.sql.query;
 
 import java.util.List;
 
-import com.it.soul.lab.sql.query.models.Compare;
+import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 
 public class SQLSelectQuery extends SQLQuery{
@@ -57,24 +57,24 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	protected void prepareWhereParams(String[] whereParams) {
-		prepareWhereParams(Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		prepareWhereParams(Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
 	@Override
-	public void setWhereCompareParams(List<Compare> whereParams) {
+	public void setWhereCompareParams(List<Expression> whereParams) {
 		super.setWhereCompareParams(whereParams);
 		prepareWhereParams(whereParams);
 	}
 	
-	protected void prepareWhereParams(List<Compare> whereParams) {
+	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null 
 				&& whereParams.size() > 0
 				&& !isAllParamEmpty(whereParams.toArray())){
 			
 			if(pqlBuffer.length() > 0){
-				pqlBuffer.append(" WHERE ");
+				pqlBuffer.append("WHERE ");
 				int count = 0;
-				for(Compare param : whereParams){
+				for(Expression param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + getLogic().name() + " ");}
 					pqlBuffer.append(param.getProperty() + " " + param.getType().toString() + " " + MARKER);
@@ -93,7 +93,7 @@ public class SQLSelectQuery extends SQLQuery{
 		pqlBuffer.append("WHERE " + whereExpression.express());
 	}
 	
-	public static String create(String tableName, String[]projectionParams, Logic whereLogic, List<Compare> whereParams)
+	public static String create(String tableName, String[]projectionParams, Logic whereLogic, List<Expression> whereParams)
 			throws IllegalArgumentException{
 
 		//Query Builders
@@ -108,7 +108,7 @@ public class SQLSelectQuery extends SQLQuery{
 			if(pqlBuffer.length() > 0){
 				pqlBuffer.append(" WHERE ");
 				int count = 0;
-				for(Compare param : whereParams){
+				for(Expression param : whereParams){
 					if(param.getProperty().trim().equals("")){continue;}
 					if(count++ != 0){pqlBuffer.append( " " + whereLogic.name() + " ");}
 					pqlBuffer.append(param.getProperty() + " " + param.getType().toString() + " " + MARKER);
@@ -121,7 +121,7 @@ public class SQLSelectQuery extends SQLQuery{
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, String[] whereParams)
 			throws IllegalArgumentException{
-		return SQLSelectQuery.create(tableName, projectionParams, whereLogic, Compare.createListFrom(whereParams, ComparisonType.IsEqual));
+		return SQLSelectQuery.create(tableName, projectionParams, whereLogic, Expression.createListFrom(whereParams, Operator.IsEqual));
 	}
 	
 	public static String create(String tableName, String...projectionParams)
