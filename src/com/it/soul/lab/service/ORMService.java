@@ -8,19 +8,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockTimeoutException;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceException;
-import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
-import javax.persistence.QueryTimeoutException;
-import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.Expression;
 
@@ -52,18 +46,6 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
 		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
 		catch(PersistenceException e){
 			result = null;
 		}
@@ -89,20 +71,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
-		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
-		catch(PersistenceException e){
+		}catch(PersistenceException e){
 			result = null;
 		}
 		catch (Exception e) {
@@ -129,20 +98,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getResultList();
-		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
-		catch(PersistenceException e){
+		}catch(PersistenceException e){
 			result = null;
 		}
 		catch (Exception e) {
@@ -172,20 +128,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 				query.setParameter(item.getKey(), item.getValue());
 			}
 			result = query.getResultList();
-		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
-		catch(PersistenceException e){
+		}catch(PersistenceException e){
 			result = null;
 		}
 		catch (Exception e) {
@@ -222,18 +165,6 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			}
 			result = query.getResultList();
 		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
 		catch(PersistenceException e){
 			result = null;
 		}
@@ -262,24 +193,6 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			result = query.getSingleResult();
 			
 		}
-		catch(NoResultException e){
-			result = null;
-		}
-		catch(NonUniqueResultException e){
-			result = null;
-		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
-		}
 		catch(PersistenceException e){
 			result = null;
 		}
@@ -307,24 +220,6 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			query.setParameter(searchKey, value);
 			result = query.getSingleResult();
 			
-		}
-		catch(NoResultException e){
-			result = null;
-		}
-		catch(NonUniqueResultException e){
-			result = null;
-		}
-		catch(QueryTimeoutException e){
-			result = null;
-		}
-		catch(TransactionRequiredException e){
-			result = null;
-		}
-		catch(PessimisticLockException  e){
-			result = null;
-		}
-		catch(LockTimeoutException  e){
-			result = null;
 		}
 		catch(PersistenceException e){
 			result = null;
@@ -372,26 +267,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			Long val = (Long)query.getSingleResult();
 			result = val;
 			
-		}
-		catch(NoResultException e){
-			result = 0;
-		}
-		catch(NonUniqueResultException e){
-			result = 0;
-		}
-		catch(QueryTimeoutException e){
-			result = 0;
-		}
-		catch(TransactionRequiredException e){
-			result = 0;
-		}
-		catch(PessimisticLockException  e){
-			result = 0;
-		}
-		catch(LockTimeoutException  e){
-			result = 0;
-		}
-		catch(PersistenceException e){
+		}catch(PersistenceException e){
 			result = 0;
 		}
 		catch (Exception e) {

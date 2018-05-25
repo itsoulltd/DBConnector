@@ -3,13 +3,13 @@ package com.it.soul.lab.sql.query.builder;
 import java.util.Arrays;
 import java.util.List;
 
-import com.it.soul.lab.sql.query.SQLCountQuery;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
-import com.it.soul.lab.sql.query.SQLDistinctQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.SQLScalerQuery;
+import com.it.soul.lab.sql.query.SQLScalerQuery.ScalerType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
@@ -33,10 +33,10 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		SQLQuery temp = null;
 		switch (type) {
 		case COUNT:
-			temp = new SQLCountQuery();
+			temp = new SQLScalerQuery(ScalerType.COUNT);
 			break;
 		case DISTINCT:
-			temp = new SQLDistinctQuery();
+			temp = new SQLScalerQuery(ScalerType.DISTINCT);
 			break;
 		case DELETE:
 			temp = new SQLDeleteQuery();
@@ -46,6 +46,9 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 			break;
 		case UPDATE:
 			temp = new SQLUpdateQuery();
+			break;
+		case MAX:
+			temp = new SQLScalerQuery(ScalerType.MAX);
 			break;
 		default:
 			temp = new SQLSelectQuery();
@@ -75,22 +78,15 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	}
 	@Override
 	public ScalerClauseBuilder on(String name) {
-		if(tempQuery instanceof SQLCountQuery){
-			((SQLCountQuery)tempQuery).setTableName(name);
+		if(tempQuery instanceof SQLScalerQuery){
+			((SQLScalerQuery)tempQuery).setTableName(name);
 		}
 		return this;
 	}
 	@Override
-	public QueryBuilder countClause(Property prop, Expression comps) {
-		if(tempQuery instanceof SQLCountQuery){
-			((SQLCountQuery)tempQuery).setCountClouse(prop, comps);
-		}
-		return this;
-	}
-	@Override
-	public QueryBuilder distinctClause(Property prop, Expression comps) {
-		if(tempQuery instanceof SQLDistinctQuery){
-			((SQLDistinctQuery)tempQuery).setCountClouse(prop, comps);
+	public QueryBuilder scalerClause(Property prop, Expression comps) {
+		if(tempQuery instanceof SQLScalerQuery){
+			((SQLScalerQuery)tempQuery).setScalerClouse(prop, comps);
 		}
 		return this;
 	}

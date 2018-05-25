@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.it.soul.lab.sql.query.SQLCountQuery;
+import com.it.soul.lab.sql.query.SQLScalerQuery;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
@@ -100,38 +100,39 @@ public class SQLExecutor implements Serializable{
 	 * @param rst
 	 */
 	public void displayResultSet(ResultSet rst){
-		
+		StringBuffer buffer = new StringBuffer();
 		try{
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
                 rst.beforeFirst();
             }
-			ResultSetMetaData rsmd=rst.getMetaData();
+			ResultSetMetaData rsmd = rst.getMetaData();
 			int numCol = rsmd.getColumnCount();
 			int totalHeaderLenght = 0;
 			for(int x = 1; x <= numCol; x++){
-				if(x > 1)System.out.print(",  ");
-				System.out.print(rsmd.getColumnLabel(x));
-				totalHeaderLenght += rsmd.getColumnLabel(x).length() + 5;
+				String columnName = "     " + rsmd.getColumnLabel(x) + "     ";
+				totalHeaderLenght += columnName.length();
+				buffer.append(columnName);
 			}
 			
-			System.out.println("");
+			buffer.append('\n');
 			for(int x = 0; x <= totalHeaderLenght; x++){
-				System.out.print("-");
+				buffer.append("-");
 			}
-			System.out.println("");
+			buffer.append('\n');
 			
 			boolean more = rst.next();
 			while(more){
 				for(int x = 1; x <= numCol; x++){
-					if(x > 1)System.out.print(",    ");
-					System.out.print(rst.getString(x));
+					buffer.append("     "+rst.getString(x)+"     ");
 				}
-				System.out.println("");
+				buffer.append('\n');
 				more=rst.next();
 			}
 		}catch(SQLException exp){
 			exp.getStackTrace();
 		}
+		
+		System.out.println(buffer.toString());
 	}
 	
 	/**
@@ -139,19 +140,26 @@ public class SQLExecutor implements Serializable{
 	 * @param o
 	 */
 	public void displayCollection(Object o){
+		System.out.println(toString(o));
+	}
+	
+	public String toString(Object o){
+		StringBuffer buffer = new StringBuffer();
 		if(o instanceof List){
 			List<?> ox = (List<?>)o;
 			for(Object x : ox){
-				System.out.println(x.toString());
+				buffer.append(x.toString() + ";");
+				buffer.append('\n');
 			}
 			
 		}else if(o instanceof Map){
 			Map<?,?> ox = (Map<?,?>)o;
-			System.out.println(ox.toString());
+			buffer.append(ox.toString());
 		}else if(o instanceof Set){
 			Set<?> ox = (Set<?>)o;
-			System.out.println(ox.toString());
+			buffer.append(ox.toString());
 		}
+		return buffer.toString();
 	}
 	
 ////////////////////////////////////Block Of Queries///////////////////////
@@ -781,7 +789,7 @@ public class SQLExecutor implements Serializable{
      * @return
      * @throws SQLException
      */
-    public int getRowCount(String query)
+    public int getScalerValue(String query)
     throws SQLException{
     	
         ResultSet rs = null;
@@ -812,7 +820,7 @@ public class SQLExecutor implements Serializable{
      * @return
      * @throws SQLException
      */
-    public int getRowCount(SQLCountQuery cQuery)
+    public int getScalerValue(SQLScalerQuery cQuery)
     throws SQLException{
     	
         ResultSet rs = null;

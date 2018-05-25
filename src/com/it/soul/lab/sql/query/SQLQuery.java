@@ -102,8 +102,6 @@ public class SQLQuery {
 	protected static final char QUIENTIFIER = 'e';
 	protected static final char STARIC = '*';
 	protected static final char MARKER = '?';
-	protected static final String COUNT_FUNC = "COUNT";
-	protected static final String DISTINCT_FUNC = "DISTINCT";
 	
 	public String queryString() throws IllegalArgumentException{
 		if(tableName == null || tableName.trim().equals("")){
@@ -133,7 +131,8 @@ public class SQLQuery {
 		DISTINCT,
 		INSERT,
 		UPDATE,
-		DELETE
+		DELETE,
+		MAX
 	}
 	
 	public static enum DataType{

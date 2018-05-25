@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.it.soul.lab.sql.query.SQLQuery.DataType;
+
 public class Properties {
 	private List<Property> items = new ArrayList<Property>();
 	public Properties add(Property prop){
@@ -13,6 +15,12 @@ public class Properties {
 		}
 		items.add(prop);
 		return this;
+	}
+	public Properties add(String name){
+		return add(new Property(name));
+	}
+	public Properties add(String name, Object value, DataType type){
+		return add(new Property(name, value, type));
 	}
 	public List<Property> getProperties(){
 		return new ArrayList<Property>(this.items);

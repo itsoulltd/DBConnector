@@ -52,6 +52,9 @@ public class Expression implements LogicExpression{
 	
 	public static Properties convertToProperties(List<Expression> coms){
 		Properties props = new Properties();
+		if(coms == null){
+			return props;
+		}
 		for (Expression compare : coms) {
 			props.add(compare.getValueProperty());
 		}

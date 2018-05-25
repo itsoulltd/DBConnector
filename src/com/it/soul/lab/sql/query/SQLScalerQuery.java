@@ -5,10 +5,48 @@ import java.util.List;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.Property;
 
-public class SQLCountQuery extends SQLSelectQuery{
+public class SQLScalerQuery extends SQLSelectQuery{
+	
+	public static enum ScalerType{
+		COUNT,
+		DISTINCT,
+		MAX,
+		MIN;
+		
+		public String toString(){
+			String result;
+			switch (this) {
+			case DISTINCT:
+				result = "DISTINCT";
+				break;
+			case MAX:
+				result = "MAX";
+				break;
+			case MIN:
+				result = "MIN";
+				break;
+			default:
+				result = "COUNT";
+				break;
+			}
+			return result;
+		}
+		
+	}
+	
+	public SQLScalerQuery() {
+		this(ScalerType.COUNT);
+	}
 
-	public SQLCountQuery() {
+	public SQLScalerQuery(ScalerType type) {
 		this.pqlBuffer = new StringBuffer("SELECT ");
+		this.type = type;
+	}
+	
+	private ScalerType type = ScalerType.COUNT;
+
+	public ScalerType getType() {
+		return type;
 	}
 
 	@Override
@@ -25,9 +63,9 @@ public class SQLCountQuery extends SQLSelectQuery{
 	protected void prepareColumns(String[] columns){
 		if(columns != null && columns.length > 0){
 			String firstParam = columns[0];
-			pqlBuffer.append(COUNT_FUNC+"(" + firstParam + ")");
+			pqlBuffer.append(type.toString()+"(" + firstParam + ")");
 		}else{
-			pqlBuffer.append(COUNT_FUNC+"(" + "*" + ")");
+			pqlBuffer.append(type.toString()+"(" + "*" + ")");
 		}
 	}
 	
@@ -36,7 +74,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		pqlBuffer.append(" From " + name + " ");
 	}
 	
-	public void setCountClouse(Property prop, Expression comps){
+	public void setScalerClouse(Property prop, Expression comps){
 		if(prop != null){
 			pqlBuffer.append("Where " + prop.getKey() +" "+ comps.getType().toString() +" ");
 			if(prop.getType() == DataType.BOOL 
@@ -69,7 +107,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		param = (param != null && param.length()>=1) ? param : "*";
 		
 		StringBuilder builder = new StringBuilder("SELECT ");
-		builder.append(COUNT_FUNC+"(" + param + ")");
+		builder.append(ScalerType.COUNT.toString()+"(" + param + ")");
 		builder.append(" From " + tableName + " ");
 
 		if(whereParams != null && whereParams.size() > 0){
@@ -90,7 +128,7 @@ public class SQLCountQuery extends SQLSelectQuery{
 		param = (param != null && param.length()>=1) ? param : "*";
 
 		StringBuilder builder = new StringBuilder("SELECT ");
-		builder.append(COUNT_FUNC+"(" + param + ")");
+		builder.append(ScalerType.COUNT.toString()+"(" + param + ")");
 		builder.append(" From " + tableName + " ");
 
 		if(whereParam != null && paramValue != null){
