@@ -705,7 +705,7 @@ public class SQLExecutor implements Serializable{
 			nValues.add(new Property(property.getKey()));
 		}
         Property[] values = (Property[]) nValues.toArray(new Property[0]);
-        SQLInsertQuery iQuery = (SQLInsertQuery) new SQLQuery.Builder(QueryType.Insert).into(tableName).values(values).build();
+        SQLInsertQuery iQuery = (SQLInsertQuery) new SQLQuery.Builder(QueryType.INSERT).into(tableName).values(values).build();
         String query = iQuery.toString();
         
         try{ 

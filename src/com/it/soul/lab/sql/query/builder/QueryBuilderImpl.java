@@ -18,7 +18,7 @@ import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder{
 
-	protected QueryType tempType = QueryType.Select;
+	protected QueryType tempType = QueryType.SELECT;
 	protected SQLQuery tempQuery;
 
 	public QueryBuilderImpl(){
@@ -32,19 +32,19 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 	protected SQLQuery factory(QueryType type){
 		SQLQuery temp = null;
 		switch (type) {
-		case Count:
+		case COUNT:
 			temp = new SQLCountQuery();
 			break;
-		case Distinct:
+		case DISTINCT:
 			temp = new SQLDistinctQuery();
 			break;
-		case Delete:
+		case DELETE:
 			temp = new SQLDeleteQuery();
 			break;
-		case Insert:
+		case INSERT:
 			temp = new SQLInsertQuery();
 			break;
-		case Update:
+		case UPDATE:
 			temp = new SQLUpdateQuery();
 			break;
 		default:

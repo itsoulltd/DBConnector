@@ -128,12 +128,12 @@ public class SQLQuery {
 	//////////////////////////////////SQLQuery-Enums//////////////////////////////////////////////
 	
 	public enum QueryType{
-		Select,
-		Count,
-		Distinct,
-		Insert,
-		Update,
-		Delete
+		SELECT,
+		COUNT,
+		DISTINCT,
+		INSERT,
+		UPDATE,
+		DELETE
 	}
 	
 	public static enum DataType{

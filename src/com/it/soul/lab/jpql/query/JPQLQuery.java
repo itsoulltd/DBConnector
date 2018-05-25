@@ -21,10 +21,10 @@ public static class Builder extends QueryBuilderImpl{
 		protected SQLQuery factory(QueryType type){
 			SQLQuery temp = null;
 			switch (type) {
-			case Select:
+			case SELECT:
 				temp = new JPQLSelectQuery();
 				break;
-			case Update:
+			case UPDATE:
 				temp = new JPQLUpdateQuery();
 				break;
 			default:
