@@ -48,7 +48,6 @@ public class DBConnectionPool implements Serializable{
 	}
 	
 	private static void createNewSource(String JNDILookUp){
-		
 		String[] arr = JNDILookUp.split("/");
 		String lookUpName = arr[arr.length-1];
 		if(_DEFAULT_KEY == null){
@@ -56,7 +55,6 @@ public class DBConnectionPool implements Serializable{
 		}
 		if(initCtx != null){
 			try {
-				
 				if(!getDataSourcePool().containsKey(lookUpName)){
 					DataSource source = (DataSource) initCtx.lookup(JNDILookUp);
 					getDataSourcePool().put(lookUpName, source);
@@ -95,7 +93,7 @@ public class DBConnectionPool implements Serializable{
 	 * @return
 	 * @throws Exception
 	 */
-	public static DBConnectionPool sharedInstance() 
+	public static DBConnectionPool shared() 
 	{
 		synchronized (_lock) {
 			if(_sharedInstance != null){
