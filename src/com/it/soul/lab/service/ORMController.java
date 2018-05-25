@@ -1,4 +1,4 @@
-package com.it.soul.lab.connect;
+package com.it.soul.lab.service;
 
 import java.io.Serializable;
 
@@ -10,16 +10,14 @@ import javax.persistence.Persistence;
 import org.eclipse.persistence.exceptions.EntityManagerSetupException;
 
 
-public class EntityManagerController implements Serializable{
+public class ORMController implements Serializable{
 
-	
 	private static final long serialVersionUID = -873194077323932977L;
 	private EntityManagerFactory emf = null;
 	private EntityManager em = null;
 	
-	public EntityManagerController(String persistenceUnitName)
-	throws EntityManagerSetupException{
-		setEntityManager(persistenceUnitName);
+	public ORMController(String persistenceUnitName) throws EntityManagerSetupException{
+		createEntityManager(persistenceUnitName);
 	}
 	
 	public EntityManager getEntityManager() {
@@ -40,8 +38,7 @@ public class EntityManagerController implements Serializable{
 		}
 	}
 
-	private void setEntityManager(String persistenceUnit)
-	throws EntityManagerSetupException{
+	private void createEntityManager(String persistenceUnit) throws EntityManagerSetupException{
 		if(em == null){
 			emf = Persistence.createEntityManagerFactory(persistenceUnit); 
 			em = emf.createEntityManager();
@@ -50,9 +47,7 @@ public class EntityManagerController implements Serializable{
 		}
 	}
 	
-	public void closeEntityManager()
-	throws EntityManagerSetupException,Exception{
-		
+	public void closeEntityManager() throws EntityManagerSetupException,Exception{
 		if(em != null){
 			try{
 				if(em.isOpen()){
@@ -61,15 +56,12 @@ public class EntityManagerController implements Serializable{
 					em.getTransaction().commit();
 				}
 			}catch(EntityManagerSetupException e){
-				
 				em.getTransaction().rollback();
 				throw e;
 			}catch(Exception e){
-				
 				em.getTransaction().rollback();
 				throw e;
 			}finally{
-				
 				em.clear();
 				em.close();
 				em = null;

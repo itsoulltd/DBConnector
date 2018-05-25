@@ -15,14 +15,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-public class ConnectDatabasePool implements Serializable{
+public class DBConnectionPool implements Serializable{
     
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8229833245259862179L;
 	private static Object _lock = new Object();
-	private static ConnectDatabasePool _sharedInstance = null;
+	private static DBConnectionPool _sharedInstance = null;
 	private static int activeConnectionCount = 0;
 	
 	private static InitialContext initCtx=null;
@@ -37,11 +34,8 @@ public class ConnectDatabasePool implements Serializable{
      * @throws NamingException
      * @throws IllegalArgumentException
      */
-	private ConnectDatabasePool(String JNDILookUp) 
-	throws NamingException,IllegalArgumentException{
-		
+	private DBConnectionPool(String JNDILookUp) throws NamingException,IllegalArgumentException{
 		if(JNDILookUp != null && !JNDILookUp.trim().equals("")){
-			
 			try{
 	            initCtx = new InitialContext();
 	            createNewSource(JNDILookUp);
@@ -79,15 +73,12 @@ public class ConnectDatabasePool implements Serializable{
 	 * @return
 	 * @throws Exception
 	 */
-	public static void setUpConnectionPool(String JNDILookUp) 
+	public static void configureConnectionPool(String JNDILookUp) 
 	{
-		
 		synchronized (_lock) {
-			
 			if(_sharedInstance == null){
-				
 				try{
-					_sharedInstance = new ConnectDatabasePool(JNDILookUp);
+					_sharedInstance = new DBConnectionPool(JNDILookUp);
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -104,16 +95,14 @@ public class ConnectDatabasePool implements Serializable{
 	 * @return
 	 * @throws Exception
 	 */
-	public static ConnectDatabasePool sharedInstance() 
+	public static DBConnectionPool sharedInstance() 
 	{
-		
 		synchronized (_lock) {
-			
 			if(_sharedInstance != null){
-				
 				return _sharedInstance;
 			}
 		}
+		System.out.println("Please Call configureConnectionPool at least once.");
 		return null;
 	}
 	
@@ -142,6 +131,7 @@ public class ConnectDatabasePool implements Serializable{
 			activeConnectionCount++;
 		}
 	}
+	
 	//increase decrease 
 	private static void decreasePoolCount(){
 		synchronized (_lock) {
@@ -168,26 +158,22 @@ public class ConnectDatabasePool implements Serializable{
 	/**
 	 * 
 	 */
-	synchronized public Connection getConnectionFromPool() 
-    throws SQLException{
-    	
+	synchronized public Connection getConnectionFromPool() throws SQLException{
     	Connection con = null;
         try{
         	con = findSourceByName(_DEFAULT_KEY).getConnection();
-        	ConnectDatabasePool.increasePoolCount();
+        	DBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
         }       
         return con;
     } 
 	
-	synchronized public Connection getConnectionFromPool(String key) 
-    throws SQLException{
-    	
+	synchronized public Connection getConnectionFromPool(String key) throws SQLException{
     	Connection con = null;
         try{
         	con = findSourceByName(key).getConnection();
-        	ConnectDatabasePool.increasePoolCount();
+        	DBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
         }       
@@ -203,11 +189,10 @@ public class ConnectDatabasePool implements Serializable{
 	 */
     synchronized public Connection getConnectionFromPool(String key, String userName , String password) 
     throws SQLException{
-        
     	Connection con = null;
     	try{
             con = findSourceByName(key).getConnection(userName,password);
-            ConnectDatabasePool.increasePoolCount();
+            DBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
         	throw sqe;
         }
@@ -242,7 +227,7 @@ public class ConnectDatabasePool implements Serializable{
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-        	ConnectDatabasePool.decreasePoolCount();
+        	DBConnectionPool.decreasePoolCount();
         }
     }
 
