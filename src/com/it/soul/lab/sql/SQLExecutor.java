@@ -335,6 +335,17 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
+    private Properties getLeastAppropriateProperties(List<Properties> items, int index){
+    	if(items == null || items.isEmpty()){
+    		return new Properties();
+    	}
+    	if(index < items.size()){
+    		return items.get(index);
+    	}else{
+    		return items.get(0);
+    	}
+    }
+    
     /**
      * 
      * @param batchSize
@@ -346,7 +357,7 @@ public class SQLExecutor implements Serializable{
      * @throws IllegalArgumentException
      * @throws Exception
      */
-    public Integer[] executeUpdate(int batchSize
+    public Integer[] executeBatchUpdate(int batchSize
     		, SQLUpdateQuery queryC
     		, List<Properties> updateProperties
     		, List<Properties> whereClause)
@@ -376,8 +387,9 @@ public class SQLExecutor implements Serializable{
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
 					
 					int length = keySet.length;
-					String[] whereKeySet = whereClause.get(index).getKeys();
-					Map<String, Property> rowWhere = whereClause.get(index).keyValueMap();
+					Properties whereClouseProperties = getLeastAppropriateProperties(whereClause, index);
+					String[] whereKeySet = whereClouseProperties.getKeys();
+					Map<String, Property> rowWhere = whereClouseProperties.keyValueMap();
 					stmt = bindValueToStatement(stmt, length + 1, whereKeySet, rowWhere);
 					
 					stmt.addBatch();
@@ -398,7 +410,6 @@ public class SQLExecutor implements Serializable{
             		conn.commit(); 
             }            
         }catch(SQLException exp){
-        	
         	if(!conn.getAutoCommit())
         		conn.rollback();
             throw exp;
@@ -466,7 +477,7 @@ public class SQLExecutor implements Serializable{
      * @throws SQLException
      * @throws Exception
      */
-    public int executeDelete(int batchSize
+    public int executeBatchDelete(int batchSize
     		, SQLDeleteQuery dQuery
     		, List<Properties> whereClause)
     throws SQLException,Exception{
@@ -533,15 +544,13 @@ public class SQLExecutor implements Serializable{
     	
     	int lastIncrementedID = 0;
     	PreparedStatement stmt=null;
-        try{ 
-        	
+        try{
         	if(query != null 
 	    			&& query.length() > 0 
 	    			&& !query.toUpperCase().startsWith("INSERT")){
 	    		throw new IllegalArgumentException("Query string must be a Insert query!");
 	    	}
             if(conn != null){
-            	
                 if (isAutoGenaretedId) {
 					stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
 					stmt.executeUpdate();
@@ -556,7 +565,6 @@ public class SQLExecutor implements Serializable{
                 	conn.commit(); 
             }            
         }catch(SQLException exp){
-        	
         	if(!conn.getAutoCommit())
         		conn.rollback();
             throw exp;
@@ -569,7 +577,6 @@ public class SQLExecutor implements Serializable{
         return lastIncrementedID;		
     }
     
-    
     /**
      * 
      * @param isAutoGenaretedId
@@ -579,62 +586,8 @@ public class SQLExecutor implements Serializable{
      * @throws IllegalArgumentException
      * @throws Exception
      */
-    public int executeInsert(boolean isAutoGenaretedId
-    		, SQLInsertQuery iQuery)
-    throws SQLException,IllegalArgumentException,Exception{
-    	
-    	if(iQuery.getColumns() == null || iQuery.getColumns().length <= 0){
-    		throw new Exception("Parameter should not be null or empty!!!");
-    	}
-    	
-    	int affectedRows = 0;
-        PreparedStatement stmt=null;        
-        String query = iQuery.toString();
-        try{ 
-        	
-            if(conn != null){
-                
-            	if(isAutoGenaretedId){
-            		stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);                	
-                	stmt.executeUpdate();
-                	ResultSet set = stmt.getGeneratedKeys();
-                	if(set != null && set.next()){
-                		affectedRows = set.getInt(1);
-                	}                	
-            	}else{
-            		stmt = conn.prepareStatement(query);                	
-                	affectedRows = stmt.executeUpdate();
-            	}
-            	if(!conn.getAutoCommit())
-            		conn.commit(); 
-            }            
-        }catch(SQLException exp){
-        	
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
-            throw exp;
-        }catch(IllegalArgumentException iel){
-        	
-        	throw iel;
-        }finally{
-        	if(stmt != null)
-        		stmt.close();
-        }
-        return affectedRows;		
-    }
     
-    
-    /**
-     * 
-     * @param isAutoGenaretedId
-     * @param iQuery
-     * @return
-     * @throws SQLException
-     * @throws IllegalArgumentException
-     * @throws Exception
-     */
-    public int executeParameterizedInsert(boolean isAutoGenaretedId
-    		, SQLInsertQuery iQuery)
+    public int executeInsert(boolean isAutoGenaretedId, SQLInsertQuery iQuery)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(iQuery.getColumns() == null || iQuery.getColumns().length <= 0){
@@ -646,9 +599,7 @@ public class SQLExecutor implements Serializable{
         String query = iQuery.toString();
         
         try{ 
-        	
             if(conn != null){
-                
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,	Statement.RETURN_GENERATED_KEYS);
                 	stmt = bindValueToStatement(stmt, 1,iQuery.getProperties().getKeys(), iQuery.getProperties().keyValueMap());
@@ -666,12 +617,10 @@ public class SQLExecutor implements Serializable{
             		conn.commit(); 
             }            
         }catch(SQLException exp){
-        	
         	if(!conn.getAutoCommit())
         		conn.rollback();
             throw exp;
         }catch(IllegalArgumentException iel){
-        	
         	throw iel;
         }finally{
         	if(stmt != null)
@@ -691,7 +640,7 @@ public class SQLExecutor implements Serializable{
      * @throws IllegalArgumentException
      * @throws Exception
      */
-    public Integer[] executeParameterizedInsert(boolean isAutoGenaretedId
+    public Integer[] executeBatchInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
     		, List<Properties> params)
@@ -1581,7 +1530,7 @@ public class SQLExecutor implements Serializable{
                                 }
 	            				break;
 	            			default:
-	            				stmt.setObject(index++, property.getValue());
+	            				stmt.setObject(index++, property.getValue() != null ? property.getValue() : null);
 	            				break;
             			}
             		}

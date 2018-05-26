@@ -50,6 +50,22 @@ public class QueryExecutionTest {
 	public void after(){
 		exe.close();
 	}
+	
+	@Test public void testSelectAll(){
+		
+		try{
+			
+			SQLSelectQuery query = (SQLSelectQuery) new SQLQuery.Builder(QueryType.SELECT).columns().from("Passenger").build();
+			ResultSet set = exe.executeSelect(query);
+			List<Map<String,Object>> x = exe.convertToKeyValuePaire(set);
+			exe.displayCollection(x);
+			Assert.assertTrue("Select All Successfull", x.size() > 0);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
 
 	@Test
 	public void testSelect() {
@@ -77,7 +93,7 @@ public class QueryExecutionTest {
 		//Insert into
 		SQLInsertQuery iQuery2 = (SQLInsertQuery) new SQLQuery.Builder(QueryType.INSERT)
 										.into("Passenger")
-										.values(new Property("name","tanvir"), new Property("age", 28, DataType.INT), new Property("sex","male"))
+										.values(new Property("name","tanvir"), new Property("age", 28, DataType.INT), new Property("sex"))
 										.build();
 		try {
 			int autoId = exe.executeInsert(true, iQuery2);

@@ -44,21 +44,24 @@ public class SQLInsertQuery extends SQLQuery{
 			this.properties.add(prop);
 			if(count != 0){ paramBuffer.append(", "); valueBuffer.append(", "); }
 			paramBuffer.append( prop.getKey() );
-			Property val = prop;
-			if(val.getValue() != null && val.getType() != null){
-				if(val.getType() == DataType.BOOL 
-    					|| val.getType() == DataType.INT
-    					|| val.getType() == DataType.DOUBLE
-    					|| val.getType() == DataType.FLOAT) {
-					valueBuffer.append(val.getValue().toString());
-				}else{
-					valueBuffer.append("'"+val.getValue().toString()+"'");
-				}
-			}else{
-				valueBuffer.append(MARKER);
-			}
+			bindPropertyToQuery(prop, true);
 			if(count == (props.size() - 1)){ paramBuffer.append(")"); valueBuffer.append(")"); }
 			count++;
+		}
+	}
+	
+	private void bindPropertyToQuery(Property val, Boolean ignoreValue){
+		if( ignoreValue == false && val.getValue() != null && val.getType() != null){
+			if(val.getType() == DataType.BOOL 
+					|| val.getType() == DataType.INT
+					|| val.getType() == DataType.DOUBLE
+					|| val.getType() == DataType.FLOAT) {
+				valueBuffer.append(val.getValue().toString());
+			}else{
+				valueBuffer.append("'"+val.getValue().toString()+"'");
+			}
+		}else{
+			valueBuffer.append(MARKER);
 		}
 	}
 	

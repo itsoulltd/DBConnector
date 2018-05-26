@@ -10,15 +10,15 @@ public class Property {
 	private Object value = null;
 	
 	private Property(Object value, DataType type){
+		this.value = value;
 		this.type = type;
 		if (value != null){
-			//TODO Regx type value validation is required.
+			//TODO: Regx type value validation is required.
 			if(value instanceof java.util.Date || value instanceof java.sql.Date){
 				value = getFormattedDateString(value);
 				this.type = DataType.STRING;
 			}
 		}
-		this.value = value;
 	}
 	
 	public Property(String key, Object value, DataType type){
@@ -27,7 +27,7 @@ public class Property {
 	}
 	
 	public Property(String key){
-		this(key, null, null);
+		this(key, null, DataType.OBJECT);
 	}
 	
 	public Property(String key, String value){
