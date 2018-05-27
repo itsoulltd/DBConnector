@@ -1530,7 +1530,7 @@ public class SQLExecutor implements Serializable{
                                 }
 	            				break;
 	            			default:
-	            				stmt.setObject(index++, property.getValue() != null ? property.getValue() : null);
+	            				stmt.setObject(index++, property.getValue());
 	            				break;
             			}
             		}
