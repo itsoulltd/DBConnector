@@ -89,3 +89,7 @@ bin/com/it/soul/lab/sql/query/SQLScalerQuery.class
 bin/com/it/soul/lab/sql/query/models/Expression.class
 bin/com/it/soul/lab/unit/test/QueryBuilderTest.class
 bin/com/it/soul/lab/unit/test/QueryExecutionTest.class
+bin/com/it/soul/lab/connect/JDBConnection$Builder.class
+bin/com/it/soul/lab/connect/JDBConnection$DriverClass.class
+bin/com/it/soul/lab/connect/JDBConnection.class
+bin/com/it/soul/lab/connect/JDBConnectionPool.class
