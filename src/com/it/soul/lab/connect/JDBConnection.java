@@ -6,7 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DBConnection implements Serializable{
+public class JDBConnection implements Serializable{
 	
 	public static enum DriverClass{
 		MYSQL,
@@ -43,9 +43,9 @@ public class DBConnection implements Serializable{
 	}
 	
 	public static class Builder {
-		private DBConnection dbConnection;
+		private JDBConnection dbConnection;
 		public Builder(String connectionURL){
-			dbConnection = new DBConnection();
+			dbConnection = new JDBConnection();
 			dbConnection.serverUrl = connectionURL;
 		}
 		public Builder driver(DriverClass driver){
@@ -68,7 +68,7 @@ public class DBConnection implements Serializable{
 	private String user = null;
 	private String password = null;
 	
-	private DBConnection(){}
+	private JDBConnection(){}
 
 	private void printMetaInfos(DatabaseMetaData dma) throws Exception{
 		//checkForWarning(conn.getWarnings());

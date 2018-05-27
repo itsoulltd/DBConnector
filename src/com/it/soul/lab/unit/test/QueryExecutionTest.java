@@ -11,8 +11,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.it.soul.lab.connect.DBConnection;
-import com.it.soul.lab.connect.DBConnection.DriverClass;
+import com.it.soul.lab.connect.JDBConnection;
+import com.it.soul.lab.connect.JDBConnection.DriverClass;
 import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
@@ -33,7 +33,7 @@ public class QueryExecutionTest {
 	@Before
 	public void before(){
 		try {
-			Connection conn = new DBConnection.Builder("jdbc:mysql://localhost:3306/testDB")
+			Connection conn = new JDBConnection.Builder("jdbc:mysql://localhost:3306/testDB")
 										.driver(DriverClass.MYSQL)
 										.credential("root","towhid@123")
 										.build();

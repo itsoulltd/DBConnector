@@ -15,11 +15,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-public class DBConnectionPool implements Serializable{
+public class JDBConnectionPool implements Serializable{
     
 	private static final long serialVersionUID = 8229833245259862179L;
 	private static Object _lock = new Object();
-	private static DBConnectionPool _sharedInstance = null;
+	private static JDBConnectionPool _sharedInstance = null;
 	private static int activeConnectionCount = 0;
 	
 	private static InitialContext initCtx=null;
@@ -34,7 +34,7 @@ public class DBConnectionPool implements Serializable{
      * @throws NamingException
      * @throws IllegalArgumentException
      */
-	private DBConnectionPool(String JNDILookUp) throws NamingException,IllegalArgumentException{
+	private JDBConnectionPool(String JNDILookUp) throws NamingException,IllegalArgumentException{
 		if(JNDILookUp != null && !JNDILookUp.trim().equals("")){
 			try{
 	            initCtx = new InitialContext();
@@ -76,7 +76,7 @@ public class DBConnectionPool implements Serializable{
 		synchronized (_lock) {
 			if(_sharedInstance == null){
 				try{
-					_sharedInstance = new DBConnectionPool(JNDILookUp);
+					_sharedInstance = new JDBConnectionPool(JNDILookUp);
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -93,7 +93,7 @@ public class DBConnectionPool implements Serializable{
 	 * @return
 	 * @throws Exception
 	 */
-	public static DBConnectionPool shared() 
+	public static JDBConnectionPool shared() 
 	{
 		synchronized (_lock) {
 			if(_sharedInstance != null){
@@ -160,7 +160,7 @@ public class DBConnectionPool implements Serializable{
     	Connection con = null;
         try{
         	con = findSourceByName(_DEFAULT_KEY).getConnection();
-        	DBConnectionPool.increasePoolCount();
+        	JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
         }       
@@ -171,7 +171,7 @@ public class DBConnectionPool implements Serializable{
     	Connection con = null;
         try{
         	con = findSourceByName(key).getConnection();
-        	DBConnectionPool.increasePoolCount();
+        	JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
         }       
@@ -190,7 +190,7 @@ public class DBConnectionPool implements Serializable{
     	Connection con = null;
     	try{
             con = findSourceByName(key).getConnection(userName,password);
-            DBConnectionPool.increasePoolCount();
+            JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
         	throw sqe;
         }
@@ -225,7 +225,7 @@ public class DBConnectionPool implements Serializable{
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-        	DBConnectionPool.decreasePoolCount();
+        	JDBConnectionPool.decreasePoolCount();
         }
     }
 
