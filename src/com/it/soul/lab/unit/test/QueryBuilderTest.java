@@ -238,5 +238,13 @@ public class QueryBuilderTest {
 				.build();
 
 		Assert.assertEquals("SELECT name, age FROM Passenger  LIMIT 10", qu9.toString());
+		
+		SQLQuery qu10 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.orderBy("id")
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger  ORDER BY id ASC", qu10.toString());
 	}
 }
