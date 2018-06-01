@@ -189,4 +189,54 @@ public class QueryBuilderTest {
 											.build();
 		Assert.assertEquals(JPQL_UPDATE, jpqlUp.toString());
 	}
+	
+	@Test public void OrderByTest() {
+		SQLQuery qu5 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.whereParams(Logic.OR, "id", "age")
+				.orderBy("id")
+				.addLimit(10, 20)
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger WHERE id = ? OR age = ? ORDER BY id ASC LIMIT 10 OFFSET 20", qu5.toString());
+		
+		SQLQuery qu8 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.whereParams(Logic.OR, "id", "age")
+				.orderBy()
+				.addLimit(-1, 0)
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger WHERE id = ? OR age = ?", qu8.toString());
+		
+		SQLQuery qu6 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.whereParams(Logic.OR, "id", "age")
+				.orderBy("id")
+				.addLimit(10, 0)
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger WHERE id = ? OR age = ? ORDER BY id ASC LIMIT 10", qu6.toString());
+		
+		SQLQuery qu7 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.whereParams(Logic.OR, "id", "age")
+				.orderBy("id")
+				.addLimit(-1, 0)
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger WHERE id = ? OR age = ? ORDER BY id ASC", qu7.toString());
+		
+		SQLQuery qu9 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name","age")
+				.from("Passenger")
+				.addLimit(10, 0)
+				.build();
+
+		Assert.assertEquals("SELECT name, age FROM Passenger  LIMIT 10", qu9.toString());
+	}
 }

@@ -8,6 +8,9 @@ import com.it.soul.lab.sql.query.models.LogicExpression;
 public class SQLSelectQuery extends SQLQuery{
 	
 	protected StringBuffer pqlBuffer;
+	protected Integer limit;
+	protected Integer offset;
+	protected List<String> orderByList;
 	
 	public SQLSelectQuery() {
 		this.pqlBuffer = new StringBuffer("SELECT ");
@@ -17,6 +20,32 @@ public class SQLSelectQuery extends SQLQuery{
 	public String queryString() throws IllegalArgumentException{
 		super.queryString();
 		return pqlBuffer.toString();
+	}
+	
+	public void setLimit(Integer limit, Integer offset) {
+		this.limit = (limit < 0) ? 0 : limit;
+		this.offset = (offset < 0) ? 0 : offset;
+		if (limit > 0) { 
+			pqlBuffer.append(" LIMIT " + limit) ;
+			if (offset > 0) { pqlBuffer.append(" OFFSET " + offset) ;}
+		}
+	}
+	
+	public void setOrderBy(List<String> columns, Operator opt) {
+		this.orderByList = columns;
+		if (columns != null && columns.size() > 0) {
+			StringBuffer orderBuffer = new StringBuffer(" ORDER BY ");
+			int count = 0;
+			for(String col : columns) {
+				if(col.trim().equals("")){continue;}
+				if(count++ != 0){pqlBuffer.append(", ");}
+				orderBuffer.append(col);
+			}
+			if (count > 0) {
+				if (opt != null) {orderBuffer.append(" " + opt.toString());}
+				pqlBuffer.append(orderBuffer.toString());
+			}
+		}
 	}
 	
 	@Override

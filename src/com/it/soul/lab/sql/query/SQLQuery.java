@@ -158,7 +158,9 @@ public class SQLQuery {
     	IN,
     	NOT_IN,
     	LIKE,
-    	NOT_LIKE;
+    	NOT_LIKE,
+    	ASC,
+    	DESC;
     	
     	public String toString(){
 
@@ -190,6 +192,13 @@ public class SQLQuery {
     			break;
     		case NOT_LIKE:
     			eq = "NOT LIKE";
+    			break;
+    		case ASC:
+    			eq = "ASC";
+    			break;
+    		case DESC:
+    			eq = "DESC";
+    			break;
     		default:
     			break;
     		}

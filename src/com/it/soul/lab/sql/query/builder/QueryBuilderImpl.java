@@ -7,6 +7,7 @@ import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLScalerQuery;
 import com.it.soul.lab.sql.query.SQLScalerQuery.ScalerType;
@@ -16,7 +17,8 @@ import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.LogicExpression;
 import com.it.soul.lab.sql.query.models.Property;
 
-public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder{
+public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
+, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, OrderByBuilder{
 
 	protected QueryType tempType = QueryType.SELECT;
 	protected SQLQuery tempQuery;
@@ -65,12 +67,12 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		tempQuery.setColumns(name);
 		return this;
 	}
-	public QueryBuilder whereParams(Logic logic, String... name){
+	public OrderByBuilder whereParams(Logic logic, String... name){
 		if (logic != null){tempQuery.setLogic(logic);}
 		tempQuery.setWhereParams(name);
 		return this;
 	}
-	public QueryBuilder whereParams(Logic logic, Expression... comps){
+	public OrderByBuilder whereParams(Logic logic, Expression... comps){
 		if (logic != null){tempQuery.setLogic(logic);}
 		List<Expression> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
@@ -127,8 +129,22 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder, WhereClau
 		return this;
 	}
 	@Override
-	public QueryBuilder where(LogicExpression expression) {
+	public OrderByBuilder where(LogicExpression expression) {
 		tempQuery.setWhereExpression(expression); 
+		return this;
+	}
+	@Override
+	public QueryBuilder addLimit(Integer limit, Integer offset) {
+		if(tempQuery instanceof SQLSelectQuery) {
+			((SQLSelectQuery)tempQuery).setLimit(limit, offset);
+		}
+		return this;
+	}
+	@Override
+	public LimitBuilder orderBy(String... columns) {
+		if(tempQuery instanceof SQLSelectQuery) {
+			((SQLSelectQuery)tempQuery).setOrderBy(Arrays.asList(columns), Operator.ASC);
+		}
 		return this;
 	}
 }
