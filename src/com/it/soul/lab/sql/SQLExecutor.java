@@ -25,6 +25,7 @@ import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.PropertyList;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.PropertyCollection;
 
 public class SQLExecutor implements Serializable{
 
@@ -863,100 +864,80 @@ public class SQLExecutor implements Serializable{
         }
         return rst;           
     }
+    
+    public PropertyCollection collection(ResultSet rst, String...columns){
+    	if(columns.length == 0) {
+    		return collection(rst);
+    	}
+    	PropertyCollection result = new PropertyCollection();
+    	try{
+    		//IF cursor is moved till last row. Then set to the above first row. 
+    		if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
+    			rst.beforeFirst();
+    		}
+    		ResultSetMetaData rsmd = rst.getMetaData();
+    		//Optimization
+    		List<Integer> columnIndecies = new ArrayList<Integer>();
+    		for(String columnName : columns){
+    			columnIndecies.add(rst.findColumn(columnName));
+    		}
+
+    		while(rst.next()){ //For each Row
+    			PropertyList row = new PropertyList();
+    			for(int x : columnIndecies){ //For each column in the columns
+    				String key = rsmd.getColumnName(x);
+    				DataType type = convertDataType(rsmd
+    						.getColumnTypeName(x));
+    				Object value = getValueFromResultSet(type, rst, x);
+    				Property property = new Property(key, value, type);
+    				row.add(property);
+    			}
+    			if(row.size() > 0)
+    				result.add(row);
+    		}
+    	}catch(SQLException exp){
+    		result = null;
+    		exp.getStackTrace();
+    	}
+    	return result;
+    }
 	
 	/**
 	 * 
 	 * @param rst
 	 * @return
 	 */
-	public List<Map<String,Property>> convertToMaps(ResultSet rst){
-		
-		List<Map<String,Property>> result = new ArrayList<Map<String, Property>>();
-		
+    public PropertyCollection collection(ResultSet rst){
+    	PropertyCollection result = new PropertyCollection();
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
                 rst.beforeFirst();
             }
-			
 			ResultSetMetaData rsmd = rst.getMetaData();
 			int numCol = rsmd.getColumnCount();
 			
 			while(rst.next()){ //For each Row
-				
-				Map<String, Property> row = new HashMap<String, Property>(numCol);
+				PropertyList row = new PropertyList();
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
-					
 					String key = rsmd.getColumnName(x);
 					DataType type = convertDataType(rsmd.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
 					
 					Property property = new Property(key, value, type);
-					row.put(key, property);
+					row.add(property);
 				}
 				result.add(row);
 			}
 		}catch(SQLException exp){
-			
 			result = null;
 			exp.getStackTrace();
 		}
-		
 		return result;
 	}
 	
-	public List<Map<String,Property>> convertToMaps(ResultSet rst, List<String> paramProperties){
-		
-		if(paramProperties == null || paramProperties.size() <= 0){
-            return convertToMaps(rst);
-        }
-		
-		List<Map<String,Property>> result = new ArrayList<Map<String, Property>>();
-		
-		try{
-			
-			//IF cursor is moved till last row. Then set to the above first row. 
-			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
-                rst.beforeFirst();
-            }
-			
-			ResultSetMetaData rsmd = rst.getMetaData();
-			//Optimization
-            List<Integer> columnIndecies = new ArrayList<Integer>();
-            for(String columnName : paramProperties){
-                columnIndecies.add(rst.findColumn(columnName));
-            }
-			
-			while(rst.next()){ //For each Row
-				
-				Map<String, Property> row = new HashMap<String, Property>(columnIndecies.size());
-				for(int x : columnIndecies){ //For each column in the paramProperties
-
-					String key = rsmd.getColumnName(x);
-
-					DataType type = convertDataType(rsmd
-							.getColumnTypeName(x));
-					Object value = getValueFromResultSet(type, rst, x);
-					Property property = new Property(key, value, type);
-					row.put(key, property);
-
-				}
-				if(row.size() > 0)
-					result.add(row);
-			}
-		}catch(SQLException exp){
-			
-			result = null;
-			exp.getStackTrace();
-		}
-		
-		return result;
-	}
-	
-	public List<List<Property>> convertToLists(ResultSet rst){
-		
-		List<List<Property>> result = new ArrayList<List<Property>>();
-		
+	public List<PropertyList> convertToLists(ResultSet rst){
+		List<PropertyList> result = new ArrayList<PropertyList>();
 		try{
 			
 			//IF cursor is moved till last row. Then set to the above first row. 
@@ -968,7 +949,7 @@ public class SQLExecutor implements Serializable{
 			int numCol = rsmd.getColumnCount();
 			
 			while(rst.next()){ //For each Row
-				List<Property> row = new ArrayList<Property>(numCol);
+				PropertyList row = new PropertyList();
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
 					
 					String key = rsmd.getColumnName(x);
@@ -976,12 +957,11 @@ public class SQLExecutor implements Serializable{
 					Object value = getValueFromResultSet(type, rst, x);
 					
 					Property property = new Property(key, value, type);
-					row.add((x - 1), property);
+					row.add(property);
 				}
 				result.add(row);
 			}
 		}catch(SQLException exp){
-			
 			result = null;
 			exp.getStackTrace();
 		}
@@ -989,16 +969,12 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<List<Property>> convertToLists(ResultSet rst, List<String> paramProperties){
-		
-		if(paramProperties == null || paramProperties.size() <= 0){
+	public List<PropertyList> convertToLists(ResultSet rst, String...columns){
+		if(columns.length == 0){
             return convertToLists(rst);
         }
-		
-		List<List<Property>> result = new ArrayList<List<Property>>();
-		
+		List<PropertyList> result = new ArrayList<PropertyList>();
 		try{
-			
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
                 rst.beforeFirst();
@@ -1007,32 +983,27 @@ public class SQLExecutor implements Serializable{
 			ResultSetMetaData rsmd = rst.getMetaData();
 			//Optimization
             List<Integer> columnIndecies = new ArrayList<Integer>();
-            for(String columnName : paramProperties){
+            for(String columnName : columns){
                 columnIndecies.add(rst.findColumn(columnName));
             }
 			
 			while(rst.next()){ //For each Row
-				List<Property> row = new ArrayList<Property>(columnIndecies.size());
+				PropertyList row = new PropertyList();
 				for(int x : columnIndecies){ //For each column in the paramProperties
-
 					String key = rsmd.getColumnName(x);
-
 					DataType type = convertDataType(rsmd
 							.getColumnTypeName(x));
 					Object value = getValueFromResultSet(type, rst, x);
 					Property property = new Property(key, value, type);
 					row.add(property);
-
 				}
 				if(row.size() > 0)
 					result.add(row);
 			}
 		}catch(SQLException exp){
-			
 			result = null;
 			exp.getStackTrace();
 		}
-		
 		return result;
 	}
 	
@@ -1332,51 +1303,36 @@ public class SQLExecutor implements Serializable{
 	 * @return
 	 */
 	
-	public Map<String, Object> retrieveRow(ResultSet rst, int rowIndex, boolean isObjectType){
-
-        Map<String, Object> result = null;
-
+	public PropertyList retrieveRow(ResultSet rst, int rowIndex){
+        PropertyList result = null;
         try{
             ResultSetMetaData rsmd = rst.getMetaData();
             int numCol = rsmd.getColumnCount();
             if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE){
+            	
                 int offset = (rowIndex <= 0) ? 1 : rowIndex;
                 rst.absolute(offset);
-                HashMap<String, Object> row = new HashMap<String, Object>(numCol);
+                PropertyList row = new PropertyList();
                 
                 for(int x = 1; x <= numCol; x++){ //For each column in a Row
-                    
                     String key = rsmd.getColumnName(x);
                     DataType type = convertDataType(rsmd.getColumnTypeName(x));
                     Object value = getValueFromResultSet(type, rst, x);
-                    if(!isObjectType){
-                        Property property = new Property(key, value, type);
-                        row.put(key, property);
-                    }else{
-                        row.put(key, value);
-                    }
+                    Property property = new Property(key, value, type);
+                    row.add(property);
                 }
                 result = row;
             }else{
                 if(!rst.isAfterLast()){
-                    
                     while(rst.next()){
-                        
                         if(rowIndex == rst.getRow()){
-                            
-                            HashMap<String, Object> row = new HashMap<String, Object>(numCol);
-                            
+                            PropertyList row = new PropertyList();
                             for(int x = 1; x <= numCol; x++){ //For each column in a Row
-                                
                                 String key = rsmd.getColumnName(x);
                                 DataType type = convertDataType(rsmd.getColumnTypeName(x));
                                 Object value = getValueFromResultSet(type, rst, x);
-                                if(!isObjectType){
-                                    Property property = new Property(key, value, type);
-                                    row.put(key, property);
-                                }else{
-                                    row.put(key, value);
-                                }
+                                Property property = new Property(key, value, type);
+                                row.add(property);
                             }
                             result = row;
                             break;
@@ -1385,17 +1341,15 @@ public class SQLExecutor implements Serializable{
                 }
             }//
         }catch(SQLException exp){
-
             result = null;
             exp.getStackTrace();
         }
-
         return result;
     }
 	
-	public List<Object> retrieveColumn(ResultSet rst, String indexColumn){
+	public PropertyList retrieveColumn(ResultSet rst, String indexColumn){
 		
-		List<Object> result = new ArrayList<Object>();
+		PropertyList result = new PropertyList();
 		
 		try{
 			
@@ -1407,28 +1361,26 @@ public class SQLExecutor implements Serializable{
 			ResultSetMetaData rsmd = rst.getMetaData();
 			int x = (rst.findColumn(indexColumn) <= 0) ? 1 : rst.findColumn(indexColumn);
 			
+			String key = rsmd.getColumnName(x);
 			DataType type = convertDataType(rsmd.getColumnTypeName(x));
 			
 			while(rst.next()){ //For each Row
-				
 				Object value = getValueFromResultSet(type, rst, x);
-				result.add(value);
+				Property prop = new Property(key,value, type);
+				result.add(prop);
 			}
 		}catch(SQLException exp){
-			
 			result = null;
 			exp.getStackTrace();
 		}
-		
 		return result;
 	}
 	
-	public List<Object> retrieveColumn(ResultSet rst, int indexColumn){
+	public PropertyList retrieveColumn(ResultSet rst, int indexColumn){
 		
-		List<Object> result = new ArrayList<Object>();
+		PropertyList result = new PropertyList();
 		
 		try{
-			
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
                 rst.beforeFirst();
@@ -1442,19 +1394,18 @@ public class SQLExecutor implements Serializable{
 				x = indexColumn;
 			}
 			
+			String key = rsmd.getColumnName(x);
 			DataType type = convertDataType(rsmd.getColumnTypeName(x));
 			
 			while(rst.next()){ //For each Row
-				
 				Object value = getValueFromResultSet(type, rst, x);
-				result.add(value);
+				Property prop = new Property(key,value, type);
+				result.add(prop);
 			}
 		}catch(SQLException exp){
-			
 			result = null;
 			exp.getStackTrace();
 		}
-		
 		return result;
 	}
 	
