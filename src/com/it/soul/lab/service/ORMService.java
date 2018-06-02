@@ -17,6 +17,8 @@ import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.Expression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Property;
 
 public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {
 
@@ -46,13 +48,13 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<T> findAll(String[] propertyNames) throws Exception {
+	public Collection<T> findAll(String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames);
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).build();
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
 		}catch(PersistenceException e){result = null;}
@@ -61,16 +63,15 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<T> findAll(String searchKey, Object value,
-			String[] propertyNames) throws Exception {
+	@Deprecated public Collection<T> findAll(Property item, String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).whereParams(Logic.AND, item.getKey()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
-			query.setParameter(searchKey, value);
+			query.setParameter(item.getKey(), item.getValue());
 			result = query.getResultList();
 		}catch(PersistenceException e){result = null;}
 		catch (Exception e) {throw e;}
@@ -78,17 +79,16 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<T> findAll(Map<String, Object> keyValuePair,
-			Logic whereLogic, String[] propertyNames) throws Exception {
+	@Deprecated public Collection<T> findAll(Map<String, Object> itemIds, Logic whereLogic, String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, keyValuePair.keySet().toArray(new String[]{}));
-			String[] whereParams = keyValuePair.keySet().toArray(new String[]{});
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereParams).build();
+			String[] whereParams = itemIds.keySet().toArray(new String[]{});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).whereParams(whereLogic, whereParams).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
-			for (Entry<String,Object> item : keyValuePair.entrySet()) {
+			for (Entry<String,Object> item : itemIds.entrySet()) {
 				query.setParameter(item.getKey(), item.getValue());
 			}
 			result = query.getResultList();
@@ -97,24 +97,41 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		return result;
 	}
 	
-	public Collection<T> findAll(Map<String, Object> keyValuePair,
-			Logic whereLogic, Map<String, Operator> operators, String[] propertyNames) throws Exception {
+	public Collection<T> findMatches(ExpressionInterpreter expression , String...columns) throws Exception {
+		List<T> result = null;
+		//Checking entityManager
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
+		try{
+			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, keyValuePair.keySet().toArray(new String[]{}));
+			//String[] whereParams = itemIds.keySet().toArray(new String[]{});
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).where(expression).build();
+			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
+			for (Expression item : expression.resolveExpressions()) {
+				query.setParameter(item.getProperty(), item.getValueProperty().getValue());
+			}
+			result = query.getResultList();
+		}catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
+		return result;
+	}
+	
+	@Deprecated public Collection<T> findAll(Map<String, Object> itemIds, Logic whereLogic, Map<String, Operator> operators, String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
 			//new way
-			String[] whereParams = keyValuePair.keySet().toArray(new String[0]);
+			String[] whereParams = itemIds.keySet().toArray(new String[0]);
 			List<Expression> compares = new ArrayList<Expression>();
 			for (String string : whereParams) {
 				compares.add(new Expression(string, operators.get(string)));
 			}
 			Expression[] whereCompares = compares.toArray(new Expression[0]);
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereCompares).build();
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).whereParams(whereLogic, whereCompares).build();
 			//
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, operators);
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
-			for (Entry<String,Object> item : keyValuePair.entrySet()) {
+			for (Entry<String,Object> item : itemIds.entrySet()) {
 				query.setParameter(item.getKey(), item.getValue());
 			}
 			result = query.getResultList();
@@ -125,16 +142,16 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Object findBy(String searchKey, Object value) throws Exception {
+	public Object findBy(Property searchProperty) throws Exception {
 		Object result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), null, Logic.AND, new String[]{searchKey});
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns().from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns().from(getEntity()).whereParams(Logic.AND, searchProperty.getKey()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
-			query.setParameter(searchKey, value);
+			query.setParameter(searchProperty.getKey(), searchProperty.getValue());
 			result = query.getSingleResult();
 		}
 		catch(PersistenceException e){result = null;}
@@ -143,16 +160,16 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Object findBy(String searchKey, Object value, String... propertyNames) throws Exception{
+	public Object findBy(Property searchProperty, String...columns) throws Exception{
 		Object result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
-			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(Logic.AND, searchKey).build();
+			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(columns).from(getEntity()).whereParams(Logic.AND, searchProperty.getKey()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
-			query.setParameter(searchKey, value);
+			query.setParameter(searchProperty.getKey(), searchProperty.getValue());
 			result = query.getSingleResult();
 		}
 		catch(PersistenceException e){result = null;}

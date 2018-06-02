@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Property;
 
 
 public interface ORMServiceProtocol<T> {
@@ -12,12 +14,16 @@ public interface ORMServiceProtocol<T> {
 	public Class<T> getEntityType();
 	public String getEntity();
 	public EntityManager getEntityManager();
+	
 	public Collection<T> findAll() throws Exception;
-	public Collection<T> findAll(String[] propertyNames) throws Exception;
-	public Collection<T> findAll(String itemId, Object itemValue, String[] propertyNames) throws Exception;
-	public Collection<T> findAll(Map<String,Object> itemIds, Logic whereLogic, String[] propertyNames) throws Exception;
-	public Object findBy(String searchProperty, Object value) throws Exception;
-	public Object findBy(String searchProperty, Object value, String... propertyNames) throws Exception;
+	public Collection<T> findAll(String...columns) throws Exception;
+	@Deprecated public Collection<T> findAll(Property item, String...columns) throws Exception;
+	@Deprecated public Collection<T> findAll(Map<String,Object> itemIds, Logic whereLogic, String...columns) throws Exception;
+	public Collection<T> findMatches(ExpressionInterpreter expression , String...columns) throws Exception;
+	
+	public Object findBy(Property searchProperty) throws Exception;
+	public Object findBy(Property searchProperty, String...columns) throws Exception;
+	
 	public boolean isItemExist(Object itemId) throws Exception;
 	public long getItemCount() throws Exception;
 	public Object addNewItem(Object item) throws Exception;
