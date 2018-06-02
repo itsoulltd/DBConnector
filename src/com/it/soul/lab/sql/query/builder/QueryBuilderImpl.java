@@ -14,7 +14,7 @@ import com.it.soul.lab.sql.query.SQLScalerQuery.ScalerType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
@@ -129,7 +129,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		return this;
 	}
 	@Override
-	public OrderByBuilder where(LogicExpression expression) {
+	public OrderByBuilder where(ExpressionInterpreter expression) {
 		tempQuery.setWhereExpression(expression); 
 		return this;
 	}

@@ -2,10 +2,10 @@ package com.it.soul.lab.sql.query.builder;
 
 import com.it.soul.lab.sql.query.SQLQuery.Logic;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 
 public interface WhereClauseBuilder extends OrderByBuilder{
 	public OrderByBuilder whereParams(Logic logic, String... name);
 	public OrderByBuilder whereParams(Logic logic, Expression... comps);
-	public OrderByBuilder where(LogicExpression expression);
+	public OrderByBuilder where(ExpressionInterpreter expression);
 }

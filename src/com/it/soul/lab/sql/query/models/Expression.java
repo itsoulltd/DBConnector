@@ -6,7 +6,7 @@ import java.util.List;
 import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
-public class Expression implements LogicExpression{
+public class Expression implements ExpressionInterpreter{
 	public Expression(String property, Operator type){
 		this.property = property;
 		this.type = type;
@@ -79,12 +79,12 @@ public class Expression implements LogicExpression{
 		}
 	}
 	@Override
-	public String express() {
+	public String interpret() {
 		if (Character.isWhitespace(quientifier) == false) {return quientifier+ "." + getProperty() + " " + type.toString() + " " + expressMarker;}
 		else {return getProperty() + " " + type.toString() + " " + MARKER;}
 	}
 	@Override
-	public Expression[] resolveCompares() {
+	public Expression[] resolveExpressions() {
 		return new Expression[] {this};
 	}
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 
 public class JPQLUpdateQuery extends SQLUpdateQuery {
 	
@@ -49,12 +49,12 @@ public class JPQLUpdateQuery extends SQLUpdateQuery {
 	}
 	
 	@Override
-	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		Expression[] resolved = whereExpression.resolveCompares();
+	protected void prepareWhereExpression(ExpressionInterpreter whereExpression) {
+		Expression[] resolved = whereExpression.resolveExpressions();
 		for (Expression comp : resolved) {
 			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
 		}
-		whereBuffer.append("WHERE " + whereExpression.express());
+		whereBuffer.append("WHERE " + whereExpression.interpret());
 		for (Expression comp : resolved) {
 			comp.setQuientifier(' ');
 		}

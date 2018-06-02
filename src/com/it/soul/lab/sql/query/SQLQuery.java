@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.Properties;
 
 public class SQLQuery {
@@ -29,13 +29,13 @@ public class SQLQuery {
 	
 	//////////////////////////////////SQLQuery///////////////////////////////////////////
 	
-	public LogicExpression getWhereExpression() {
+	public ExpressionInterpreter getWhereExpression() {
 		return whereExpression;
 	}
 
-	public void setWhereExpression(LogicExpression whereExpression) {
+	public void setWhereExpression(ExpressionInterpreter whereExpression) {
 		this.whereExpression = whereExpression;
-		Expression[] comps = whereExpression.resolveCompares();
+		Expression[] comps = whereExpression.resolveExpressions();
 		this.whereCompareParams = Arrays.asList(comps);
 	}
 	
@@ -120,7 +120,7 @@ public class SQLQuery {
 	private String[] whereParams;
 	private Logic logic = Logic.AND;
 	private List<Expression> whereCompareParams;
-	private LogicExpression whereExpression;
+	private ExpressionInterpreter whereExpression;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////SQLQuery-Enums//////////////////////////////////////////////

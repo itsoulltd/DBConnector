@@ -4,31 +4,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AndExpression implements LogicExpression {
+public class AndExpression implements ExpressionInterpreter {
 
-	protected LogicExpression lhr;
-	protected LogicExpression rhr;
+	protected ExpressionInterpreter lhr;
+	protected ExpressionInterpreter rhr;
 	
-	public AndExpression(LogicExpression lhr, LogicExpression rhr) {
+	public AndExpression(ExpressionInterpreter lhr, ExpressionInterpreter rhr) {
 		this.lhr = lhr;
 		this.rhr = rhr;
 	}
 
 	@Override
-	public String express() {
-		return "( " + lhr.express() + " AND " + rhr.express() + " )";
+	public String interpret() {
+		return "( " + lhr.interpret() + " AND " + rhr.interpret() + " )";
 	}
 	
 	@Override
 	public String toString() {
-		return express();
+		return interpret();
 	}
 	
 	@Override
-	public Expression[] resolveCompares() {
+	public Expression[] resolveExpressions() {
 		List<Expression> comps = new ArrayList<Expression>();
-		comps.addAll(Arrays.asList(lhr.resolveCompares()));
-		comps.addAll(Arrays.asList(rhr.resolveCompares()));
+		comps.addAll(Arrays.asList(lhr.resolveExpressions()));
+		comps.addAll(Arrays.asList(rhr.resolveExpressions()));
 		return comps.toArray(new Expression[0]);
 	}
 

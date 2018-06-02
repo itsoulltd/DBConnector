@@ -3,7 +3,7 @@ package com.it.soul.lab.sql.query;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 
 public class SQLSelectQuery extends SQLQuery{
 	
@@ -113,13 +113,13 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	@Override
-	public void setWhereExpression(LogicExpression whereExpression) {
+	public void setWhereExpression(ExpressionInterpreter whereExpression) {
 		super.setWhereExpression(whereExpression);
 		prepareWhereExpression(whereExpression);
 	}
 	
-	protected void prepareWhereExpression(LogicExpression whereExpression){
-		pqlBuffer.append("WHERE " + whereExpression.express());
+	protected void prepareWhereExpression(ExpressionInterpreter whereExpression){
+		pqlBuffer.append("WHERE " + whereExpression.interpret());
 	}
 	
 	public static String create(String tableName, String[]projectionParams, Logic whereLogic, List<Expression> whereParams)

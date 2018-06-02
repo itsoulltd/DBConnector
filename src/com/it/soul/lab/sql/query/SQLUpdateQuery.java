@@ -3,7 +3,7 @@ package com.it.soul.lab.sql.query;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.Properties;
 import com.it.soul.lab.sql.query.models.Property;
 
@@ -86,8 +86,8 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 	}
 	
 	@Override
-	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		whereBuffer.append("WHERE " + whereExpression.express());
+	protected void prepareWhereExpression(ExpressionInterpreter whereExpression) {
+		whereBuffer.append("WHERE " + whereExpression.interpret());
 	}
 	
 	public static String create(String tableName, String[]setParams, Logic whereLogic, String[] whereParams){

@@ -11,7 +11,7 @@ import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.AndExpression;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.OrExpression;
 import com.it.soul.lab.sql.query.models.Properties;
 import com.it.soul.lab.sql.query.models.Property;
@@ -75,8 +75,8 @@ public class QueryBuilderTest {
 	@Test
 	public void select_where_expressionTest(){
 		
-		LogicExpression andExp = new AndExpression(new Expression("id", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN_OR_EQUAL));
-		LogicExpression orExp = new OrExpression(new Expression("name", Operator.LIKE), andExp);
+		ExpressionInterpreter andExp = new AndExpression(new Expression("id", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN_OR_EQUAL));
+		ExpressionInterpreter orExp = new OrExpression(new Expression("name", Operator.LIKE), andExp);
 		
 		SQLQuery qu6 = new SQLQuery.Builder(QueryType.SELECT)
 									.columns("name","age")
@@ -144,7 +144,7 @@ public class QueryBuilderTest {
 	@Test
 	public void updateTest(){
 		
-		LogicExpression andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
+		ExpressionInterpreter andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
 		
 		SQLQuery update = new SQLQuery.Builder(QueryType.UPDATE)
 								.columns("name","age")
@@ -159,7 +159,7 @@ public class QueryBuilderTest {
 	@Test
 	public void deleteTest(){
 		
-		LogicExpression andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
+		ExpressionInterpreter andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
 		
 		SQLQuery delete = new SQLQuery.Builder(QueryType.DELETE)
 										.rowsFrom("Passenger")
@@ -173,7 +173,7 @@ public class QueryBuilderTest {
 	@Test
 	public void jpqlTest(){
 		
-		LogicExpression andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
+		ExpressionInterpreter andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
 		
 		SQLQuery jqpSel = new JPQLQuery.Builder(QueryType.SELECT)
 											.columns("name","age","sex")

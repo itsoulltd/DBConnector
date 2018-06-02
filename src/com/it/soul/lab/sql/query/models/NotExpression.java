@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NotExpression implements LogicExpression{
+public class NotExpression implements ExpressionInterpreter{
 
-	protected LogicExpression lhr;
+	protected ExpressionInterpreter lhr;
 	
-	public NotExpression(LogicExpression expression) {
+	public NotExpression(ExpressionInterpreter expression) {
 		lhr = expression;
 	}
 	
 	@Override
-	public String express() {
-		return " NOT " + lhr.express();
+	public String interpret() {
+		return " NOT " + lhr.interpret();
 	}
 
 	@Override
-	public Expression[] resolveCompares() {
+	public Expression[] resolveExpressions() {
 		List<Expression> comps = new ArrayList<Expression>();
-		comps.addAll(Arrays.asList(lhr.resolveCompares()));
+		comps.addAll(Arrays.asList(lhr.resolveExpressions()));
 		return comps.toArray(new Expression[0]);
 	}
 }

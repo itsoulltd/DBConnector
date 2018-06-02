@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.models.Expression;
-import com.it.soul.lab.sql.query.models.LogicExpression;
+import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 
 public class JPQLSelectQuery extends SQLSelectQuery {
 
@@ -62,12 +62,12 @@ public class JPQLSelectQuery extends SQLSelectQuery {
 	}
 	
 	@Override
-	protected void prepareWhereExpression(LogicExpression whereExpression) {
-		Expression[] resolved = whereExpression.resolveCompares();
+	protected void prepareWhereExpression(ExpressionInterpreter whereExpression) {
+		Expression[] resolved = whereExpression.resolveExpressions();
 		for (Expression comp : resolved) {
 			comp.setQuientifier(QUIENTIFIER).setMarker(":"+comp.getProperty());
 		}
-		pqlBuffer.append(" WHERE " + whereExpression.express());
+		pqlBuffer.append(" WHERE " + whereExpression.interpret());
 		for (Expression comp : resolved) {
 			comp.setQuientifier(' ');
 		}
