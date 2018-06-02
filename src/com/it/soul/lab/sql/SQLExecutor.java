@@ -25,7 +25,7 @@ import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.PropertyList;
 import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.models.PropertyCollection;
+import com.it.soul.lab.sql.query.models.PropertyListCollection;
 
 public class SQLExecutor implements Serializable{
 
@@ -659,7 +659,7 @@ public class SQLExecutor implements Serializable{
          */
         Object[] keySet = params.get(0).getKeys();
         List<Property> nValues = new ArrayList<Property>();
-        for (Property property : params.get(0).getProperties()) {
+        for (Property property : params.get(0).getCloneProperties()) {
 			nValues.add(new Property(property.getKey()));
 		}
         Property[] values = (Property[]) nValues.toArray(new Property[0]);
@@ -865,11 +865,11 @@ public class SQLExecutor implements Serializable{
         return rst;           
     }
     
-    public PropertyCollection collection(ResultSet rst, String...columns){
+    public PropertyListCollection collection(ResultSet rst, String...columns){
     	if(columns.length == 0) {
     		return collection(rst);
     	}
-    	PropertyCollection result = new PropertyCollection();
+    	PropertyListCollection result = new PropertyListCollection();
     	try{
     		//IF cursor is moved till last row. Then set to the above first row. 
     		if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
@@ -907,8 +907,8 @@ public class SQLExecutor implements Serializable{
 	 * @param rst
 	 * @return
 	 */
-    public PropertyCollection collection(ResultSet rst){
-    	PropertyCollection result = new PropertyCollection();
+    public PropertyListCollection collection(ResultSet rst){
+    	PropertyListCollection result = new PropertyListCollection();
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){

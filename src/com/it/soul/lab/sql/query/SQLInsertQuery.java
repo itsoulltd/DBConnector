@@ -72,7 +72,7 @@ public class SQLInsertQuery extends SQLQuery{
 			if(tableName == null || tableName.trim().equals("")){
 				throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
 			}
-			if(isAllParamEmpty(properties.getProperties().toArray())){
+			if(isAllParamEmpty(properties.getCloneProperties().toArray())){
 				throw new IllegalArgumentException("All Empty Parameters!!! You nuts (:D");
 			}
 		}catch(IllegalArgumentException iex){

@@ -131,7 +131,7 @@ public class QueryBuilderTest {
 	public void insertTest(){
 		
 		PropertyList nP = new PropertyList().add("name").add("age").add("sex");
-		Property[] values =  (Property[]) nP.getProperties().toArray(new Property[0]);
+		Property[] values =  (Property[]) nP.getCloneProperties().toArray(new Property[0]);
 		
 		SQLQuery insert = new SQLQuery.Builder(QueryType.INSERT)
 									.into("Passenger")

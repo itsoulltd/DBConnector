@@ -11,19 +11,19 @@ public class PropertyList {
 	public PropertyList() {
 		super();
 	}
-	public List<Property> getItems() {
-		return items;
+	public List<Property> getProperties() {
+		return properties;
 	}
-	public void setItems(List<Property> items) {
+	public void setProperties(List<Property> items) {
 		if(items == null) {return;}
-		this.items = items;
+		this.properties = items;
 	}
-	private List<Property> items = new ArrayList<Property>();
+	private List<Property> properties = new ArrayList<Property>();
 	public PropertyList add(Property prop){
-		if (items.contains(prop)){
+		if (properties.contains(prop)){
 			return this;
 		}
-		items.add(prop);
+		properties.add(prop);
 		return this;
 	}
 	public PropertyList add(String name){
@@ -32,20 +32,20 @@ public class PropertyList {
 	public PropertyList add(String name, Object value, DataType type){
 		return add(new Property(name, value, type));
 	}
-	public List<Property> getProperties(){
-		return new ArrayList<Property>(this.items);
+	public List<Property> getCloneProperties(){
+		return new ArrayList<Property>(this.properties);
 	}
 	public String[] getKeys(){
     	//Before Java 8
         List<String> result = new ArrayList<String>();
-        for (Property x : this.items) {
+        for (Property x : this.properties) {
             result.add(x.getKey());
         }
     	return result.toArray(new String[]{});
     }
     public Map<String, Property> keyValueMap(){
     	Map<String, Property> result = new HashMap<String, Property>();
-    	for (Property parameter : this.items) {
+    	for (Property parameter : this.properties) {
 			result.put(parameter.getKey(), parameter);
 		}
     	return result;
@@ -87,6 +87,6 @@ public class PropertyList {
         return nXRow;
     }
     public int size(){
-    	return items.size();
+    	return properties.size();
     }
 }
