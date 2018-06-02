@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
-public class PropertyList {
-	public PropertyList() {
+public class Row {
+	public Row() {
 		super();
 	}
 	public List<Property> getProperties() {
@@ -19,17 +19,17 @@ public class PropertyList {
 		this.properties = items;
 	}
 	private List<Property> properties = new ArrayList<Property>();
-	public PropertyList add(Property prop){
+	public Row add(Property prop){
 		if (properties.contains(prop)){
 			return this;
 		}
 		properties.add(prop);
 		return this;
 	}
-	public PropertyList add(String name){
+	public Row add(String name){
 		return add(new Property(name));
 	}
-	public PropertyList add(String name, Object value, DataType type){
+	public Row add(String name, Object value, DataType type){
 		return add(new Property(name, value, type));
 	}
 	public List<Property> getCloneProperties(){

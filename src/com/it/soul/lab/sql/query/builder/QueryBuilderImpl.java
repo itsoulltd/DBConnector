@@ -103,7 +103,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public QueryBuilder values(Property... properties) {
 		if(tempQuery instanceof SQLInsertQuery){
 			try{
-				((SQLInsertQuery)tempQuery).setProperties(Arrays.asList(properties));
+				((SQLInsertQuery)tempQuery).setRowProperties(Arrays.asList(properties));
 			}catch(IllegalArgumentException are){
 				System.out.println(are.getMessage());
 			}
@@ -121,7 +121,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public TableBuilder set(Property... properties) {
 		if (tempQuery instanceof SQLUpdateQuery){
 			try{
-				((SQLUpdateQuery)tempQuery).setProperties(Arrays.asList(properties));
+				((SQLUpdateQuery)tempQuery).setRowProperties(Arrays.asList(properties));
 			}catch(IllegalArgumentException are){
 				System.out.println(are.getMessage());
 			}

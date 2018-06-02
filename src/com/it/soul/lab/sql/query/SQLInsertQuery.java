@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.models.PropertyList;
+import com.it.soul.lab.sql.query.models.Row;
 
 public class SQLInsertQuery extends SQLQuery{
 	
 	private StringBuffer pqlBuffer = new StringBuffer("INSERT INTO ");
 	private StringBuffer paramBuffer = new StringBuffer(" ( ");
 	private StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
-	private PropertyList properties;
+	private Row row;
 	
 	@Override
 	public String queryString() throws IllegalArgumentException {
@@ -27,21 +27,21 @@ public class SQLInsertQuery extends SQLQuery{
 	
 	@Override
 	public String[] getColumns() {
-		if (properties == null){
+		if (row == null){
 			return super.getColumns();
 		}
-		return properties.getKeys();
+		return row.getKeys();
 	}
 	
-	public void setProperties(List<Property> props) throws IllegalArgumentException{
+	public void setRowProperties(List<Property> props) throws IllegalArgumentException{
 		if(props == null || props.size() == 0){
 			throw new IllegalArgumentException("In Properties can't be null or zero.");
 		}
-		this.properties = new PropertyList();
+		this.row = new Row();
 		int count = 0;
 		for (Property prop : props) {
 			if(prop.getKey().trim().equals("")){ continue; }
-			this.properties.add(prop);
+			this.row.add(prop);
 			if(count != 0){ paramBuffer.append(", "); valueBuffer.append(", "); }
 			paramBuffer.append( prop.getKey() );
 			bindPropertyToQuery(prop, true);
@@ -65,7 +65,7 @@ public class SQLInsertQuery extends SQLQuery{
 		}
 	}
 	
-	public static String createInsertQuery(String tableName, PropertyList properties){
+	public static String createInsertQuery(String tableName, Row properties){
 		
 		//Checking Illegal Arguments
 		try{
@@ -123,8 +123,8 @@ public class SQLInsertQuery extends SQLQuery{
 		return pqlBuffer.toString() + valueBuffer.toString();
 	}
 
-	public PropertyList getProperties() {
-		return properties;
+	public Row getRow() {
+		return row;
 	}
 	
 }

@@ -13,7 +13,7 @@ import com.it.soul.lab.sql.query.models.AndExpression;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.OrExpression;
-import com.it.soul.lab.sql.query.models.PropertyList;
+import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderTest {
@@ -130,7 +130,7 @@ public class QueryBuilderTest {
 	@Test
 	public void insertTest(){
 		
-		PropertyList nP = new PropertyList().add("name").add("age").add("sex");
+		Row nP = new Row().add("name").add("age").add("sex");
 		Property[] values =  (Property[]) nP.getCloneProperties().toArray(new Property[0]);
 		
 		SQLQuery insert = new SQLQuery.Builder(QueryType.INSERT)

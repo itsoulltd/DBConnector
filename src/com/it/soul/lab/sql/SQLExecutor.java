@@ -23,9 +23,9 @@ import com.it.soul.lab.sql.query.SQLQuery.DataType;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
-import com.it.soul.lab.sql.query.models.PropertyList;
+import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.models.PropertyListCollection;
+import com.it.soul.lab.sql.query.models.Table;
 
 public class SQLExecutor implements Serializable{
 
@@ -251,7 +251,7 @@ public class SQLExecutor implements Serializable{
      */
     @Deprecated
     public int executeUpdate(SQLUpdateQuery query
-    		, PropertyList setParameter)
+    		, Row setParameter)
     throws SQLException,Exception{
     	
     	if(setParameter == null 
@@ -300,7 +300,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeUpdate(SQLUpdateQuery query) throws SQLException,Exception{
     	
-    	PropertyList setProperties = query.getProperties();
+    	Row setProperties = query.getRow();
     	if(setProperties == null 
     			|| setProperties.size() <= 0){
     		throw new Exception("Set Parameter Should not be bull or empty!!!");
@@ -336,9 +336,9 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
-    private PropertyList getLeastAppropriateProperties(List<PropertyList> items, int index){
+    private Row getLeastAppropriateProperties(List<Row> items, int index){
     	if(items == null || items.isEmpty()){
-    		return new PropertyList();
+    		return new Row();
     	}
     	if(index < items.size()){
     		return items.get(index);
@@ -360,8 +360,8 @@ public class SQLExecutor implements Serializable{
      */
     public Integer[] executeBatchUpdate(int batchSize
     		, SQLUpdateQuery queryC
-    		, List<PropertyList> updateProperties
-    		, List<PropertyList> whereClause)
+    		, List<Row> updateProperties
+    		, List<Row> whereClause)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(updateProperties == null 
@@ -388,7 +388,7 @@ public class SQLExecutor implements Serializable{
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
 					
 					int length = keySet.length;
-					PropertyList whereClouseProperties = getLeastAppropriateProperties(whereClause, index);
+					Row whereClouseProperties = getLeastAppropriateProperties(whereClause, index);
 					String[] whereKeySet = whereClouseProperties.getKeys();
 					Map<String, Property> rowWhere = whereClouseProperties.keyValueMap();
 					stmt = bindValueToStatement(stmt, length + 1, whereKeySet, rowWhere);
@@ -480,7 +480,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeBatchDelete(int batchSize
     		, SQLDeleteQuery dQuery
-    		, List<PropertyList> whereClause)
+    		, List<Row> whereClause)
     throws SQLException,Exception{
     	
     	if(dQuery.getWhereParams() == null || dQuery.getWhereParams().length <= 0){
@@ -497,7 +497,7 @@ public class SQLExecutor implements Serializable{
             	conn.setAutoCommit(false);
                 int batchCount = 1;
                 stmt = conn.prepareStatement(query);
-            	for (PropertyList paramValue: whereClause) {
+            	for (Row paramValue: whereClause) {
             		
                     stmt = bindValueToStatement(stmt, 1, whereKeySet, paramValue.keyValueMap());
                     stmt.addBatch();
@@ -603,7 +603,7 @@ public class SQLExecutor implements Serializable{
             if(conn != null){
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,	Statement.RETURN_GENERATED_KEYS);
-                	stmt = bindValueToStatement(stmt, 1,iQuery.getProperties().getKeys(), iQuery.getProperties().keyValueMap());
+                	stmt = bindValueToStatement(stmt, 1,iQuery.getRow().getKeys(), iQuery.getRow().keyValueMap());
                 	stmt.executeUpdate();
                 	ResultSet set = stmt.getGeneratedKeys();
                 	if(set != null && set.next()){
@@ -611,7 +611,7 @@ public class SQLExecutor implements Serializable{
                 	}                	
             	}else{
             		stmt = conn.prepareStatement(query);
-                	stmt = bindValueToStatement(stmt, 1, iQuery.getProperties().getKeys(), iQuery.getProperties().keyValueMap());
+                	stmt = bindValueToStatement(stmt, 1, iQuery.getRow().getKeys(), iQuery.getRow().keyValueMap());
                 	affectedRows = stmt.executeUpdate();
             	}
             	if(!conn.getAutoCommit())
@@ -644,7 +644,7 @@ public class SQLExecutor implements Serializable{
     public Integer[] executeBatchInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
-    		, List<PropertyList> params)
+    		, List<Row> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -673,7 +673,7 @@ public class SQLExecutor implements Serializable{
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 	int batchCount = 1;
-            		for (PropertyList row : params) {
+            		for (Row row : params) {
                 		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
@@ -692,7 +692,7 @@ public class SQLExecutor implements Serializable{
             		stmt = conn.prepareStatement(query);
             		int batchCount = 1;
             		List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-            		for (PropertyList row : params) {
+            		for (Row row : params) {
                 		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
@@ -777,7 +777,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement pstmt = null;
         int rowCount = 0;
         String query = cQuery.toString();
-        PropertyList whereClause = cQuery.getWhereCompareProperties();
+        Row whereClause = cQuery.getWhereCompareProperties();
         try{
             if(conn != null){
                 pstmt = conn.prepareStatement(query);
@@ -848,7 +848,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement stmt = null;
         ResultSet rst=null;
         String queryStr = query.toString();
-        PropertyList whereClause = query.getWhereCompareProperties();
+        Row whereClause = query.getWhereCompareProperties();
         try{
             if(conn != null && !conn.isClosed()){
             	stmt = conn.prepareStatement(queryStr,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
@@ -865,11 +865,11 @@ public class SQLExecutor implements Serializable{
         return rst;           
     }
     
-    public PropertyListCollection collection(ResultSet rst, String...columns){
+    public Table collection(ResultSet rst, String...columns){
     	if(columns.length == 0) {
     		return collection(rst);
     	}
-    	PropertyListCollection result = new PropertyListCollection();
+    	Table result = new Table();
     	try{
     		//IF cursor is moved till last row. Then set to the above first row. 
     		if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
@@ -883,7 +883,7 @@ public class SQLExecutor implements Serializable{
     		}
 
     		while(rst.next()){ //For each Row
-    			PropertyList row = new PropertyList();
+    			Row row = new Row();
     			for(int x : columnIndecies){ //For each column in the columns
     				String key = rsmd.getColumnName(x);
     				DataType type = convertDataType(rsmd
@@ -907,8 +907,8 @@ public class SQLExecutor implements Serializable{
 	 * @param rst
 	 * @return
 	 */
-    public PropertyListCollection collection(ResultSet rst){
-    	PropertyListCollection result = new PropertyListCollection();
+    public Table collection(ResultSet rst){
+    	Table result = new Table();
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
@@ -918,7 +918,7 @@ public class SQLExecutor implements Serializable{
 			int numCol = rsmd.getColumnCount();
 			
 			while(rst.next()){ //For each Row
-				PropertyList row = new PropertyList();
+				Row row = new Row();
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
 					String key = rsmd.getColumnName(x);
 					DataType type = convertDataType(rsmd.getColumnTypeName(x));
@@ -936,8 +936,8 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<PropertyList> convertToLists(ResultSet rst){
-		List<PropertyList> result = new ArrayList<PropertyList>();
+	public List<Row> convertToLists(ResultSet rst){
+		List<Row> result = new ArrayList<Row>();
 		try{
 			
 			//IF cursor is moved till last row. Then set to the above first row. 
@@ -949,7 +949,7 @@ public class SQLExecutor implements Serializable{
 			int numCol = rsmd.getColumnCount();
 			
 			while(rst.next()){ //For each Row
-				PropertyList row = new PropertyList();
+				Row row = new Row();
 				for(int x = 1; x <= numCol; x++){ //For each column in a Row
 					
 					String key = rsmd.getColumnName(x);
@@ -969,11 +969,11 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public List<PropertyList> convertToLists(ResultSet rst, String...columns){
+	public List<Row> convertToLists(ResultSet rst, String...columns){
 		if(columns.length == 0){
             return convertToLists(rst);
         }
-		List<PropertyList> result = new ArrayList<PropertyList>();
+		List<Row> result = new ArrayList<Row>();
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
 			if(rst.getType() == ResultSet.TYPE_SCROLL_SENSITIVE && rst.isAfterLast()){
@@ -988,7 +988,7 @@ public class SQLExecutor implements Serializable{
             }
 			
 			while(rst.next()){ //For each Row
-				PropertyList row = new PropertyList();
+				Row row = new Row();
 				for(int x : columnIndecies){ //For each column in the paramProperties
 					String key = rsmd.getColumnName(x);
 					DataType type = convertDataType(rsmd
@@ -1303,8 +1303,8 @@ public class SQLExecutor implements Serializable{
 	 * @return
 	 */
 	
-	public PropertyList retrieveRow(ResultSet rst, int rowIndex){
-        PropertyList result = null;
+	public Row retrieveRow(ResultSet rst, int rowIndex){
+        Row result = null;
         try{
             ResultSetMetaData rsmd = rst.getMetaData();
             int numCol = rsmd.getColumnCount();
@@ -1312,7 +1312,7 @@ public class SQLExecutor implements Serializable{
             	
                 int offset = (rowIndex <= 0) ? 1 : rowIndex;
                 rst.absolute(offset);
-                PropertyList row = new PropertyList();
+                Row row = new Row();
                 
                 for(int x = 1; x <= numCol; x++){ //For each column in a Row
                     String key = rsmd.getColumnName(x);
@@ -1326,7 +1326,7 @@ public class SQLExecutor implements Serializable{
                 if(!rst.isAfterLast()){
                     while(rst.next()){
                         if(rowIndex == rst.getRow()){
-                            PropertyList row = new PropertyList();
+                            Row row = new Row();
                             for(int x = 1; x <= numCol; x++){ //For each column in a Row
                                 String key = rsmd.getColumnName(x);
                                 DataType type = convertDataType(rsmd.getColumnTypeName(x));
@@ -1347,9 +1347,9 @@ public class SQLExecutor implements Serializable{
         return result;
     }
 	
-	public PropertyList retrieveColumn(ResultSet rst, String indexColumn){
+	public Row retrieveColumn(ResultSet rst, String indexColumn){
 		
-		PropertyList result = new PropertyList();
+		Row result = new Row();
 		
 		try{
 			
@@ -1376,9 +1376,9 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
-	public PropertyList retrieveColumn(ResultSet rst, int indexColumn){
+	public Row retrieveColumn(ResultSet rst, int indexColumn){
 		
-		PropertyList result = new PropertyList();
+		Row result = new Row();
 		
 		try{
 			//IF cursor is moved till last row. Then set to the above first row. 
