@@ -26,100 +26,64 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	private static final String _MESSAGE = "GenericServiceImpl not available now!";
 	
 	public ORMService(EntityManager manager, String entity, Class<T> type){
-		//Must Call super constructor
 		super(manager,entity,type);
 	}
 	
 	@Override
 	public Collection<T> findAll() throws Exception {
-		
 		List<T> result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), null);
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns().from(getEntity()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
 		}
-		catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 	
 	@Override
 	public Collection<T> findAll(String[] propertyNames) throws Exception {
-		
 		List<T> result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames);
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			result = query.getResultList();
-		}catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		}catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public Collection<T> findAll(String searchKey, Object value,
 			String[] propertyNames) throws Exception {
-		
 		List<T> result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(Logic.AND, searchKey).build();
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getResultList();
-		}catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		}catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public Collection<T> findAll(Map<String, Object> keyValuePair,
 			Logic whereLogic, String[] propertyNames) throws Exception {
-		
 		List<T> result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, whereLogic, keyValuePair.keySet().toArray(new String[]{}));
 			String[] whereParams = keyValuePair.keySet().toArray(new String[]{});
 			JPQLQuery jpql = (JPQLQuery) new JPQLQuery.Builder(QueryType.SELECT).columns(propertyNames).from(getEntity()).whereParams(whereLogic, whereParams).build();
@@ -128,27 +92,17 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 				query.setParameter(item.getKey(), item.getValue());
 			}
 			result = query.getResultList();
-		}catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		}catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 	
 	public Collection<T> findAll(Map<String, Object> keyValuePair,
 			Logic whereLogic, Map<String, Operator> operators, String[] propertyNames) throws Exception {
-		
 		List<T> result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			//new way
 			String[] whereParams = keyValuePair.keySet().toArray(new String[0]);
 			List<Expression> compares = new ArrayList<Expression>();
@@ -165,25 +119,16 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			}
 			result = query.getResultList();
 		}
-		catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public Object findBy(String searchKey, Object value) throws Exception {
-		
 		Object result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), null, Logic.AND, new String[]{searchKey});
@@ -191,27 +136,17 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getSingleResult();
-			
 		}
-		catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 	
 	@Override
 	public Object findBy(String searchKey, Object value, String... propertyNames) throws Exception{
-		
 		Object result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
 		try{
 			//String jpql = JPQLBuilders.createSelectQuery(getEntity(), propertyNames, Logic.AND, new String[]{searchKey});
@@ -219,74 +154,43 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			TypedQuery<T> query = getEntityManager().createQuery(jpql.toString(), getEntityType());
 			query.setParameter(searchKey, value);
 			result = query.getSingleResult();
-			
 		}
-		catch(PersistenceException e){
-			result = null;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		catch(PersistenceException e){result = null;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public boolean isItemExist(Object itemId) throws Exception {
-		
 		boolean result = false;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			if(getEntityManager().find(getEntityType(), itemId) != null){
-				result = true;
-			}
-			
-		}catch (Exception e) {
-			throw e;
-		}
-		
+			if(getEntityManager().find(getEntityType(), itemId) != null){result = true;}
+		}catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public long getItemCount() throws Exception {
-		
 		long result = 0;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try{
-			
 			String pql = "SELECT COUNT(u) FROM "+getEntity()+" u";
 			Query query = getEntityManager().createQuery(pql);
 			Long val = (Long)query.getSingleResult();
 			result = val;
-			
-		}catch(PersistenceException e){
-			result = 0;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		
+		}catch(PersistenceException e){result = 0;}
+		catch (Exception e) {throw e;}
 		return result;
 	}
 
 	@Override
 	public synchronized Object addNewItem(Object item) throws Exception {
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return null;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
 		if(item != null){
-			
 			try{
 				getEntityManager().getTransaction().begin(); 
 				getEntityManager().persist(item);
@@ -296,22 +200,15 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 				throw e;
 			}
 		}
-		
 		return item;
 	}
 
 	@Override
 	public synchronized Object modifyItem(Object item) throws Exception {
-		
 		Object result = null;
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		if(item != null){
-			
 			try{
 				getEntityManager().getTransaction().begin();
 				result = getEntityManager().merge(item);
@@ -321,21 +218,15 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 				throw e;
 			}
 		}
-		
 		return result;
 	}
 
 	@Override
 	public synchronized boolean deleteItem(Object item) throws Exception {
-		
 		boolean result = false;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		if(item != null){
-			
 			try{
 				if(getEntityManager().contains(item)){
 					getEntityManager().getTransaction().begin();
@@ -348,19 +239,14 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 				throw e;
 			}
 		}
-		
 		return result;
 	}
 
 	@Override
 	public synchronized Collection<?> addNewItems(Collection<? extends Object> items)
 			throws Exception {
-		
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return null;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
 		try {
 			if (items != null && items.size() > 0) {
 				//TODO Optimize implementation for large number of items
@@ -380,16 +266,11 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	@Override
 	public synchronized Collection<?> modifyItems(Collection<? extends Object> items)
 			throws Exception {
-		
 		ArrayList<Object> result = null;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return null;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try {
 			if (items != null && items.size() > 0) {
-
 				result = new ArrayList<Object>();
 				//TODO Optimize implementation for large number of items
 				getEntityManager().getTransaction().begin();
@@ -409,13 +290,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	@Override
 	public synchronized boolean deleteItems(Collection<? extends Object> items)
 			throws Exception {
-		
 		boolean result = false;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return result;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try {
 			if (items != null && items.size() > 0) {
 				//TODO Optimize implementation for large number of items
@@ -438,13 +315,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	public Collection<?> addNewItems(Collection<? extends Object> items,
 			int batchSize) throws Exception {
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return null;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
 		try {
 			if (items != null && items.size() > 0) {
-				
 				getEntityManager().getTransaction().begin();
 				int counter = 1;
 				for (Object _item : items) {
@@ -469,13 +342,9 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 			int batchSize) throws Exception {
 		ArrayList<Object> result = null;
 		//Checking entityManager
-		if(getEntityManager() == null || !getEntityManager().isOpen()){
-			return null;
-		}
-		
+		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try {
 			if (items != null && items.size() > 0) {
-
 				result = new ArrayList<Object>();
 				getEntityManager().getTransaction().begin();
 				int counter = 1;
@@ -499,9 +368,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	
 	@Override
 	public Object refresh(Object item) throws Exception{
-		
 		Object result = null;
-		
 		if(item != null){
 			result = item;
 			try{
@@ -511,61 +378,46 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 					result = getEntityManager().merge(item);
 					getEntityManager().refresh(result);
 				}
-			}catch(Exception e){
-				throw e;
-			}
+			}catch(Exception e){throw e;}
 		}
-		
 		return result;
 	}
 
 	@Override
 	public Collection<T> refresh(Collection<T> items) throws Exception {
-		
 		try{
 			if(items != null && items.size() > 0){
 				for(Object item : items){
 					getEntityManager().refresh(item);
 				}
 			}
-		}catch(Exception e){
-			throw e;
-		}
-		
+		}catch(Exception e){throw e;}
 		return items;
 	}
 
 	@Override
 	public void clearItem(Object item) throws Exception {
-		
 		if(item != null){
 			try{
 				if(getEntityManager().contains(item))
 					getEntityManager().detach(item);
-			}catch (Exception e) {
-				throw e;
-			}
+			}catch (Exception e) {throw e;}
 		}
 	}
 
 	@Override
 	public void clearItems(Collection<T> items) throws Exception {
-		
 		if(items != null && items.size() > 0){
 			try{
 				for(Object item : items){
 					if(getEntityManager().contains(item))
 						getEntityManager().detach(item);
 				}
-			}catch (Exception e) {
-				throw e;
-			}
+			}catch (Exception e) {throw e;}
 		}		
 	}
 
 	@Override
-	public String toString() {
-		return  _TAG + " extends " + super.toString();
-	}
+	public String toString() {return  _TAG + " extends " + super.toString();}
 
 }

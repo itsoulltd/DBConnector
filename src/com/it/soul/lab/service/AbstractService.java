@@ -12,12 +12,10 @@ public abstract class AbstractService<T> {
 	private String entity = null;
 	private Class<T> entityType = null;
 	
-	public AbstractService(){
-		
-	}
+	private AbstractService(){}
 	
 	public AbstractService(EntityManager manager, String entity, Class<T> type){
-		
+		this();
 		this.entityManager = manager;
 		this.entity = entity;
 		this.entityType = type;
@@ -37,7 +35,6 @@ public abstract class AbstractService<T> {
 	
 	@Override
 	public String toString() {
-		
 		return _TAG;
 	}
 	

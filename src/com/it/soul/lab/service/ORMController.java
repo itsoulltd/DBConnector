@@ -7,8 +7,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 
-import org.eclipse.persistence.exceptions.EntityManagerSetupException;
-
 
 public class ORMController implements Serializable{
 
@@ -16,7 +14,7 @@ public class ORMController implements Serializable{
 	private EntityManagerFactory emf = null;
 	private EntityManager em = null;
 	
-	public ORMController(String persistenceUnitName) throws EntityManagerSetupException{
+	public ORMController(String persistenceUnitName) throws IllegalStateException{
 		createEntityManager(persistenceUnitName);
 	}
 	
@@ -38,7 +36,7 @@ public class ORMController implements Serializable{
 		}
 	}
 
-	private void createEntityManager(String persistenceUnit) throws EntityManagerSetupException{
+	private void createEntityManager(String persistenceUnit) throws IllegalStateException{
 		if(em == null){
 			emf = Persistence.createEntityManagerFactory(persistenceUnit); 
 			em = emf.createEntityManager();
@@ -47,7 +45,7 @@ public class ORMController implements Serializable{
 		}
 	}
 	
-	public void closeEntityManager() throws EntityManagerSetupException,Exception{
+	public void closeEntityManager() throws IllegalStateException,Exception{
 		if(em != null){
 			try{
 				if(em.isOpen()){
@@ -55,7 +53,7 @@ public class ORMController implements Serializable{
 					em.flush();
 					em.getTransaction().commit();
 				}
-			}catch(EntityManagerSetupException e){
+			}catch(IllegalStateException e){
 				em.getTransaction().rollback();
 				throw e;
 			}catch(Exception e){
