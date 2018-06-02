@@ -4,6 +4,10 @@ import java.text.SimpleDateFormat;
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
 public class Property {
+	public Property() {
+		super();
+	}
+
 	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private String key = null;
 	private DataType type = null;
