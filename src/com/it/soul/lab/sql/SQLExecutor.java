@@ -23,7 +23,7 @@ import com.it.soul.lab.sql.query.SQLQuery.DataType;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
-import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.PropertyList;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class SQLExecutor implements Serializable{
@@ -250,7 +250,7 @@ public class SQLExecutor implements Serializable{
      */
     @Deprecated
     public int executeUpdate(SQLUpdateQuery query
-    		, Properties setParameter)
+    		, PropertyList setParameter)
     throws SQLException,Exception{
     	
     	if(setParameter == null 
@@ -299,7 +299,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeUpdate(SQLUpdateQuery query) throws SQLException,Exception{
     	
-    	Properties setProperties = query.getProperties();
+    	PropertyList setProperties = query.getProperties();
     	if(setProperties == null 
     			|| setProperties.size() <= 0){
     		throw new Exception("Set Parameter Should not be bull or empty!!!");
@@ -335,9 +335,9 @@ public class SQLExecutor implements Serializable{
         return rowUpdated;		
     }
     
-    private Properties getLeastAppropriateProperties(List<Properties> items, int index){
+    private PropertyList getLeastAppropriateProperties(List<PropertyList> items, int index){
     	if(items == null || items.isEmpty()){
-    		return new Properties();
+    		return new PropertyList();
     	}
     	if(index < items.size()){
     		return items.get(index);
@@ -359,8 +359,8 @@ public class SQLExecutor implements Serializable{
      */
     public Integer[] executeBatchUpdate(int batchSize
     		, SQLUpdateQuery queryC
-    		, List<Properties> updateProperties
-    		, List<Properties> whereClause)
+    		, List<PropertyList> updateProperties
+    		, List<PropertyList> whereClause)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(updateProperties == null 
@@ -387,7 +387,7 @@ public class SQLExecutor implements Serializable{
 					stmt = bindValueToStatement(stmt, 1, keySet, row);
 					
 					int length = keySet.length;
-					Properties whereClouseProperties = getLeastAppropriateProperties(whereClause, index);
+					PropertyList whereClouseProperties = getLeastAppropriateProperties(whereClause, index);
 					String[] whereKeySet = whereClouseProperties.getKeys();
 					Map<String, Property> rowWhere = whereClouseProperties.keyValueMap();
 					stmt = bindValueToStatement(stmt, length + 1, whereKeySet, rowWhere);
@@ -479,7 +479,7 @@ public class SQLExecutor implements Serializable{
      */
     public int executeBatchDelete(int batchSize
     		, SQLDeleteQuery dQuery
-    		, List<Properties> whereClause)
+    		, List<PropertyList> whereClause)
     throws SQLException,Exception{
     	
     	if(dQuery.getWhereParams() == null || dQuery.getWhereParams().length <= 0){
@@ -496,7 +496,7 @@ public class SQLExecutor implements Serializable{
             	conn.setAutoCommit(false);
                 int batchCount = 1;
                 stmt = conn.prepareStatement(query);
-            	for (Properties paramValue: whereClause) {
+            	for (PropertyList paramValue: whereClause) {
             		
                     stmt = bindValueToStatement(stmt, 1, whereKeySet, paramValue.keyValueMap());
                     stmt.addBatch();
@@ -643,7 +643,7 @@ public class SQLExecutor implements Serializable{
     public Integer[] executeBatchInsert(boolean isAutoGenaretedId
     		, int batchSize
     		, String tableName
-    		, List<Properties> params)
+    		, List<PropertyList> params)
     throws SQLException,IllegalArgumentException,Exception{
     	
     	if(params == null || params.size() <= 0){
@@ -672,7 +672,7 @@ public class SQLExecutor implements Serializable{
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 	int batchCount = 1;
-            		for (Properties row : params) {
+            		for (PropertyList row : params) {
                 		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
@@ -691,7 +691,7 @@ public class SQLExecutor implements Serializable{
             		stmt = conn.prepareStatement(query);
             		int batchCount = 1;
             		List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
-            		for (Properties row : params) {
+            		for (PropertyList row : params) {
                 		stmt = bindValueToStatement(stmt, 1, keySet, row.keyValueMap());
                 		stmt.addBatch();
                 		if((++batchCount % batchSize) == 0){
@@ -776,7 +776,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement pstmt = null;
         int rowCount = 0;
         String query = cQuery.toString();
-        Properties whereClause = cQuery.getWhereCompareProperties();
+        PropertyList whereClause = cQuery.getWhereCompareProperties();
         try{
             if(conn != null){
                 pstmt = conn.prepareStatement(query);
@@ -847,7 +847,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement stmt = null;
         ResultSet rst=null;
         String queryStr = query.toString();
-        Properties whereClause = query.getWhereCompareProperties();
+        PropertyList whereClause = query.getWhereCompareProperties();
         try{
             if(conn != null && !conn.isClosed()){
             	stmt = conn.prepareStatement(queryStr,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);

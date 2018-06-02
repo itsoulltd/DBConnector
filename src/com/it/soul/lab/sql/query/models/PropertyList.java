@@ -7,19 +7,29 @@ import java.util.Map;
 
 import com.it.soul.lab.sql.query.SQLQuery.DataType;
 
-public class Properties {
+public class PropertyList {
+	public PropertyList() {
+		super();
+	}
+	public List<Property> getItems() {
+		return items;
+	}
+	public void setItems(List<Property> items) {
+		if(items == null) {return;}
+		this.items = items;
+	}
 	private List<Property> items = new ArrayList<Property>();
-	public Properties add(Property prop){
+	public PropertyList add(Property prop){
 		if (items.contains(prop)){
 			return this;
 		}
 		items.add(prop);
 		return this;
 	}
-	public Properties add(String name){
+	public PropertyList add(String name){
 		return add(new Property(name));
 	}
-	public Properties add(String name, Object value, DataType type){
+	public PropertyList add(String name, Object value, DataType type){
 		return add(new Property(name, value, type));
 	}
 	public List<Property> getProperties(){

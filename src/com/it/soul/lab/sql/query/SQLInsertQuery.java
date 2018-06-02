@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.it.soul.lab.sql.query.models.Property;
-import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.PropertyList;
 
 public class SQLInsertQuery extends SQLQuery{
 	
 	private StringBuffer pqlBuffer = new StringBuffer("INSERT INTO ");
 	private StringBuffer paramBuffer = new StringBuffer(" ( ");
 	private StringBuffer valueBuffer = new StringBuffer(" VALUES ( ");
-	private Properties properties;
+	private PropertyList properties;
 	
 	@Override
 	public String queryString() throws IllegalArgumentException {
@@ -37,7 +37,7 @@ public class SQLInsertQuery extends SQLQuery{
 		if(props == null || props.size() == 0){
 			throw new IllegalArgumentException("In Properties can't be null or zero.");
 		}
-		this.properties = new Properties();
+		this.properties = new PropertyList();
 		int count = 0;
 		for (Property prop : props) {
 			if(prop.getKey().trim().equals("")){ continue; }
@@ -65,7 +65,7 @@ public class SQLInsertQuery extends SQLQuery{
 		}
 	}
 	
-	public static String createInsertQuery(String tableName, Properties properties){
+	public static String createInsertQuery(String tableName, PropertyList properties){
 		
 		//Checking Illegal Arguments
 		try{
@@ -123,7 +123,7 @@ public class SQLInsertQuery extends SQLQuery{
 		return pqlBuffer.toString() + valueBuffer.toString();
 	}
 
-	public Properties getProperties() {
+	public PropertyList getProperties() {
 		return properties;
 	}
 	

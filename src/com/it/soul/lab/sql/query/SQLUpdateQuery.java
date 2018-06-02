@@ -4,14 +4,14 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
-import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.PropertyList;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class SQLUpdateQuery extends SQLSelectQuery{
 	
 	protected StringBuffer paramBuffer;
 	protected StringBuffer whereBuffer;
-	private Properties properties;
+	private PropertyList properties;
 	
 	public SQLUpdateQuery() {
 		this.pqlBuffer = new StringBuffer("UPDATE ");
@@ -42,7 +42,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 		}
 	}
 	
-	public Properties getProperties() {
+	public PropertyList getProperties() {
 		return properties;
 	}
 	
@@ -50,7 +50,7 @@ public class SQLUpdateQuery extends SQLSelectQuery{
 		if(props == null || props.size() == 0){
 			throw new IllegalArgumentException("In Properties can't be null or zero.");
 		}
-		properties = new Properties();
+		properties = new PropertyList();
 		for (Property property : props) {
 			properties.add(property);
 		}

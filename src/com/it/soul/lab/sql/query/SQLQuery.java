@@ -8,7 +8,7 @@ import java.util.List;
 import com.it.soul.lab.sql.query.builder.QueryBuilderImpl;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
-import com.it.soul.lab.sql.query.models.Properties;
+import com.it.soul.lab.sql.query.models.PropertyList;
 
 public class SQLQuery {
 	
@@ -43,7 +43,7 @@ public class SQLQuery {
 		return whereCompareParams;
 	}
 	
-	public Properties getWhereCompareProperties() {
+	public PropertyList getWhereCompareProperties() {
 		return Expression.convertToProperties(whereCompareParams);
 	}
 

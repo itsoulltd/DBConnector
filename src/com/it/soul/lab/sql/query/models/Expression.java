@@ -50,8 +50,8 @@ public class Expression implements ExpressionInterpreter{
 		return resutls;
 	}
 	
-	public static Properties convertToProperties(List<Expression> coms){
-		Properties props = new Properties();
+	public static PropertyList convertToProperties(List<Expression> coms){
+		PropertyList props = new PropertyList();
 		if(coms == null){
 			return props;
 		}
