@@ -1,5 +1,6 @@
 package com.it.soul.lab.sql.query.models;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +22,7 @@ public class Row {
 	}
 	private List<Property> properties = new ArrayList<Property>();
 	public Row add(Property prop){
-		if (properties.contains(prop)){
-			return this;
-		}
+		if (prop == null || properties.contains(prop) == true) {return this;}
 		properties.add(prop);
 		return this;
 	}
@@ -78,4 +77,18 @@ public class Row {
     public int size(){
     	return properties.size();
     }
+    public <T> T inflate(Class<T> type) throws InstantiationException, IllegalAccessException {
+		Class<T> cls = type;
+		T newInstance = cls.newInstance();
+		Field[] fields = cls.getDeclaredFields();
+		Map<String, Property> data = this.keyValueMap();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Property entry = data.get(field.getName());
+            if(entry != null) {
+            	field.set(newInstance, entry.getValue());
+            }
+        }
+		return newInstance;
+	}
 }

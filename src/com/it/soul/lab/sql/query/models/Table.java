@@ -20,9 +20,7 @@ public class Table {
 		this.rows = items;
 	}
 	public Table add(Row list){
-		if (rows.contains(list)){
-			return this;
-		}
+		if (list == null || rows.contains(list) == true){return this;}
 		rows.add(list);
 		return this;
 	}
