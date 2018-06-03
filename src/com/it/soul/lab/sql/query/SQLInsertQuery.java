@@ -3,6 +3,7 @@ package com.it.soul.lab.sql.query;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.Row;
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Operator;
 
 public class JPQLSelectQuery extends SQLSelectQuery {
 

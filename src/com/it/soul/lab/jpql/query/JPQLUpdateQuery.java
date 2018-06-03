@@ -5,6 +5,7 @@ import java.util.List;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Operator;
 
 public class JPQLUpdateQuery extends SQLUpdateQuery {
 	

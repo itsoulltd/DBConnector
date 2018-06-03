@@ -2,8 +2,8 @@ package com.it.soul.lab.jpql.query;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
-import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.models.Operator;
+import com.it.soul.lab.sql.query.models.Logic;
 
 @Deprecated
 public class JPQLBuilders {

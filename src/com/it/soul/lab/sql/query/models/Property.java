@@ -1,9 +1,10 @@
 package com.it.soul.lab.sql.query.models;
 
 import java.text.SimpleDateFormat;
-import com.it.soul.lab.sql.query.SQLQuery.DataType;
+import com.it.soul.lab.sql.query.models.DataType;
 
 public class Property {
+	
 	public Property() {
 		super();
 	}
@@ -36,6 +37,10 @@ public class Property {
 	
 	public Property(String key, String value){
 		this(key, value, DataType.STRING);
+	}
+	
+	public Property(Property prop) {
+		this(prop.getKey(), prop.getValue(), prop.getType());
 	}
 	
 	@Override

@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Logic;
+import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Property;
 

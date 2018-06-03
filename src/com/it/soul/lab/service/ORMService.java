@@ -13,11 +13,11 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
-import com.it.soul.lab.sql.query.SQLQuery.Logic;
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.Logic;
+import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class ORMService<T> extends AbstractService<T> implements ORMServiceProtocol<T>,Serializable {

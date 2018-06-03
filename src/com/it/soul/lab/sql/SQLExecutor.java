@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.it.soul.lab.sql.query.SQLScalerQuery;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
-import com.it.soul.lab.sql.query.SQLQuery.DataType;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.SQLScalerQuery;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
-import com.it.soul.lab.sql.query.models.Row;
+import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Table;
 
 public class SQLExecutor implements Serializable{

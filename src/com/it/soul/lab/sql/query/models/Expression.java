@@ -3,8 +3,8 @@ package com.it.soul.lab.sql.query.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
-import com.it.soul.lab.sql.query.SQLQuery.DataType;
+import com.it.soul.lab.sql.query.models.Operator;
+import com.it.soul.lab.sql.query.models.DataType;
 
 public class Expression implements ExpressionInterpreter{
 	public Expression(String property, Operator type){

@@ -5,9 +5,9 @@ import org.junit.Test;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
-import com.it.soul.lab.sql.query.SQLQuery.DataType;
-import com.it.soul.lab.sql.query.SQLQuery.Logic;
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
+import com.it.soul.lab.sql.query.models.DataType;
+import com.it.soul.lab.sql.query.models.Logic;
+import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.AndExpression;
 import com.it.soul.lab.sql.query.models.Expression;

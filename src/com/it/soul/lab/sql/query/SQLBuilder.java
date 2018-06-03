@@ -3,8 +3,9 @@ package com.it.soul.lab.sql.query;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.it.soul.lab.sql.query.SQLQuery.Operator;
-import com.it.soul.lab.sql.query.SQLQuery.Logic;
+import com.it.soul.lab.sql.query.models.Operator;
+import com.it.soul.lab.sql.query.models.DataType;
+import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Property;
 
 @Deprecated
@@ -36,10 +37,10 @@ public class SQLBuilder {
 		
 		if(whereParam != null && paramValue != null){
 			builder.append(" Where " + whereParam +" "+ type.toString() +" ");
-			if(paramValue.getType() == SQLQuery.DataType.BOOL 
-					|| paramValue.getType() == SQLQuery.DataType.INT
-					|| paramValue.getType() == SQLQuery.DataType.DOUBLE
-					|| paramValue.getType() == SQLQuery.DataType.FLOAT) {
+			if(paramValue.getType() == DataType.BOOL 
+					|| paramValue.getType() == DataType.INT
+					|| paramValue.getType() == DataType.DOUBLE
+					|| paramValue.getType() == DataType.FLOAT) {
 				builder.append(paramValue.getValue());
 			}else{
 				builder.append("'"+paramValue.getValue()+"'");
@@ -129,10 +130,10 @@ public class SQLBuilder {
 		
 		if(whereParam != null && paramValue != null){
 			builder.append(" Where " + whereParam +" "+ type.toString() +" ");
-			if(paramValue.getType() == SQLQuery.DataType.BOOL 
-					|| paramValue.getType() == SQLQuery.DataType.INT
-					|| paramValue.getType() == SQLQuery.DataType.DOUBLE
-					|| paramValue.getType() == SQLQuery.DataType.FLOAT) {
+			if(paramValue.getType() == DataType.BOOL 
+					|| paramValue.getType() == DataType.INT
+					|| paramValue.getType() == DataType.DOUBLE
+					|| paramValue.getType() == DataType.FLOAT) {
 				builder.append(paramValue.getValue());
 			}else{
 				builder.append("'"+paramValue.getValue()+"'");
@@ -501,10 +502,10 @@ public class SQLBuilder {
 				pqlBuffer.append( ent.getKey() );
 				
 				Property val = ent.getValue();
-				if(val.getType() == SQLQuery.DataType.BOOL 
-    					|| val.getType() == SQLQuery.DataType.INT
-    					|| val.getType() == SQLQuery.DataType.DOUBLE
-    					|| val.getType() == SQLQuery.DataType.FLOAT) {
+				if(val.getType() == DataType.BOOL 
+    					|| val.getType() == DataType.INT
+    					|| val.getType() == DataType.DOUBLE
+    					|| val.getType() == DataType.FLOAT) {
 					valueBuffer.append(val.getValue().toString());
 				}else{
 					valueBuffer.append("'"+val.getValue().toString()+"'");

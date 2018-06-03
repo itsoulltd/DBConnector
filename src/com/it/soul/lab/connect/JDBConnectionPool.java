@@ -203,7 +203,7 @@ public class JDBConnectionPool implements Serializable{
      * @param conn
      * @throws SQLException
      */
-    synchronized public void releaseConnection(Connection conn)
+    synchronized public void close(Connection conn)
     {
         try{
             if(conn != null && ! conn.getAutoCommit()){
