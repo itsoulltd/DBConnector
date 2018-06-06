@@ -14,6 +14,7 @@ import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.OrExpression;
 import com.it.soul.lab.sql.query.models.Row;
+import com.it.soul.lab.sql.query.models.ScalerType;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderTest {
@@ -246,5 +247,14 @@ public class QueryBuilderTest {
 				.build();
 
 		Assert.assertEquals("SELECT name, age FROM Passenger  ORDER BY id ASC", qu10.toString());
+		
+		SQLQuery qu11 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name",ScalerType.COUNT.functionAlias("age"))
+				.from("Passenger")
+				.groupBy("name")
+				.orderBy(ScalerType.COUNT.function("age"))
+				.build();
+
+		Assert.assertEquals("SELECT name, COUNT(age) AS count_age FROM Passenger  GROUP BY name ORDER BY COUNT(age) ASC", qu11.toString());
 	}
 }

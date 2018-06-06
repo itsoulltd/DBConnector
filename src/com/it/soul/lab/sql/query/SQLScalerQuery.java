@@ -7,35 +7,9 @@ import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.ScalerType;
 
 public class SQLScalerQuery extends SQLSelectQuery{
-	
-	public static enum ScalerType{
-		COUNT,
-		DISTINCT,
-		MAX,
-		MIN;
-		
-		public String toString(){
-			String result;
-			switch (this) {
-			case DISTINCT:
-				result = "DISTINCT";
-				break;
-			case MAX:
-				result = "MAX";
-				break;
-			case MIN:
-				result = "MIN";
-				break;
-			default:
-				result = "COUNT";
-				break;
-			}
-			return result;
-		}
-		
-	}
 	
 	public SQLScalerQuery() {
 		this(ScalerType.COUNT);

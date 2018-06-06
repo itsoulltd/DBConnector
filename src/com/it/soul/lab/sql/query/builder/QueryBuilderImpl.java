@@ -10,15 +10,15 @@ import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLScalerQuery;
-import com.it.soul.lab.sql.query.SQLScalerQuery.ScalerType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.ScalerType;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
-, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, OrderByBuilder{
+, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, GroupByBuilder{
 
 	protected QueryType tempType = QueryType.SELECT;
 	protected SQLQuery tempQuery;
@@ -67,12 +67,12 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		tempQuery.setColumns(name);
 		return this;
 	}
-	public OrderByBuilder whereParams(Logic logic, String... name){
+	public GroupByBuilder whereParams(Logic logic, String... name){
 		if (logic != null){tempQuery.setLogic(logic);}
 		tempQuery.setWhereParams(name);
 		return this;
 	}
-	public OrderByBuilder whereParams(Logic logic, Expression... comps){
+	public GroupByBuilder whereParams(Logic logic, Expression... comps){
 		if (logic != null){tempQuery.setLogic(logic);}
 		List<Expression> items = Arrays.asList(comps);
 		tempQuery.setWhereCompareParams(items);
@@ -129,7 +129,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		return this;
 	}
 	@Override
-	public OrderByBuilder where(ExpressionInterpreter expression) {
+	public GroupByBuilder where(ExpressionInterpreter expression) {
 		tempQuery.setWhereExpression(expression); 
 		return this;
 	}
@@ -144,6 +144,13 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public LimitBuilder orderBy(String... columns) {
 		if(tempQuery instanceof SQLSelectQuery) {
 			((SQLSelectQuery)tempQuery).setOrderBy(Arrays.asList(columns), Operator.ASC);
+		}
+		return this;
+	}
+	@Override
+	public OrderByBuilder groupBy(String... columns) {
+		if(tempQuery instanceof SQLSelectQuery) {
+			((SQLSelectQuery)tempQuery).setGroupBy(Arrays.asList(columns));
 		}
 		return this;
 	}
