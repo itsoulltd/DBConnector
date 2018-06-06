@@ -249,10 +249,10 @@ public class QueryBuilderTest {
 		Assert.assertEquals("SELECT name, age FROM Passenger  ORDER BY id ASC", qu10.toString());
 		
 		SQLQuery qu11 = new SQLQuery.Builder(QueryType.SELECT)
-				.columns("name",ScalerType.COUNT.functionAlias("age"))
+				.columns("name",ScalerType.COUNT.toAlias("age"))
 				.from("Passenger")
 				.groupBy("name")
-				.orderBy(ScalerType.COUNT.function("age"))
+				.orderBy(ScalerType.COUNT.toString("age"))
 				.build();
 
 		Assert.assertEquals("SELECT name, COUNT(age) AS count_age FROM Passenger  GROUP BY name ORDER BY COUNT(age) ASC", qu11.toString());

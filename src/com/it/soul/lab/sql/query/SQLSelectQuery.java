@@ -13,6 +13,7 @@ public class SQLSelectQuery extends SQLQuery{
 	protected Integer limit;
 	protected Integer offset;
 	protected List<String> orderByList;
+	protected List<String> groupByList;
 	
 	public SQLSelectQuery() {
 		this.pqlBuffer = new StringBuffer("SELECT ");
@@ -51,17 +52,17 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	public void setGroupBy(List<String> columns) {
-		this.orderByList = columns;
+		this.groupByList = columns;
 		if (columns != null && columns.size() > 0) {
-			StringBuffer orderBuffer = new StringBuffer(" GROUP BY ");
+			StringBuffer groupBuffer = new StringBuffer(" GROUP BY ");
 			int count = 0;
 			for(String col : columns) {
 				if(col.trim().equals("")){continue;}
 				if(count++ != 0){pqlBuffer.append(", ");}
-				orderBuffer.append(col);
+				groupBuffer.append(col);
 			}
 			if (count > 0) {
-				pqlBuffer.append(orderBuffer.toString());
+				pqlBuffer.append(groupBuffer.toString());
 			}
 		}
 	}

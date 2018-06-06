@@ -33,41 +33,13 @@ public enum ScalerType{
 		return result;
 	}
 	
-	public String function(String column){
-		String result;
-		switch (this) {
-		case DISTINCT:
-			result = this.toString()+"("+column+")";
-			break;
-		case MAX:
-			result = this.toString()+"("+column+")";
-			break;
-		case MIN:
-			result = this.toString()+"("+column+")";
-			break;
-		default:
-			result = this.toString()+"("+column+")";
-			break;
-		}
+	public String toString(String column){
+		String result = this.toString()+"("+column+")";
 		return result;
 	}
 	
-	public String functionAlias(String column){
-		String result;
-		switch (this) {
-		case DISTINCT:
-			result = this.toString()+"("+column+") AS distinct_"+column;
-			break;
-		case MAX:
-			result = this.toString()+"("+column+") AS max_"+column;
-			break;
-		case MIN:
-			result = this.toString()+"("+column+") AS min_"+column;
-			break;
-		default:
-			result = this.toString()+"("+column+") AS count_"+column;
-			break;
-		}
+	public String toAlias(String column){
+		String result = this.toString(column)+" AS " + this.toString().toLowerCase()+"_"+column;
 		return result;
 	}
 	
