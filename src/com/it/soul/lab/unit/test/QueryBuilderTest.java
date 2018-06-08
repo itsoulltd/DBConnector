@@ -247,6 +247,10 @@ public class QueryBuilderTest {
 
 		Assert.assertEquals("SELECT name, age FROM Passenger  ORDER BY id ASC", qu10.toString());
 		
+	}
+	
+	@Test public void GroupBy() {
+		
 		SQLQuery qu11 = new SQLQuery.Builder(QueryType.SELECT)
 				.columns("name",ScalerType.COUNT.toAlias("age"))
 				.from("Passenger")
@@ -255,5 +259,17 @@ public class QueryBuilderTest {
 				.build();
 
 		Assert.assertEquals("SELECT name, COUNT(age) AS count_age FROM Passenger  GROUP BY name ORDER BY COUNT(age) ASC", qu11.toString());
+		
+		SQLQuery qu12 = new SQLQuery.Builder(QueryType.SELECT)
+				.columns("name",ScalerType.COUNT.toAlias("age"))
+				.from("Passenger")
+				.groupBy("name")
+				.having(new Expression(ScalerType.COUNT.toString("age"), Operator.GREATER_THAN))
+				.orderBy(ScalerType.COUNT.toString("age"))
+				.build();
+
+		Assert.assertEquals("SELECT name, COUNT(age) AS count_age FROM Passenger  GROUP BY name HAVING COUNT(age) > ? ORDER BY COUNT(age) ASC", qu12.toString());
+		
 	}
+	
 }

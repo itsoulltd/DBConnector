@@ -25,6 +25,8 @@ import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.ScalerType;
+import com.it.soul.lab.sql.query.models.Table;
 
 public class QueryExecutionTest {
 	
@@ -82,6 +84,7 @@ public class QueryExecutionTest {
 		try {
 			ResultSet set = exe.executeSelect(qc);
 			List<Map<String,Object>> x = exe.convertToKeyValuePaire(set);
+			//Table x = exe.collection(set);
 			Assert.assertEquals(exe.toString(x), str);
 			
 		} catch (IllegalArgumentException | SQLException e) {
@@ -146,5 +149,26 @@ public class QueryExecutionTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test public void GroupByHaving() {
+		
+		try {
+			SQLSelectQuery qu12 = (SQLSelectQuery) new SQLQuery.Builder(QueryType.SELECT)
+					.columns("name",ScalerType.COUNT.toAlias("age"))
+					.from("Passenger")
+					.groupBy("name")
+					.having(new Expression(ScalerType.COUNT.toString("age"), Operator.GREATER_THAN).setPropertyValue(28, DataType.INT))
+					.orderBy(ScalerType.COUNT.toString("age"))
+					.build();
+			
+			ResultSet set = exe.executeSelect(qu12);
+			Table x = exe.collection(set);
+			Assert.assertEquals(exe.toString(x), "");
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

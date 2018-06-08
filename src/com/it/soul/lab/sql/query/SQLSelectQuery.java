@@ -1,11 +1,14 @@
 package com.it.soul.lab.sql.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Operator;
+import com.it.soul.lab.sql.query.models.Row;
 
 public class SQLSelectQuery extends SQLQuery{
 	
@@ -14,6 +17,7 @@ public class SQLSelectQuery extends SQLQuery{
 	protected Integer offset;
 	protected List<String> orderByList;
 	protected List<String> groupByList;
+	protected ExpressionInterpreter havingInterpreter;
 	
 	public SQLSelectQuery() {
 		this.pqlBuffer = new StringBuffer("SELECT ");
@@ -67,6 +71,24 @@ public class SQLSelectQuery extends SQLQuery{
 		}
 	}
 	
+	public void setHavingExpression(ExpressionInterpreter interpreter) {
+		this.havingInterpreter = interpreter;
+		pqlBuffer.append(" HAVING " + interpreter.interpret());
+	}
+	
+	@Override
+	public Row getWhereProperties() {
+		if(havingInterpreter != null) {
+			List<Expression> exps = super.getWhereParamExpressions();
+			if(exps == null) {
+				exps = new ArrayList<Expression>();
+				super.setWhereParamExpressions(exps);
+			}
+			exps.addAll(Arrays.asList(havingInterpreter.resolveExpressions()));
+		}
+		return super.getWhereProperties();
+	}
+	
 	@Override
 	public void setColumns(String[] columns) {
 		super.setColumns(columns);
@@ -109,8 +131,8 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	@Override
-	public void setWhereCompareParams(List<Expression> whereParams) {
-		super.setWhereCompareParams(whereParams);
+	public void setWhereParamExpressions(List<Expression> whereParams) {
+		super.setWhereParamExpressions(whereParams);
 		prepareWhereParams(whereParams);
 	}
 	

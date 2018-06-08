@@ -38,19 +38,19 @@ public class SQLQuery {
 	public void setWhereExpression(ExpressionInterpreter whereExpression) {
 		this.whereExpression = whereExpression;
 		Expression[] comps = whereExpression.resolveExpressions();
-		this.whereCompareParams = Arrays.asList(comps);
+		this.whereParamExpressions = Arrays.asList(comps);
 	}
 	
-	public List<Expression> getWhereCompareParams() {
-		return whereCompareParams;
+	public List<Expression> getWhereParamExpressions() {
+		return whereParamExpressions;
 	}
 	
-	public Row getWhereCompareProperties() {
-		return Expression.convertToRow(whereCompareParams);
+	public void setWhereParamExpressions(List<Expression> params) {
+		this.whereParamExpressions = params;
 	}
-
-	public void setWhereCompareParams(List<Expression> whereCompareParams) {
-		this.whereCompareParams = whereCompareParams;
+	
+	public Row getWhereProperties() {
+		return Expression.convertToRow(whereParamExpressions);
 	}
 
 	protected static boolean isAllParamEmpty(Object[]paramList){
@@ -69,17 +69,17 @@ public class SQLQuery {
 	}
 	
 	public String[] getWhereParams() {
-		if (whereParams == null && whereCompareParams != null) {
-			return getWhereCompareProperties().getKeys();
+		if (whereParams == null && whereParamExpressions != null) {
+			return getWhereProperties().getKeys();
 		}
 		return whereParams;
 	}
 	public void setWhereParams(String[] whereParams) {
 		this.whereParams = whereParams;
-		if(whereCompareParams == null){
-			whereCompareParams = new ArrayList<Expression>();
+		if(whereParamExpressions == null){
+			whereParamExpressions = new ArrayList<Expression>();
 			for (String params : whereParams) {
-				whereCompareParams.add(new Expression(params, Operator.EQUAL));
+				whereParamExpressions.add(new Expression(params, Operator.EQUAL));
 			}
 		}
 	}
@@ -121,7 +121,7 @@ public class SQLQuery {
 	private String[] columns;
 	private String[] whereParams;
 	private Logic logic = Logic.AND;
-	private List<Expression> whereCompareParams;
+	private List<Expression> whereParamExpressions;
 	private ExpressionInterpreter whereExpression;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 package com.it.soul.lab.sql;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -26,6 +28,8 @@ import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Table;
+
+import javafx.scene.control.Tab;
 
 public class SQLExecutor implements Serializable{
 
@@ -159,6 +163,8 @@ public class SQLExecutor implements Serializable{
 		}else if(o instanceof Set){
 			Set<?> ox = (Set<?>)o;
 			buffer.append(ox.toString());
+		}else if(o instanceof Table) {
+			return toString(((Table)o).getRows());
 		}
 		return buffer.toString();
 	}
@@ -262,7 +268,7 @@ public class SQLExecutor implements Serializable{
         int rowUpdated = 0;
         PreparedStatement stmt=null;
         String queryStr = query.toString();
-        String [] whereKeySet = query.getWhereCompareProperties().getKeys();
+        String [] whereKeySet = query.getWhereProperties().getKeys();
         
         try{ 
             if(conn != null){
@@ -271,7 +277,7 @@ public class SQLExecutor implements Serializable{
                 int length = setParameter.size();
                 stmt = bindValueToStatement(stmt, 1, setParameter.getKeys(), setParameter.keyValueMap());
                 if(whereKeySet != null)
-                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereCompareProperties().keyValueMap());
+                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereProperties().keyValueMap());
                 
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
@@ -309,7 +315,7 @@ public class SQLExecutor implements Serializable{
         int rowUpdated = 0;
         PreparedStatement stmt=null;
         String queryStr = query.toString();
-        String [] whereKeySet = query.getWhereCompareProperties().getKeys();
+        String [] whereKeySet = query.getWhereProperties().getKeys();
         
         try{ 
             if(conn != null){
@@ -318,7 +324,7 @@ public class SQLExecutor implements Serializable{
                 int length = setProperties.size();
                 stmt = bindValueToStatement(stmt, 1, setProperties.getKeys(), setProperties.keyValueMap());
                 if(whereKeySet != null)
-                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereCompareProperties().keyValueMap());
+                	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereProperties().keyValueMap());
                 
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
@@ -440,7 +446,7 @@ public class SQLExecutor implements Serializable{
     public int executeDelete(SQLDeleteQuery dQuery)
     throws SQLException,Exception{
     	
-    	if(dQuery.getWhereCompareParams() == null || dQuery.getWhereCompareParams().size() <= 0){
+    	if(dQuery.getWhereParamExpressions() == null || dQuery.getWhereParamExpressions().size() <= 0){
     		throw new Exception("Where parameter should not be null or empty!!!");
     	}
     	
@@ -450,7 +456,7 @@ public class SQLExecutor implements Serializable{
         try{ 
             if(conn != null){
                 stmt = conn.prepareStatement(query);
-                stmt = bindValueToStatement(stmt, 1, dQuery.getWhereParams(), dQuery.getWhereCompareProperties().keyValueMap());
+                stmt = bindValueToStatement(stmt, 1, dQuery.getWhereParams(), dQuery.getWhereProperties().keyValueMap());
                 rowUpdated = stmt.executeUpdate();
                 if(!conn.getAutoCommit())
                 	conn.commit(); 
@@ -777,7 +783,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement pstmt = null;
         int rowCount = 0;
         String query = cQuery.toString();
-        Row whereClause = cQuery.getWhereCompareProperties();
+        Row whereClause = cQuery.getWhereProperties();
         try{
             if(conn != null){
                 pstmt = conn.prepareStatement(query);
@@ -848,7 +854,7 @@ public class SQLExecutor implements Serializable{
         PreparedStatement stmt = null;
         ResultSet rst=null;
         String queryStr = query.toString();
-        Row whereClause = query.getWhereCompareProperties();
+        Row whereClause = query.getWhereProperties();
         try{
             if(conn != null && !conn.isClosed()){
             	stmt = conn.prepareStatement(queryStr,ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);

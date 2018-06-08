@@ -19,7 +19,7 @@ import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.ScalerType;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
-, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, GroupByBuilder{
+, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, GroupByBuilder, HavingBuilder{
 
 	protected QueryType tempType = QueryType.SELECT;
 	protected SQLQuery tempQuery;
@@ -85,7 +85,7 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public GroupByBuilder whereParams(Logic logic, Expression... comps){
 		if (logic != null){tempQuery.setLogic(logic);}
 		List<Expression> items = Arrays.asList(comps);
-		tempQuery.setWhereCompareParams(items);
+		tempQuery.setWhereParamExpressions(items);
 		return this;
 	}
 	@Override
@@ -158,9 +158,16 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		return this;
 	}
 	@Override
-	public OrderByBuilder groupBy(String... columns) {
+	public HavingBuilder groupBy(String... columns) {
 		if(tempQuery instanceof SQLSelectQuery) {
 			((SQLSelectQuery)tempQuery).setGroupBy(Arrays.asList(columns));
+		}
+		return this;
+	}
+	@Override
+	public OrderByBuilder having(ExpressionInterpreter expression) {
+		if(tempQuery instanceof SQLSelectQuery) {
+			((SQLSelectQuery)tempQuery).setHavingExpression(expression);
 		}
 		return this;
 	}
