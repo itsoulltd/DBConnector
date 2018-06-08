@@ -54,6 +54,14 @@ public class Row {
 		}
     	return result;
     }
+    public Map<String, Object> keyObjectMap(){
+    	//This does a shallow copy
+    	Map<String, Object> result = new HashMap<String, Object>();
+    	for (Property parameter : this.properties) {
+			result.put(new String(parameter.getKey()), parameter.getValue());
+		}
+    	return result;
+    }
     public Map<String,Property> keyValueMapToNames(List<String> names){
     	//This does a shallow copy
     	Map<String, Property> dataMap = keyValueMap(); 
@@ -91,4 +99,9 @@ public class Row {
         }
 		return newInstance;
 	}
+    @Override
+    public String toString() {
+    	Map<String, Object> objMap = keyObjectMap(); 
+    	return objMap.toString();
+    }
 }

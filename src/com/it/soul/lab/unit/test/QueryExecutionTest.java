@@ -158,13 +158,14 @@ public class QueryExecutionTest {
 					.columns("name",ScalerType.COUNT.toAlias("age"))
 					.from("Passenger")
 					.groupBy("name")
-					.having(new Expression(ScalerType.COUNT.toString("age"), Operator.GREATER_THAN).setPropertyValue(28, DataType.INT))
+					.having(new Expression(ScalerType.COUNT.toString("age"), Operator.GREATER_THAN).setPropertyValue(1, DataType.INT))
 					.orderBy(ScalerType.COUNT.toString("age"))
 					.build();
 			
 			ResultSet set = exe.executeSelect(qu12);
 			Table x = exe.collection(set);
-			Assert.assertEquals(exe.toString(x), "");
+			exe.displayCollection(x);
+			Assert.assertTrue("Only 2 Rows Should returns.", x.getRows().size() > 0);
 			
 		}catch(Exception e) {
 			e.printStackTrace();

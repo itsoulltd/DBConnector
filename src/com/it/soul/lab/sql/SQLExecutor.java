@@ -1,7 +1,5 @@
 package com.it.soul.lab.sql;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -28,8 +26,6 @@ import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.Table;
-
-import javafx.scene.control.Tab;
 
 public class SQLExecutor implements Serializable{
 
