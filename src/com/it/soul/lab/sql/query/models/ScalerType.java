@@ -2,7 +2,6 @@ package com.it.soul.lab.sql.query.models;
 
 public enum ScalerType{
 	COUNT,
-	DISTINCT,
 	MAX,
 	MIN,
 	SUM,
@@ -11,9 +10,6 @@ public enum ScalerType{
 	public String toString(){
 		String result;
 		switch (this) {
-		case DISTINCT:
-			result = "DISTINCT";
-			break;
 		case MAX:
 			result = "MAX";
 			break;

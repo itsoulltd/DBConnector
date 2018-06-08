@@ -18,16 +18,17 @@ import com.it.soul.lab.sql.query.models.ScalerType;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class QueryBuilderTest {
+	
 	private static String SELECT_ALL = "SELECT * FROM Passenger";
 	private static String SELECT_NAME_ID = "SELECT name, id FROM Passenger";
 	private static String SELECT_WHERE_OR = "SELECT name, age FROM Passenger WHERE id = ? OR age = ?";
 	private static String SELECT_WHERE = "SELECT name, age FROM Passenger WHERE ( name LIKE ? OR ( id = ? AND age >= ? ) )";
 	
-	private static String COUNT_VALUE = "SELECT COUNT(id) From Passenger Where name = 'sohana'";
-	private static String COUNT_WHERE = "SELECT COUNT(*) From Passenger WHERE name = ?";
+	private static String COUNT_VALUE = "SELECT COUNT(id) FROM Passenger WHERE name = 'sohana'";
+	private static String COUNT_WHERE = "SELECT COUNT(*) FROM Passenger WHERE name = ?";
 	
-	private static String DISTINCT_VALUE = "SELECT DISTINCT(name) From Passenger Where name = 'sohana'";
-	private static String DISTINCT_WHERE = "SELECT DISTINCT(*) From Passenger WHERE name = ?";
+	private static String DISTINCT_VALUE = "SELECT DISTINCT name FROM Passenger";
+	private static String DISTINCT_WHERE = "SELECT DISTINCT * FROM Passenger WHERE name = ?";
 	
 	private static String INSERT_INTO = "INSERT INTO Passenger ( name, age, sex) VALUES ( ?, ?, ?)";
 	
@@ -110,18 +111,16 @@ public class QueryBuilderTest {
 	@Test 
 	public void distinctTest(){
 		
-		Property prop = new Property("name", "sohana", DataType.STRING);
 		Expression comps = new Expression("name", Operator.EQUAL);
 		
 		SQLQuery distinct = new SQLQuery.Builder(QueryType.DISTINCT)
 										.columns("name")
-										.on("Passenger")
-										.scalerClause(prop, comps)
+										.from("Passenger")
 										.build();
 		Assert.assertEquals(DISTINCT_VALUE, distinct.toString());
 		
 		SQLQuery count2 = new SQLQuery.Builder(QueryType.DISTINCT)
-									.columns().on("Passenger")
+									.columns().from("Passenger")
 									.where(comps)
 									.build();
 		Assert.assertEquals(DISTINCT_WHERE, count2.toString());

@@ -134,7 +134,10 @@ public class SQLQuery {
 		INSERT,
 		UPDATE,
 		DELETE,
-		MAX
+		MAX,
+		MIN,
+		AVG,
+		SUM
 	}
 
 }

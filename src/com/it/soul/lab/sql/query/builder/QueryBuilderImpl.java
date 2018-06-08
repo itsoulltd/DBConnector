@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
+import com.it.soul.lab.sql.query.SQLDistinctQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.models.Logic;
@@ -34,11 +35,8 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	protected SQLQuery factory(QueryType type){
 		SQLQuery temp = null;
 		switch (type) {
-		case COUNT:
-			temp = new SQLScalerQuery(ScalerType.COUNT);
-			break;
 		case DISTINCT:
-			temp = new SQLScalerQuery(ScalerType.DISTINCT);
+			temp = new SQLDistinctQuery();
 			break;
 		case DELETE:
 			temp = new SQLDeleteQuery();
@@ -49,8 +47,20 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		case UPDATE:
 			temp = new SQLUpdateQuery();
 			break;
+		case COUNT:
+			temp = new SQLScalerQuery(ScalerType.COUNT);
+			break;
 		case MAX:
 			temp = new SQLScalerQuery(ScalerType.MAX);
+			break;
+		case MIN:
+			temp = new SQLScalerQuery(ScalerType.MIN);
+			break;
+		case AVG:
+			temp = new SQLScalerQuery(ScalerType.AVG);
+			break;
+		case SUM:
+			temp = new SQLScalerQuery(ScalerType.SUM);
 			break;
 		default:
 			temp = new SQLSelectQuery();

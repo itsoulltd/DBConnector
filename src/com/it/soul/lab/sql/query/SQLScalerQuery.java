@@ -48,12 +48,12 @@ public class SQLScalerQuery extends SQLSelectQuery{
 	
 	@Override
 	protected void prepareTableName(String name) {
-		pqlBuffer.append(" From " + name + " ");
+		pqlBuffer.append(" FROM " + name + " ");
 	}
 	
 	public void setScalerClouse(Property prop, Expression comps){
 		if(prop != null){
-			pqlBuffer.append("Where " + prop.getKey() +" "+ comps.getType().toString() +" ");
+			pqlBuffer.append("WHERE " + prop.getKey() +" "+ comps.getType().toString() +" ");
 			if(prop.getType() == DataType.BOOL 
 					|| prop.getType() == DataType.INT
 					|| prop.getType() == DataType.DOUBLE
@@ -68,7 +68,7 @@ public class SQLScalerQuery extends SQLSelectQuery{
 	@Override
 	protected void prepareWhereParams(List<Expression> whereParams) {
 		if(whereParams != null && whereParams.size() > 0){
-			pqlBuffer.append("Where " );
+			pqlBuffer.append("WHERE " );
 			int count = 0;
 			for (Expression ent : whereParams) {
 				if(count++ != 0)
