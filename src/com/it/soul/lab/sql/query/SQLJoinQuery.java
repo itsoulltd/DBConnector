@@ -43,12 +43,12 @@ public class SQLJoinQuery extends SQLQuery {
 			if(table.joinWith() == null) {break;} //terminate the loop
 			if (index++ == 0) {
 				//first case
-				joinBuffer.append("("+ table.getName() + " " + joinName() + table.joinWith().getName() + table.getExpression().interpret());
+				joinBuffer.append("("+ table.getName() + " " + joinName() + " " + table.joinWith().getName() + table.getExpression().interpret()+ ")");
 			}else {
 				//every other case
 				String lastBuffer = joinBuffer.toString();
 				joinBuffer.delete(0, lastBuffer.length());
-				joinBuffer.append("("+ lastBuffer + " " + joinName() + table.joinWith().getName() + table.getExpression().interpret());
+				joinBuffer.append("("+ lastBuffer + " " + joinName() + " " + table.joinWith().getName() + table.getExpression().interpret() + ")");
 			}
 		}
 		if (index > 0) {buffer.append(joinBuffer.toString());}

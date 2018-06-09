@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
+import com.it.soul.lab.sql.query.SQLJoinQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Logic;
@@ -12,6 +13,7 @@ import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.AndExpression;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.JoinExpression;
 import com.it.soul.lab.sql.query.models.OrExpression;
 import com.it.soul.lab.sql.query.models.Row;
 import com.it.soul.lab.sql.query.models.ScalerType;
@@ -270,6 +272,22 @@ public class QueryBuilderTest {
 
 		Assert.assertEquals("SELECT name, COUNT(age) AS count_age FROM Passenger  GROUP BY name HAVING COUNT(age) > ? ORDER BY COUNT(age) ASC", qu12.toString());
 		
+	}
+	
+	@Test public void JoinTest() {
+		SQLJoinQuery join = (SQLJoinQuery) new SQLQuery.Builder(QueryType.INNER_JOIN)
+				.join("Customers", "CustomerName")
+				.on(new JoinExpression("CustomerID", "CustomerID"))
+				.join("Orders", "OrderID")
+				.on(new JoinExpression("ShipperID", "ShipperID"))
+				.join("Shippers", "ShipperName").build();
+		
+		String expected = 	"SELECT Customers.CustomerName, Orders.OrderID, Shippers.ShipperName " + 
+							"FROM ((Customers " + 
+							"INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID) " + 
+							"INNER JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID)";
+		
+		Assert.assertEquals(expected, join.toString());
 	}
 	
 }
