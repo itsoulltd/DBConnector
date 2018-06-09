@@ -24,7 +24,7 @@ public class SQLSelectQuery extends SQLQuery{
 	}
 	
 	@Override
-	public String queryString() throws IllegalArgumentException{
+	protected String queryString() throws IllegalArgumentException{
 		super.queryString();
 		return pqlBuffer.toString();
 	}

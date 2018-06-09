@@ -15,7 +15,7 @@ public class SQLInsertQuery extends SQLQuery{
 	private Row row;
 	
 	@Override
-	public String queryString() throws IllegalArgumentException {
+	protected String queryString() throws IllegalArgumentException {
 		super.queryString();
 		return pqlBuffer.toString() + paramBuffer.toString() + valueBuffer.toString();
 	}

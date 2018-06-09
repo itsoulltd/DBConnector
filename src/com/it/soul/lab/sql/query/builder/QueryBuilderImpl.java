@@ -6,6 +6,7 @@ import java.util.List;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLDistinctQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
+import com.it.soul.lab.sql.query.SQLJoinQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Operator;
@@ -15,11 +16,12 @@ import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
+import com.it.soul.lab.sql.query.models.JoinExpression;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.ScalerType;
 
 public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
-, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, GroupByBuilder, HavingBuilder{
+, WhereClauseBuilder, InsertBuilder, ScalerClauseBuilder, GroupByBuilder, HavingBuilder, JoinBuilder, JoinOnBuilder{
 
 	protected QueryType tempType = QueryType.SELECT;
 	protected SQLQuery tempQuery;
@@ -61,6 +63,12 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 			break;
 		case SUM:
 			temp = new SQLScalerQuery(ScalerType.SUM);
+			break;
+		case INNER_JOIN:
+		case LEFT_JOIN:
+		case RIGHT_JOIN:
+		case FULL_JOIN:
+			temp = new SQLJoinQuery(type);
 			break;
 		default:
 			temp = new SQLSelectQuery();
@@ -147,6 +155,8 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public QueryBuilder addLimit(Integer limit, Integer offset) {
 		if(tempQuery instanceof SQLSelectQuery) {
 			((SQLSelectQuery)tempQuery).setLimit(limit, offset);
+		}else if(tempQuery instanceof SQLJoinQuery) {
+			((SQLJoinQuery)tempQuery).setLimit(limit, offset);
 		}
 		return this;
 	}
@@ -154,6 +164,8 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public LimitBuilder orderBy(String... columns) {
 		if(tempQuery instanceof SQLSelectQuery) {
 			((SQLSelectQuery)tempQuery).setOrderBy(Arrays.asList(columns), Operator.ASC);
+		}else if(tempQuery instanceof SQLJoinQuery) {
+			((SQLJoinQuery)tempQuery).setOrderBy(Arrays.asList(columns), Operator.ASC);
 		}
 		return this;
 	}
@@ -168,6 +180,20 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 	public OrderByBuilder having(ExpressionInterpreter expression) {
 		if(tempQuery instanceof SQLSelectQuery) {
 			((SQLSelectQuery)tempQuery).setHavingExpression(expression);
+		}
+		return this;
+	}
+	@Override
+	public JoinOnBuilder join(String table, String... columns) {
+		if(tempQuery instanceof SQLJoinQuery) {
+			((SQLJoinQuery)tempQuery).setJoins(table, Arrays.asList(columns));
+		}
+		return this;
+	}
+	@Override
+	public JoinBuilder on(JoinExpression expression) {
+		if(tempQuery instanceof SQLJoinQuery) {
+			((SQLJoinQuery)tempQuery).setJoinExpression(expression);
 		}
 		return this;
 	}

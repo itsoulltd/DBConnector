@@ -105,7 +105,7 @@ public class SQLQuery {
 	protected static final char STARIC = '*';
 	protected static final char MARKER = '?';
 	
-	public String queryString() throws IllegalArgumentException{
+	protected String queryString() throws IllegalArgumentException{
 		if(tableName == null || tableName.trim().equals("")){
 			throw new IllegalArgumentException("Parameter 'tableName' must not be Null OR Empty.");
 		}
@@ -137,7 +137,11 @@ public class SQLQuery {
 		MAX,
 		MIN,
 		AVG,
-		SUM
+		SUM,
+		INNER_JOIN,
+		LEFT_JOIN,
+		RIGHT_JOIN,
+		FULL_JOIN
 	}
 
 }

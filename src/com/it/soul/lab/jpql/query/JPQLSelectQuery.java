@@ -10,7 +10,7 @@ import com.it.soul.lab.sql.query.models.Operator;
 public class JPQLSelectQuery extends SQLSelectQuery {
 
 	@Override
-	public String queryString() throws IllegalArgumentException {
+	protected String queryString() throws IllegalArgumentException {
 		if(getTableName() == null || getTableName().trim().equals("")){
 			throw new IllegalArgumentException("Parameter Table must not be Null OR Empty.");
 		}
