@@ -53,6 +53,8 @@ public class SQLJoinQuery extends SQLQuery {
 		}
 		if (index > 0) {buffer.append(joinBuffer.toString());}
 		//
+		appendOrderBy(buffer, orderByList, orderOpt);
+		appendLimit(buffer);
 		return buffer.toString();
 	}
 	

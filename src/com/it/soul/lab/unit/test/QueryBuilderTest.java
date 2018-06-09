@@ -290,4 +290,20 @@ public class QueryBuilderTest {
 		Assert.assertEquals(expected, join.toString());
 	}
 	
+	@Test public void LeftJoinTest() {
+		SQLJoinQuery join = (SQLJoinQuery) new SQLQuery.Builder(QueryType.LEFT_JOIN)
+				.join("Customers", "CustomerName")
+				.on(new JoinExpression("CustomerID", "CustomerID"))
+				.join("Orders", "OrderID")
+				.orderBy("Customers.CustomerName").build();
+		
+		String expected = 	"SELECT Customers.CustomerName, Orders.OrderID " + 
+							"FROM Customers " + 
+							"LEFT JOIN Orders " + 
+							"ON Customers.CustomerID=Orders.CustomerID " + 
+							"ORDER BY Customers.CustomerName";
+		
+		Assert.assertEquals(expected, join.toString());
+	}
+	
 }
