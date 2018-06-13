@@ -23,6 +23,9 @@ public class Expression implements ExpressionInterpreter{
 		this.valueProperty.setType(type);
 		return this;
 	}
+	public Expression setPropertyValue(Property from){
+		return setPropertyValue(from.getValue(), from.getType());
+	}
 	public Property getValueProperty() {
 		return valueProperty;
 	}
