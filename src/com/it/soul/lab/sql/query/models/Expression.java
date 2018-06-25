@@ -7,6 +7,11 @@ import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.DataType;
 
 public class Expression implements ExpressionInterpreter{
+	public Expression(Property property, Operator type){
+		this(property.getKey(), type);
+		this.valueProperty.setValue(property.getValue());
+		this.valueProperty.setType(property.getType());
+	}
 	public Expression(String property, Operator type){
 		this.property = property;
 		this.type = type;
