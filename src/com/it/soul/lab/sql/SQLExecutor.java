@@ -1572,7 +1572,8 @@ public class SQLExecutor implements Serializable{
 		}
 		else if(trimedType.equals("DATE") 
 				|| trimedType.equals("TIME")
-				|| trimedType.equals("TIMESTAMP")){
+				|| trimedType.equals("TIMESTAMP")
+				|| trimedType.equals("DATETIME")){
 			return DataType.SQLDATETIME;
 			
 		}else if(trimedType.equals("FLOAT")){
