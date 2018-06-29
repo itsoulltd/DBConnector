@@ -96,6 +96,26 @@ public class SQLExecutor implements Serializable{
 		}
 	}
 	
+	public void begin() throws SQLException{
+		if(conn != null && conn.isClosed() == false) {
+			conn.setAutoCommit(false);
+		}
+	}
+	
+	public void end() throws SQLException{
+		if(conn != null && conn.isClosed() == false && conn.getAutoCommit() == false) {
+			conn.commit();
+			conn.setAutoCommit(true);
+		}
+	}
+	
+	public void abort() throws SQLException{
+		if(conn != null && conn.isClosed() == false && conn.getAutoCommit() == false) {
+			conn.rollback();
+			conn.setAutoCommit(true);
+		}
+	}
+	
 	/**
 	 * Display rows in a Result Set
 	 * @param rst
