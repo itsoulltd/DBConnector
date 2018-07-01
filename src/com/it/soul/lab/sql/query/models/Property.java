@@ -1,7 +1,6 @@
 package com.it.soul.lab.sql.query.models;
 
 import java.text.SimpleDateFormat;
-import com.it.soul.lab.sql.query.models.DataType;
 
 public class Property {
 	
@@ -9,7 +8,7 @@ public class Property {
 		super();
 	}
 
-	private static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private String key = null;
 	private DataType type = null;
 	private Object value = null;
@@ -17,12 +16,8 @@ public class Property {
 	private Property(Object value, DataType type){
 		this.value = value;
 		this.type = type;
-		if (value != null){
-			//TODO: Regx type value validation is required.
-			if(value instanceof java.util.Date || value instanceof java.sql.Date){
-				value = getFormattedDateString(value);
-				this.type = DataType.STRING;
-			}
+		if (value != null && value instanceof java.util.Date){
+			this.type = DataType.SQLDATE;
 		}
 	}
 	
@@ -76,9 +71,9 @@ public class Property {
 		this.type = type;
 	}
 
-	private String getFormattedDateString(Object date) {
+	private String getDateString(Object date) {
 		String result = null;
-		SimpleDateFormat formatter = new SimpleDateFormat(SQL_DATE_FORMAT);
+		SimpleDateFormat formatter = new SimpleDateFormat(SQL_DATETIME_FORMAT);
 		try {
 			if (date != null 
 					&& ((date instanceof java.util.Date) 
@@ -91,5 +86,13 @@ public class Property {
 			ex.printStackTrace();
 		}
 		return result;
+	}
+	@Override
+	public String toString() {
+		if(this.value == null) {return "";}
+		if(this.value != null && this.type != null && this.type == DataType.SQLDATE) {
+			return getDateString(this.value);
+		}
+		return this.value.toString();
 	}
 }

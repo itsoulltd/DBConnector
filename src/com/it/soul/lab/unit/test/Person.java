@@ -1,6 +1,7 @@
 package com.it.soul.lab.unit.test;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import com.it.soul.lab.sql.entity.Entity;
 import com.it.soul.lab.sql.entity.PrimaryKey;
@@ -34,6 +35,7 @@ public class Person extends Entity {
 	private Boolean isActive;
 	private Double salary;
 	private Date dob;
+	private Timestamp createDate;
 	private Float height;
 	public Person() {
 		super();
@@ -73,5 +75,11 @@ public class Person extends Entity {
 	}
 	public void setHeight(Float height) {
 		this.height = height;
+	}
+	public Timestamp getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Timestamp createDate) {
+		this.createDate = createDate;
 	}
 }

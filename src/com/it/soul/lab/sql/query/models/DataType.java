@@ -6,7 +6,7 @@ public enum DataType {
 	DOUBLE,
 	BOOL,
 	STRING,
-	SQLDATETIME,
+	SQLDATE,
 	BLOB,
 	BYTEARRAY,
 	OBJECT

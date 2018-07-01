@@ -3,6 +3,9 @@ package com.it.soul.lab.unit.test;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -75,7 +78,7 @@ public class PersonTest {
 		person.setAge(getRandomAge());
 		person.setIsActive(false);
 		person.setSalary(200.00);
-		person.setDob(new Date(0));
+		person.setDob(new Date(Calendar.getInstance().getTimeInMillis()));
 		try {
 			Boolean res = person.update(exe, "age","isActive","salary","dob");
 			Assert.assertTrue("Updated", res);
@@ -92,7 +95,10 @@ public class PersonTest {
 		person.setAge(getRandomAge());
 		person.setIsActive(true);
 		person.setSalary(89200.00);
-		person.setDob(new Date(0));
+		person.setDob(new Date(Calendar.getInstance().getTimeInMillis()));
+		person.setCreateDate(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+		person.setDob(null);
+		
 		try {
 			Boolean res = person.insert(exe);
 			Assert.assertTrue("Inserted", res);
@@ -120,7 +126,7 @@ public class PersonTest {
 	public void testReadClassOfTSQLExecutorPropertyArray() {
 		try {
 			List<Person> sons = Person.read(Person.class, exe, new Property("name", "Sohana"));
-			Assert.assertTrue("Count is there", sons.size() > 1);
+			Assert.assertTrue("Count is there", sons.size() > 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -131,7 +137,11 @@ public class PersonTest {
 		try {
 			ExpressionInterpreter exp = new Expression(new Property("name", "Towhid"), Operator.EQUAL);
 			List<Person> sons = Person.read(Person.class, exe, exp);
-			Assert.assertTrue("Count is there", sons.size() > 1);
+			for (Person person : sons) {
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				System.out.println(formatter.format(person.getDob()));
+			}
+			Assert.assertTrue("Count is there", sons.size() > 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
