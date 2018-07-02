@@ -1432,6 +1432,13 @@ public class SQLExecutor implements Serializable{
 		return result;
 	}
 	
+	public Blob createBlob(String val) throws SQLException {
+		byte[] bytes = val.getBytes();
+		Blob blob = conn.createBlob();
+		blob.setBytes(1, bytes);
+		return blob;
+	}
+	
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Private Methods>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 	
 	private PreparedStatement bindValueToStatement(PreparedStatement stmt
@@ -1498,14 +1505,24 @@ public class SQLExecutor implements Serializable{
 	            				}
 	            				break;
 	            			case BLOB:
-	            				if(property.getValue() != null){
+	            				if(property.getValue() != null && property.getValue() instanceof Blob){
 	            					stmt.setBlob(index++, (Blob)property.getValue());
-	            				}else{
+	            				}else if(property.getValue() != null && property.getValue() instanceof String){
+	            					byte[] bytes = property.getValue().toString().getBytes();
+	            					Blob blob = conn.createBlob();
+	            					blob.setBytes(1, bytes);
+	            					stmt.setBlob(index++, blob);
+	            				}
+	            				else{
 	            					stmt.setNull(index++, java.sql.Types.BLOB);
 	            				}
 	            				break;
 	            			case BYTEARRAY:
-	            				if(property.getValue() != null){
+	            				if(property.getValue() != null && property.getValue() instanceof Byte){
+                                    stmt.setBytes(index++, (byte[])property.getValue());
+                                }else if(property.getValue() != null && property.getValue() instanceof String){
+                                    stmt.setBytes(index++, ((String)property.getValue()).getBytes());
+                                }else if(property.getValue() != null){
                                     stmt.setBytes(index++, (byte[])property.getValue());
                                 }else{
                                     stmt.setNull(index++, java.sql.Types.ARRAY);

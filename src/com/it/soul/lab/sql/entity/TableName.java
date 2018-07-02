@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface TableName {
 	public String value() default "";
-	public boolean autoIncrement() default false;
+	public boolean acceptAll() default true;
 }

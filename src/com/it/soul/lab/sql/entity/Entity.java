@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,26 +30,20 @@ public abstract class Entity implements EntityInterface{
 	public Entity() {
 		super();
 	}
-	protected List<Property> getProperties() {
+	private boolean hasPropertyAnnotation(Field field) {
+		boolean hasPropertyAnno = field.isAnnotationPresent(com.it.soul.lab.sql.entity.Property.class);
+		return hasPropertyAnno;
+	}
+	protected List<Property> getProperties(SQLExecutor exe) {
 		List<Property> result = new ArrayList<>();
+		boolean acceptAll = shouldAcceptAllProperty();
 		for (Field field : this.getClass().getDeclaredFields()) {
-			Property prop = getProperty(field.getName());
+			if(acceptAll == false && hasPropertyAnnotation(field) == false) {
+				continue;
+			}
+			Property prop = getProperty(field.getName(), exe);
 			if(prop == null) {continue;}
 			result.add(prop);
-		}
-		return result;
-	}
-	protected Property getProperty(String key) {
-		Property result = null;
-		try {
-			Field field = this.getClass().getDeclaredField(key);
-			field.setAccessible(true);
-			String name = field.getName();
-			Object value = field.get(this);
-			DataType type = getDataType(value);
-			result = new Property(name, value, type);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
 		}
 		return result;
 	}
@@ -77,6 +72,77 @@ public abstract class Entity implements EntityInterface{
 			return DataType.OBJECT;
 		}
 	}
+	private java.util.Date parseDate(String val, DataType type, String format){
+		try {
+			SimpleDateFormat formatter = new SimpleDateFormat((format != null && format.trim().isEmpty() == false) 
+																		? format 
+																		: Property.SQL_DATETIME_FORMAT);
+			java.util.Date date = formatter.parse(val);
+			if(type == DataType.SQLTIMESTAMP) {
+				return new Timestamp(date.getTime());
+			}else {
+				return new Date(date.getTime());
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	private Object getFieldValue(Field field, SQLExecutor exe) throws IllegalArgumentException, IllegalAccessException, SQLException {
+		Object value = field.get(this);
+		//
+		if(value == null && field.isAnnotationPresent(com.it.soul.lab.sql.entity.Property.class) == true) {
+			com.it.soul.lab.sql.entity.Property annotation = field.getAnnotation(com.it.soul.lab.sql.entity.Property.class);
+			String defaultVal = annotation.defaultValue();
+			DataType type = annotation.type();
+			switch (type) {
+			case INT:
+				value = Integer.valueOf(defaultVal);
+				break;
+			case FLOAT:
+				value = Float.valueOf(defaultVal);
+				break;
+			case DOUBLE:
+				value = Double.valueOf(defaultVal);
+				break;
+			case BOOL:
+				value = Boolean.valueOf(defaultVal);
+				break;
+			case SQLDATE:
+				value = parseDate(defaultVal, type, annotation.parseFormat());
+				break;
+			case BLOB:
+				value = (exe != null) ? exe.createBlob(defaultVal) : defaultVal;
+				break;
+			case BYTEARRAY:
+				value = defaultVal.getBytes();
+				break;
+			default:
+				value = defaultVal;
+				break;
+			}
+		}
+		//always.
+		return value;
+	}
+	protected Property getProperty(String key, SQLExecutor exe) {
+		Property result = null;
+		try {
+			Field field = this.getClass().getDeclaredField(key);
+			if(field.isAnnotationPresent(PrimaryKey.class)) {
+				if (((PrimaryKey)field.getAnnotation(PrimaryKey.class)).autoIncrement() == true) {return null;}
+			}
+			field.setAccessible(true);
+			String name = field.getName();
+			Object value = getFieldValue(field, exe);
+			DataType type = getDataType(value);
+			result = new Property(name, value, type);
+			field.setAccessible(false);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 	private String tableName() {
 		if(this.getClass().isAnnotationPresent(TableName.class) == false) {
 			return this.getClass().getName();
@@ -86,13 +152,23 @@ public abstract class Entity implements EntityInterface{
 		String name = (tableName.value().trim().length() == 0) ? this.getClass().getName() : tableName.value().trim();
 		return name;
 	}
-	private boolean isAutoIncrement() {
+	private boolean shouldAcceptAllProperty() {
 		if(this.getClass().isAnnotationPresent(TableName.class) == false) {
-			return false;
+			return true;
 		}
-		Annotation annotation = this.getClass().getAnnotation(TableName.class);
-		TableName tableName = (TableName) annotation;
-		return tableName.autoIncrement();
+		TableName tableName = (TableName) this.getClass().getAnnotation(TableName.class);
+		return tableName.acceptAll();
+	}
+	private Boolean _isAutoIncremented = null;
+	private boolean isAutoIncrement() {
+		if(_isAutoIncremented == null) {
+			PrimaryKey primAnno = getPrimaryKey(); 
+			if(primAnno == null) {
+				_isAutoIncremented = false;
+			}
+			_isAutoIncremented = primAnno.autoIncrement();
+		}
+		return _isAutoIncremented;
 	}
 	private PrimaryKey getPrimaryKey() {
 		PrimaryKey key = null;
@@ -105,9 +181,9 @@ public abstract class Entity implements EntityInterface{
 		}
 		return key;
 	}
-	private Property getPrimaryProperty() {
-		String key = getPrimaryKey().value().trim();
-		Property prop = getProperty(key);
+	private Property getPrimaryProperty(SQLExecutor exe) {
+		String key = getPrimaryKey().name().trim();
+		Property prop = getProperty(key, exe);
 		return prop;
 	}
 	public Boolean update(SQLExecutor exe, String...keys) throws SQLException, Exception {
@@ -115,12 +191,12 @@ public abstract class Entity implements EntityInterface{
 		if(keys.length > 0) {
 			for (String key : keys) {
 				String skey = key.trim();
-				Property prop = getProperty(skey);
+				Property prop = getProperty(skey, exe);
 				if (prop == null) {continue;}
 				properties.add(prop);
 			}
 		}else {
-			properties = getProperties();
+			properties = getProperties(exe);
 		}
 		String tableName = tableName();
 		SQLUpdateQuery query = (SQLUpdateQuery) new SQLQuery.Builder(QueryType.UPDATE)
@@ -131,7 +207,7 @@ public abstract class Entity implements EntityInterface{
 		return isUpdate == 1;
 	}
 	protected ExpressionInterpreter updateWhereExpression() {
-		return new Expression(getPrimaryProperty(), Operator.EQUAL);
+		return new Expression(getPrimaryProperty(null), Operator.EQUAL);
 	}
 	@Override
 	public Boolean insert(SQLExecutor exe, String... keys) throws SQLException, Exception {
@@ -139,12 +215,12 @@ public abstract class Entity implements EntityInterface{
 		if(keys.length > 0) {
 			for (String key : keys) {
 				String skey = key.trim();
-				Property prop = getProperty(skey);
+				Property prop = getProperty(skey, exe);
 				if (prop == null) {continue;}
 				properties.add(prop);
 			}
 		}else {
-			properties = getProperties();
+			properties = getProperties(exe);
 		}
 		SQLInsertQuery query = (SQLInsertQuery) new SQLQuery.Builder(QueryType.INSERT)
 															.into(tableName())
@@ -155,7 +231,7 @@ public abstract class Entity implements EntityInterface{
 	}
 	@Override
 	public Boolean delete(SQLExecutor exe) throws SQLException, Exception {
-		Expression exp = new Expression(getPrimaryProperty(), Operator.EQUAL);
+		Expression exp = new Expression(getPrimaryProperty(exe), Operator.EQUAL);
 		SQLDeleteQuery query = (SQLDeleteQuery) new SQLQuery.Builder(QueryType.DELETE)
 														.rowsFrom(tableName())
 														.where(exp).build();

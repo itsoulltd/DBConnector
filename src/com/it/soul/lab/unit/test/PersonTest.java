@@ -63,7 +63,7 @@ public class PersonTest {
 		exe.close();
 	}
 
-	@Test
+	//@Test
 	public void testUpdate() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
@@ -91,13 +91,13 @@ public class PersonTest {
 	public void testInsert() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
-		person.setName(getRandomName());
+		//person.setName(getRandomName());
 		person.setAge(getRandomAge());
-		person.setIsActive(true);
+		//person.setIsActive(true);
 		person.setSalary(89200.00);
 		person.setDob(new Date(Calendar.getInstance().getTimeInMillis()));
+		//person.setDob(null);
 		person.setCreateDate(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-		person.setDob(null);
 		
 		try {
 			Boolean res = person.insert(exe);
@@ -107,7 +107,7 @@ public class PersonTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testDelete() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
@@ -122,7 +122,7 @@ public class PersonTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testReadClassOfTSQLExecutorPropertyArray() {
 		try {
 			List<Person> sons = Person.read(Person.class, exe, new Property("name", "Sohana"));
@@ -132,7 +132,7 @@ public class PersonTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testReadClassOfTSQLExecutorExpressionInterpreter() {
 		try {
 			ExpressionInterpreter exp = new Expression(new Property("name", "Towhid"), Operator.EQUAL);

@@ -96,6 +96,7 @@ public class Row {
             if(entry != null) {
             	field.set(newInstance, entry.getValue());
             }
+            field.setAccessible(false);
         }
 		return newInstance;
 	}
