@@ -6,6 +6,7 @@ import java.sql.Blob;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,10 +59,10 @@ public abstract class Entity implements EntityInterface{
 			return DataType.BOOL;
 		}else if(value instanceof String) {
 			return DataType.STRING;
-		}else if(value instanceof Date 
-				|| value instanceof Timestamp 
-				|| value instanceof java.util.Date) {
+		}else if(value instanceof Date || value instanceof java.util.Date) {
 			return DataType.SQLDATE;
+		}else if(value instanceof Timestamp || value instanceof Time) {
+			return DataType.SQLTIMESTAMP;
 		}else if(value instanceof Blob) {
 			return DataType.BLOB;
 		}else if(value instanceof Integer) {
@@ -109,6 +110,7 @@ public abstract class Entity implements EntityInterface{
 				value = Boolean.valueOf(defaultVal);
 				break;
 			case SQLDATE:
+			case SQLTIMESTAMP:
 				value = parseDate(defaultVal, type, annotation.parseFormat());
 				break;
 			case BLOB:

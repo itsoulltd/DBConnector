@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1494,9 +1495,12 @@ public class SQLExecutor implements Serializable{
 	            				}
 	            				break;
 	            			case SQLDATE:
+	            			case SQLTIMESTAMP:
 	            				if(property.getValue() != null) {
 	            					if(property.getValue() instanceof java.sql.Timestamp) {
 	            						stmt.setTimestamp(index++, (Timestamp)property.getValue());
+	            					}else if(property.getValue() instanceof java.sql.Time) {
+	            						stmt.setTime(index++, (Time)property.getValue());
 	            					}else {
 	            						stmt.setDate(index++, (Date)property.getValue());
 	            					}
@@ -1567,6 +1571,9 @@ public class SQLExecutor implements Serializable{
 		case SQLDATE:
 			value = rst.getDate(index);
 			break;
+		case SQLTIMESTAMP:
+			value = rst.getTimestamp(index);
+			break;
 		case BYTEARRAY:
 			byte[] arr = rst.getBytes(index); 
 			value = arr;
@@ -1596,11 +1603,13 @@ public class SQLExecutor implements Serializable{
 			return DataType.INT;
 			
 		}
-		else if(trimedType.equals("DATE") 
-				|| trimedType.equals("TIME")
-				|| trimedType.equals("TIMESTAMP")
+		else if(trimedType.equals("DATE")
 				|| trimedType.equals("DATETIME")){
 			return DataType.SQLDATE;
+			
+		}else if(trimedType.equals("TIME")
+				|| trimedType.equals("TIMESTAMP")){
+			return DataType.SQLTIMESTAMP;
 			
 		}else if(trimedType.equals("FLOAT")){
 			return DataType.FLOAT;

@@ -87,7 +87,7 @@ public class PersonTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testInsert() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
@@ -95,9 +95,16 @@ public class PersonTest {
 		person.setAge(getRandomAge());
 		//person.setIsActive(true);
 		person.setSalary(89200.00);
-		person.setDob(new Date(Calendar.getInstance().getTimeInMillis()));
-		//person.setDob(null);
+		
+		//person.setDob(new Date(Calendar.getInstance().getTimeInMillis()));
+		person.setDob(null);
+		
 		person.setCreateDate(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+		
+		person.setDobDate(new Date(Calendar.getInstance().getTimeInMillis()));
+		
+		//person.setCreateTime(null);
+		person.setCreateTime(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 		
 		try {
 			Boolean res = person.insert(exe);
@@ -132,14 +139,21 @@ public class PersonTest {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testReadClassOfTSQLExecutorExpressionInterpreter() {
 		try {
-			ExpressionInterpreter exp = new Expression(new Property("name", "Towhid"), Operator.EQUAL);
+			ExpressionInterpreter exp = new Expression(new Property("name", "towhid-islam"), Operator.EQUAL);
 			List<Person> sons = Person.read(Person.class, exe, exp);
 			for (Person person : sons) {
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				System.out.println(formatter.format(person.getDob()));
+				if(person.getDob() != null) {
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					System.out.println(formatter.format(person.getDob()));
+				}
+				if(person.getCreateTime() != null) {
+					SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+					System.out.println(formatter.format(person.getCreateTime()));
+				}
+				
 			}
 			Assert.assertTrue("Count is there", sons.size() > 0);
 		} catch (Exception e) {

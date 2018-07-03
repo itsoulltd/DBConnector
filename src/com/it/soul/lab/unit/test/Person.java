@@ -1,6 +1,7 @@
 package com.it.soul.lab.unit.test;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.it.soul.lab.sql.entity.Entity;
@@ -52,6 +53,12 @@ public class Person extends Entity {
 	
 	private Float height;
 	
+	@Property(defaultValue="2010-06-21" , type=DataType.SQLDATE, parseFormat="yyyy-MM-dd")
+	private Date dobDate;
+	
+	@Property(defaultValue="21:01:01" , type=DataType.SQLTIMESTAMP, parseFormat="HH:mm:ss")
+	private Timestamp createTime;
+	
 	public Person() {
 		super();
 	}
@@ -96,5 +103,17 @@ public class Person extends Entity {
 	}
 	public void setCreateDate(Timestamp createDate) {
 		this.createDate = createDate;
+	}
+	public Date getDobDate() {
+		return dobDate;
+	}
+	public void setDobDate(Date dobDate) {
+		this.dobDate = dobDate;
+	}
+	public Timestamp getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
 	}
 }
