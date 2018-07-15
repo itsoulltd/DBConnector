@@ -31,6 +31,10 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		super(manager,entity,type);
 	}
 	
+	public ORMService(EntityManager manager, Class<T> type){
+		this(manager,type.getName(),type);
+	}
+	
 	@Override
 	public Collection<T> findAll() throws Exception {
 		List<T> result = null;
