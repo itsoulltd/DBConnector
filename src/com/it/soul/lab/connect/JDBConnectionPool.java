@@ -65,35 +65,7 @@ public class JDBConnectionPool implements Serializable{
 		}
 	}
 	
-	/**
-	 * User must have to call this method first.
-	 * @param JNDILookUp
-	 * @return
-	 * @throws Exception
-	 */
-	public static void configureConnectionPool(String JNDILookUp) 
-	{
-		synchronized (_lock) {
-			if(_sharedInstance == null){
-				try{
-					_sharedInstance = new JDBConnectionPool(JNDILookUp);
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-			}else{
-				if(JNDILookUp != null && !JNDILookUp.trim().equals("")){
-					createNewSource(JNDILookUp);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Use this method to get JDBC connection from connections pool.
-	 * @return
-	 * @throws Exception
-	 */
-	public static JDBConnectionPool shared() 
+	private static JDBConnectionPool poolInstance() 
 	{
 		synchronized (_lock) {
 			if(_sharedInstance != null){
@@ -120,7 +92,7 @@ public class JDBConnectionPool implements Serializable{
 		return "ConnectDatabaseJDBCSingleton : " + serialVersionUID;
 	}
 	
-	public static int getActiveConnectionCount(){
+	public static int activeConnections(){
 		return activeConnectionCount;
 	}
 	
@@ -146,6 +118,29 @@ public class JDBConnectionPool implements Serializable{
 	
 	///////////////////////////////JDBL Connection Pooling/////////////////////////
 	
+	/**
+	 * User must have to call this method first.
+	 * @param JNDILookUp
+	 * @return
+	 * @throws Exception
+	 */
+	public static void configure(String JNDILookUp) 
+	{
+		synchronized (_lock) {
+			if(_sharedInstance == null){
+				try{
+					_sharedInstance = new JDBConnectionPool(JNDILookUp);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}else{
+				if(JNDILookUp != null && !JNDILookUp.trim().equals("")){
+					createNewSource(JNDILookUp);
+				}
+			}
+		}
+	}
+	
 	private DataSource findSourceByName(String key){
 		if(!getDataSourcePool().containsKey(key))
 			return getDataSourcePool().get(_DEFAULT_KEY);
@@ -156,10 +151,10 @@ public class JDBConnectionPool implements Serializable{
 	/**
 	 * 
 	 */
-	synchronized public Connection getConnectionFromPool() throws SQLException{
+	public static synchronized Connection connection() throws SQLException{
     	Connection con = null;
         try{
-        	con = findSourceByName(_DEFAULT_KEY).getConnection();
+        	con = JDBConnectionPool.poolInstance().findSourceByName(_DEFAULT_KEY).getConnection();
         	JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
@@ -167,10 +162,10 @@ public class JDBConnectionPool implements Serializable{
         return con;
     } 
 	
-	synchronized public Connection getConnectionFromPool(String key) throws SQLException{
+	public static synchronized Connection connection(String key) throws SQLException{
     	Connection con = null;
         try{
-        	con = findSourceByName(key).getConnection();
+        	con = JDBConnectionPool.poolInstance().findSourceByName(key).getConnection();
         	JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
             throw sqe;
@@ -185,11 +180,11 @@ public class JDBConnectionPool implements Serializable{
 	 * @return
 	 * @throws SQLException
 	 */
-    synchronized public Connection getConnectionFromPool(String key, String userName , String password) 
+    public static synchronized Connection connection(String key, String userName , String password) 
     throws SQLException{
     	Connection con = null;
     	try{
-            con = findSourceByName(key).getConnection(userName,password);
+            con = JDBConnectionPool.poolInstance().findSourceByName(key).getConnection(userName,password);
             JDBConnectionPool.increasePoolCount();
         }catch(SQLException sqe){
         	throw sqe;
@@ -203,7 +198,7 @@ public class JDBConnectionPool implements Serializable{
      * @param conn
      * @throws SQLException
      */
-    synchronized public void close(Connection conn)
+    public static synchronized void close(Connection conn)
     {
         try{
             if(conn != null && ! conn.getAutoCommit()){
