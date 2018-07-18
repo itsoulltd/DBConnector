@@ -24,16 +24,16 @@ public interface ORMServiceProtocol<T> {
 	public Object findBy(Property searchProperty) throws Exception;
 	public Object findBy(Property searchProperty, String...columns) throws Exception;
 	
-	public boolean isItemExist(Object itemId) throws Exception;
-	public long getItemCount() throws Exception;
-	public Object addNewItem(Object item) throws Exception;
-	public Object modifyItem(Object item) throws Exception;
-	public boolean deleteItem(Object item) throws Exception;
-	public Collection<?> addNewItems(Collection<? extends Object> items) throws Exception;
-	public Collection<?> modifyItems(Collection<? extends Object> items) throws Exception;
-	public boolean deleteItems(Collection<? extends Object> items) throws Exception;
-	public Collection<?> addNewItems(Collection<? extends Object> items, int batchSize) throws Exception;
-	public Collection<?> modifyItems(Collection<? extends Object> items, int batchSize) throws Exception;
+	public boolean exist(Object itemId) throws Exception;
+	public long rowCount() throws Exception;
+	public Object insert(Object item) throws Exception;
+	public Object update(Object item) throws Exception;
+	public boolean delete(Object item) throws Exception;
+	public Collection<?> batchInsert(Collection<? extends Object> items) throws Exception;
+	public Collection<?> batchUpdate(Collection<? extends Object> items) throws Exception;
+	public boolean batchDelete(Collection<? extends Object> items) throws Exception;
+	public Collection<?> batchInsert(Collection<? extends Object> items, int batchSize) throws Exception;
+	public Collection<?> batchUpdate(Collection<? extends Object> items, int batchSize) throws Exception;
 	public Object refresh(Object item) throws Exception;
 	public Collection<T> refresh(Collection<T> items) throws Exception;
 	public void clearItem(Object item) throws Exception;

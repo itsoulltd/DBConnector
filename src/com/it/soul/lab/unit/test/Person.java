@@ -1,7 +1,6 @@
 package com.it.soul.lab.unit.test;
 
 import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.it.soul.lab.sql.entity.Entity;

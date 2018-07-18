@@ -183,7 +183,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public boolean isItemExist(Object itemId) throws Exception {
+	public boolean exist(Object itemId) throws Exception {
 		boolean result = false;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -194,7 +194,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public long getItemCount() throws Exception {
+	public long rowCount() throws Exception {
 		long result = 0;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -209,7 +209,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Object addNewItem(Object item) throws Exception {
+	public synchronized Object insert(Object item) throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
 		if(item != null){
@@ -226,7 +226,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Object modifyItem(Object item) throws Exception {
+	public synchronized Object update(Object item) throws Exception {
 		Object result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -244,7 +244,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized boolean deleteItem(Object item) throws Exception {
+	public synchronized boolean delete(Object item) throws Exception {
 		boolean result = false;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -265,7 +265,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Collection<?> addNewItems(Collection<? extends Object> items)
+	public synchronized Collection<?> batchInsert(Collection<? extends Object> items)
 			throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
@@ -286,7 +286,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Collection<?> modifyItems(Collection<? extends Object> items)
+	public synchronized Collection<?> batchUpdate(Collection<? extends Object> items)
 			throws Exception {
 		ArrayList<Object> result = null;
 		//Checking entityManager
@@ -310,7 +310,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized boolean deleteItems(Collection<? extends Object> items)
+	public synchronized boolean batchDelete(Collection<? extends Object> items)
 			throws Exception {
 		boolean result = false;
 		//Checking entityManager
@@ -334,7 +334,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<?> addNewItems(Collection<? extends Object> items,
+	public Collection<?> batchInsert(Collection<? extends Object> items,
 			int batchSize) throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
@@ -360,7 +360,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<?> modifyItems(Collection<? extends Object> items,
+	public Collection<?> batchUpdate(Collection<? extends Object> items,
 			int batchSize) throws Exception {
 		ArrayList<Object> result = null;
 		//Checking entityManager
