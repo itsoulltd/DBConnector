@@ -147,8 +147,8 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Object findBy(Property searchProperty) throws Exception {
-		Object result = null;
+	public T findBy(Property searchProperty) throws Exception {
+		T result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
@@ -165,8 +165,8 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Object findBy(Property searchProperty, String...columns) throws Exception{
-		Object result = null;
+	public T findBy(Property searchProperty, String...columns) throws Exception{
+		T result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		
@@ -209,7 +209,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Object insert(Object item) throws Exception {
+	public synchronized T insert(T item) throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
 		if(item != null){
@@ -226,8 +226,8 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Object update(Object item) throws Exception {
-		Object result = null;
+	public synchronized T update(T item) throws Exception {
+		T result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		if(item != null){
@@ -265,7 +265,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Collection<?> batchInsert(Collection<? extends Object> items)
+	public synchronized Collection<T> batchInsert(Collection<T> items)
 			throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
@@ -286,17 +286,17 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized Collection<?> batchUpdate(Collection<? extends Object> items)
+	public synchronized Collection<T> batchUpdate(Collection<T> items)
 			throws Exception {
-		ArrayList<Object> result = null;
+		ArrayList<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try {
 			if (items != null && items.size() > 0) {
-				result = new ArrayList<Object>();
+				result = new ArrayList<T>();
 				//TODO Optimize implementation for large number of items
 				getEntityManager().getTransaction().begin();
-				for (Object _item : items) {
+				for (T _item : items) {
 					result.add(getEntityManager().merge(_item));
 				}
 				getEntityManager().getTransaction().commit();
@@ -310,7 +310,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public synchronized boolean batchDelete(Collection<? extends Object> items)
+	public synchronized boolean batchDelete(Collection<T> items)
 			throws Exception {
 		boolean result = false;
 		//Checking entityManager
@@ -334,7 +334,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<?> batchInsert(Collection<? extends Object> items,
+	public Collection<T> batchInsert(Collection<T> items,
 			int batchSize) throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
@@ -360,17 +360,17 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<?> batchUpdate(Collection<? extends Object> items,
+	public Collection<T> batchUpdate(Collection<T> items,
 			int batchSize) throws Exception {
-		ArrayList<Object> result = null;
+		ArrayList<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
 		try {
 			if (items != null && items.size() > 0) {
-				result = new ArrayList<Object>();
+				result = new ArrayList<T>();
 				getEntityManager().getTransaction().begin();
 				int counter = 1;
-				for (Object _item : items) {
+				for (T _item : items) {
 					result.add(getEntityManager().merge(_item));
 					counter ++;
 					if((counter % batchSize) == 0){
@@ -389,8 +389,8 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Object refresh(Object item) throws Exception{
-		Object result = null;
+	public T refresh(T item) throws Exception{
+		T result = null;
 		if(item != null){
 			result = item;
 			try{
