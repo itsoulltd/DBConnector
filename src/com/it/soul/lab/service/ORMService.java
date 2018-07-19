@@ -334,7 +334,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<T> batchInsert(Collection<T> items,
+	public synchronized Collection<T> batchInsert(Collection<T> items,
 			int batchSize) throws Exception {
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return null;}
@@ -360,7 +360,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<T> batchUpdate(Collection<T> items,
+	public synchronized Collection<T> batchUpdate(Collection<T> items,
 			int batchSize) throws Exception {
 		ArrayList<T> result = null;
 		//Checking entityManager
@@ -389,7 +389,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public T refresh(T item) throws Exception{
+	public synchronized T refresh(T item) throws Exception{
 		T result = null;
 		if(item != null){
 			result = item;
@@ -406,7 +406,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public Collection<T> refresh(Collection<T> items) throws Exception {
+	public synchronized Collection<T> refresh(Collection<T> items) throws Exception {
 		try{
 			if(items != null && items.size() > 0){
 				for(Object item : items){
