@@ -12,10 +12,9 @@ public static class Builder extends QueryBuilderImpl{
 			tempQuery = factory(tempType);
 		}
 		
-		public SQLQuery build(){
-			//SQLQuery query = factory(tempType);
-			//TODO: Build up a new Object from existing one.
-			return tempQuery;
+		@SuppressWarnings("unchecked")
+		public <T extends SQLQuery> T build(){
+			return (T) tempQuery;
 		}
 		
 		protected SQLQuery factory(QueryType type){

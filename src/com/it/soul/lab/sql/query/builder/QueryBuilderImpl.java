@@ -30,8 +30,9 @@ public class QueryBuilderImpl implements ColumnsBuilder, TableBuilder
 		tempQuery = factory(tempType);
 	}
 
-	public SQLQuery build(){
-		return tempQuery;
+	@SuppressWarnings("unchecked")
+	public <T extends SQLQuery> T build(){
+		return (T) tempQuery;
 	}
 
 	protected SQLQuery factory(QueryType type){

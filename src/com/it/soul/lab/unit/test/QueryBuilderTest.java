@@ -4,12 +4,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.it.soul.lab.jpql.query.JPQLQuery;
+import com.it.soul.lab.jpql.query.JPQLSelectQuery;
+import com.it.soul.lab.jpql.query.JPQLUpdateQuery;
 import com.it.soul.lab.sql.query.SQLJoinQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Logic;
 import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
+import com.it.soul.lab.sql.query.SQLScalerQuery;
+import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.models.AndExpression;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
@@ -82,7 +86,7 @@ public class QueryBuilderTest {
 		ExpressionInterpreter andExp = new AndExpression(new Expression("id", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN_OR_EQUAL));
 		ExpressionInterpreter orExp = new OrExpression(new Expression("name", Operator.LIKE), andExp);
 		
-		SQLQuery qu6 = new SQLQuery.Builder(QueryType.SELECT)
+		SQLSelectQuery qu6 = new SQLQuery.Builder(QueryType.SELECT)
 									.columns("name","age")
 									.from("Passenger")
 									.where(orExp)
@@ -96,7 +100,7 @@ public class QueryBuilderTest {
 		Property prop = new Property("name", "sohana", DataType.STRING);
 		Expression comps = new Expression("name", Operator.EQUAL);
 		
-		SQLQuery count = new SQLQuery.Builder(QueryType.COUNT)
+		SQLScalerQuery count = new SQLQuery.Builder(QueryType.COUNT)
 										.columns("id")
 										.on("Passenger")
 										.scalerClause(prop, comps)
@@ -177,14 +181,14 @@ public class QueryBuilderTest {
 		
 		ExpressionInterpreter andExpression = new AndExpression(new Expression("name", Operator.EQUAL), new Expression("age", Operator.GREATER_THAN));
 		
-		SQLQuery jqpSel = new JPQLQuery.Builder(QueryType.SELECT)
+		JPQLSelectQuery jqpSel = new JPQLQuery.Builder(QueryType.SELECT)
 											.columns("name","age","sex")
 											.from("Passenger")
 											.where(andExpression)
 											.build();
 		Assert.assertEquals(JPQL_SELECT, jqpSel.toString());
 		
-		SQLQuery jpqlUp = new JPQLQuery.Builder(QueryType.UPDATE)
+		JPQLUpdateQuery jpqlUp = new JPQLQuery.Builder(QueryType.UPDATE)
 											.columns("name", "age", "sex")
 											.from("Passenger")
 											.where(andExpression)
@@ -275,7 +279,7 @@ public class QueryBuilderTest {
 	}
 	
 	@Test public void JoinTest() {
-		SQLJoinQuery join = (SQLJoinQuery) new SQLQuery.Builder(QueryType.INNER_JOIN)
+		SQLJoinQuery join = new SQLQuery.Builder(QueryType.INNER_JOIN)
 				.join("Customers", "CustomerName")
 				.on(new JoinExpression("CustomerID", "CustomerID"))
 				.join("Orders", "OrderID")
@@ -291,17 +295,17 @@ public class QueryBuilderTest {
 	}
 	
 	@Test public void LeftJoinTest() {
-		SQLJoinQuery join = (SQLJoinQuery) new SQLQuery.Builder(QueryType.LEFT_JOIN)
+		SQLJoinQuery join = new SQLQuery.Builder(QueryType.LEFT_JOIN)
 				.join("Customers", "CustomerName")
 				.on(new JoinExpression("CustomerID", "CustomerID"))
 				.join("Orders", "OrderID")
 				.orderBy("Customers.CustomerName").build();
 		
 		String expected = 	"SELECT Customers.CustomerName, Orders.OrderID " + 
-							"FROM Customers " + 
+							"FROM (Customers " + 
 							"LEFT JOIN Orders " + 
-							"ON Customers.CustomerID=Orders.CustomerID " + 
-							"ORDER BY Customers.CustomerName";
+							"ON Customers.CustomerID = Orders.CustomerID) " + 
+							"ORDER BY Customers.CustomerName ASC";
 		
 		Assert.assertEquals(expected, join.toString());
 	}
