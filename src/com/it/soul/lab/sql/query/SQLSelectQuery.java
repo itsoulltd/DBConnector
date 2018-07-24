@@ -18,6 +18,7 @@ public class SQLSelectQuery extends SQLQuery{
 	protected List<String> orderByList;
 	protected List<String> groupByList;
 	protected ExpressionInterpreter havingInterpreter;
+	private char quientifier = ' '; //Default is empty space
 	
 	public SQLSelectQuery() {
 		this.pqlBuffer = new StringBuffer("SELECT ");
@@ -29,6 +30,19 @@ public class SQLSelectQuery extends SQLQuery{
 		return pqlBuffer.toString();
 	}
 	
+	protected SQLSelectQuery setQuientifier(char quientifier){
+		this.quientifier = quientifier;
+		return this;
+	}
+	
+	protected char getQuientifier() {
+		return quientifier;
+	}
+	
+	protected Boolean quientifierEnabled(){
+		return Character.isWhitespace(quientifier) == false;
+	}
+
 	public void setLimit(Integer limit, Integer offset) {
 		this.limit = (limit < 0) ? 0 : limit;
 		this.offset = (offset < 0) ? 0 : offset;
@@ -46,7 +60,8 @@ public class SQLSelectQuery extends SQLQuery{
 			for(String col : columns) {
 				if(col.trim().equals("")){continue;}
 				if(count++ != 0){pqlBuffer.append(", ");}
-				orderBuffer.append(col);
+				if(quientifierEnabled()) {orderBuffer.append(getQuientifier() + "." + col);}
+				else {orderBuffer.append(col);}
 			}
 			if (count > 0) {
 				if (opt != null) {orderBuffer.append(" " + opt.toString());}
@@ -63,7 +78,8 @@ public class SQLSelectQuery extends SQLQuery{
 			for(String col : columns) {
 				if(col.trim().equals("")){continue;}
 				if(count++ != 0){pqlBuffer.append(", ");}
-				groupBuffer.append(col);
+				if(quientifierEnabled()){groupBuffer.append(getQuientifier() + "." + col);}
+				else {groupBuffer.append(col);}
 			}
 			if (count > 0) {
 				pqlBuffer.append(groupBuffer.toString());

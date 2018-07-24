@@ -74,4 +74,18 @@ public class JPQLSelectQuery extends SQLSelectQuery {
 		}
 	}
 	
+	@Override
+	public void setOrderBy(List<String> columns, Operator opt) {
+		setQuientifier(QUIENTIFIER);
+		super.setOrderBy(columns, opt);
+		setQuientifier(' ');
+	}
+	
+	@Override
+	public void setGroupBy(List<String> columns) {
+		setQuientifier(QUIENTIFIER);
+		super.setGroupBy(columns);
+		setQuientifier(' ');
+	}
+	
 }
