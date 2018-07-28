@@ -145,15 +145,6 @@ public abstract class Entity implements EntityInterface{
 		}
 		return result;
 	}
-	private String tableName() {
-		if(this.getClass().isAnnotationPresent(TableName.class) == false) {
-			return this.getClass().getName();
-		}
-		Annotation annotation = this.getClass().getAnnotation(TableName.class);
-		TableName tableName = (TableName) annotation;
-		String name = (tableName.value().trim().length() == 0) ? this.getClass().getName() : tableName.value().trim();
-		return name;
-	}
 	private boolean shouldAcceptAllProperty() {
 		if(this.getClass().isAnnotationPresent(TableName.class) == false) {
 			return true;
@@ -200,7 +191,7 @@ public abstract class Entity implements EntityInterface{
 		}else {
 			properties = getProperties(exe);
 		}
-		String tableName = tableName();
+		String tableName = Entity.tableName(getClass());
 		SQLUpdateQuery query = (SQLUpdateQuery) new SQLQuery.Builder(QueryType.UPDATE)
 														.set(properties.toArray(new Property[0]))
 														.from(tableName)
@@ -225,7 +216,7 @@ public abstract class Entity implements EntityInterface{
 			properties = getProperties(exe);
 		}
 		SQLInsertQuery query = (SQLInsertQuery) new SQLQuery.Builder(QueryType.INSERT)
-															.into(tableName())
+															.into(Entity.tableName(getClass()))
 															.values(properties.toArray(new Property[0])).build();
 		
 		int insert = exe.executeInsert(isAutoIncrement(), query);
@@ -235,10 +226,18 @@ public abstract class Entity implements EntityInterface{
 	public Boolean delete(SQLExecutor exe) throws SQLException, Exception {
 		Expression exp = new Expression(getPrimaryProperty(exe), Operator.EQUAL);
 		SQLDeleteQuery query = (SQLDeleteQuery) new SQLQuery.Builder(QueryType.DELETE)
-														.rowsFrom(tableName())
+														.rowsFrom(Entity.tableName(getClass()))
 														.where(exp).build();
 		int deletedId = exe.executeDelete(query);
 		return deletedId == 1;
+	}
+	private static <T extends Entity> String tableName(Class<T> type) {
+		if(type.isAnnotationPresent(TableName.class) == false) {
+			return type.getSimpleName();
+		}
+		TableName tableName = (TableName) type.getAnnotation(TableName.class);
+		String name = (tableName.value().trim().length() == 0) ? type.getSimpleName() : tableName.value().trim();
+		return name;
 	}
 	public static <T extends Entity> List<T> read(Class<T>  type, SQLExecutor exe, Property...match) throws SQLException, Exception{
 		ExpressionInterpreter and = null;
@@ -256,8 +255,7 @@ public abstract class Entity implements EntityInterface{
 		return T.read(type, exe, and);
 	}
 	public static <T extends Entity> List<T> read(Class<T>  type, SQLExecutor exe, ExpressionInterpreter expression) throws SQLException, Exception{
-		TableName annotation = (TableName) type.getAnnotation(TableName.class);
-		String name = (annotation.value().trim().length() == 0) ? type.getName() : annotation.value().trim();
+		String name = Entity.tableName(type);
 		SQLSelectQuery query = null;
 		if(expression != null) {
 			query = (SQLSelectQuery) new SQLQuery.Builder(QueryType.SELECT)
