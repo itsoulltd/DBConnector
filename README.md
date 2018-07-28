@@ -241,7 +241,7 @@
         public void setUuid(String uuid) {
             this.uuid = uuid;
         }
-        @Property(defaultValue="towhid-islam")
+        @Property(defaultValue="Mr/Mrs")
         private String name;
 
         @Property(defaultValue="34", type = DataType.INT)
@@ -277,7 +277,7 @@
 	
     Connection conn = new JDBConnection.Builder("jdbc:mysql://localhost:3306/testDB")
 										.driver(DriverClass.MYSQL)
-										.credential("root","towhid@123")
+										.credential("root","****")
 										.build();
                                         
 	SQLExecutor exe = new SQLExecutor(conn);
@@ -299,7 +299,7 @@
     Boolean isDeleted = person.delete(exe);
     
     //Read All
-    ExpressionInterpreter clause = new Expression(new Property("name", "towhid-islam"), Operator.EQUAL);
+    ExpressionInterpreter clause = new Expression(new Property("name", "Jake"), Operator.EQUAL);
 	List<Person> sons = Person.read(Person.class, exe, clause); //if clause is null the return all.
     
     
