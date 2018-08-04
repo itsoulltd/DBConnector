@@ -15,14 +15,14 @@ public interface ORMServiceProtocol<T> {
 	public String getEntity();
 	public EntityManager getEntityManager();
 	
-	public Collection<T> findAll() throws Exception;
-	public Collection<T> findAll(String...columns) throws Exception;
-	public Collection<T> findMatches(ExpressionInterpreter expression , String...columns) throws Exception;
+	public Collection<T> read() throws Exception;
+	public Collection<T> read(String...columns) throws Exception;
+	public Collection<T> read(ExpressionInterpreter expression , String...columns) throws Exception;
 	@Deprecated public Collection<T> findAll(Property item, String...columns) throws Exception;
 	@Deprecated public Collection<T> findAll(Map<String,Object> itemIds, Logic whereLogic, String...columns) throws Exception;
 	
-	public T findBy(Property searchProperty) throws Exception;
-	public T findBy(Property searchProperty, String...columns) throws Exception;
+	public T readBy(Property searchProperty) throws Exception;
+	public T readBy(Property searchProperty, String...columns) throws Exception;
 	
 	public boolean exist(Object itemId) throws Exception;
 	public long rowCount() throws Exception;

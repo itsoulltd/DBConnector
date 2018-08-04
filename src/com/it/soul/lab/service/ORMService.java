@@ -37,7 +37,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<T> findAll() throws Exception {
+	public Collection<T> read() throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -53,7 +53,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public Collection<T> findAll(String...columns) throws Exception {
+	public Collection<T> read(String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -102,7 +102,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 		return result;
 	}
 	
-	public Collection<T> findMatches(ExpressionInterpreter expression , String...columns) throws Exception {
+	public Collection<T> read(ExpressionInterpreter expression , String...columns) throws Exception {
 		List<T> result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -147,7 +147,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 
 	@Override
-	public T findBy(Property searchProperty) throws Exception {
+	public T readBy(Property searchProperty) throws Exception {
 		T result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}
@@ -165,7 +165,7 @@ public class ORMService<T> extends AbstractService<T> implements ORMServiceProto
 	}
 	
 	@Override
-	public T findBy(Property searchProperty, String...columns) throws Exception{
+	public T readBy(Property searchProperty, String...columns) throws Exception{
 		T result = null;
 		//Checking entityManager
 		if(getEntityManager() == null || !getEntityManager().isOpen()){return result;}

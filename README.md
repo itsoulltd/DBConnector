@@ -76,7 +76,7 @@
     
     //Now we can create a service for Person entity.
     ORMService<Person> service = new ORMService(em, Person.class);
-    List<Person> all = (List<Person>) service.findAll();
+    List<Person> all = (List<Person>) service.read();
     //Create a new Person
     Person newOne = new Person();
     newOne.setName("Jack Gyl");
