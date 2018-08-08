@@ -174,9 +174,19 @@ public abstract class Entity implements EntityInterface{
 		return key;
 	}
 	private Property getPrimaryProperty(SQLExecutor exe) {
-		String key = getPrimaryKey().name().trim();
-		Property prop = getProperty(key, exe);
-		return prop;
+		Property result = null;
+		try {
+			String key = getPrimaryKey().name().trim();
+			Field field = this.getClass().getDeclaredField(key);
+			field.setAccessible(true);
+			Object value = getFieldValue(field, exe);
+			DataType type = getDataType(value);
+			result = new Property(key, value, type);
+			field.setAccessible(false);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 	public Boolean update(SQLExecutor exe, String...keys) throws SQLException, Exception {
 		List<Property> properties = new ArrayList<>();
@@ -202,7 +212,7 @@ public abstract class Entity implements EntityInterface{
 		return new Expression(getPrimaryProperty(null), Operator.EQUAL);
 	}
 	@Override
-	public Boolean insert(SQLExecutor exe, String... keys) throws SQLException, Exception {
+	public Integer insert(SQLExecutor exe, String... keys) throws SQLException, Exception {
 		List<Property> properties = new ArrayList<>();
 		if(keys.length > 0) {
 			for (String key : keys) {
@@ -219,7 +229,7 @@ public abstract class Entity implements EntityInterface{
 															.values(properties.toArray(new Property[0])).build();
 		
 		int insert = exe.executeInsert(isAutoIncrement(), query);
-		return insert == 1;
+		return insert;
 	}
 	@Override
 	public Boolean delete(SQLExecutor exe) throws SQLException, Exception {
