@@ -9,7 +9,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
@@ -30,18 +32,18 @@ public abstract class Entity implements EntityInterface{
 	public Entity() {
 		super();
 	}
-	private boolean hasPropertyAnnotation(Field field) {
-		boolean hasPropertyAnno = field.isAnnotationPresent(com.it.soul.lab.sql.entity.Property.class);
+	private boolean hasColumnAnnotation(Field field) {
+		boolean hasPropertyAnno = field.isAnnotationPresent(Column.class);
 		return hasPropertyAnno;
 	}
 	protected List<Property> getProperties(SQLExecutor exe, boolean skipPrimary) {
 		List<Property> result = new ArrayList<>();
 		boolean acceptAll = shouldAcceptAllProperty();
 		for (Field field : this.getClass().getDeclaredFields()) {
-			if(acceptAll == false && hasPropertyAnnotation(field) == false) {
+			if(acceptAll == false && hasColumnAnnotation(field) == false) {
 				continue;
 			}
-			Property prop = getProperty(field.getName(), exe, skipPrimary);
+			Property prop = getProperty(getPropertyKey(field), exe, skipPrimary);
 			if(prop == null) {continue;}
 			result.add(prop);
 		}
@@ -91,8 +93,8 @@ public abstract class Entity implements EntityInterface{
 	private Object getFieldValue(Field field, SQLExecutor exe) throws IllegalArgumentException, IllegalAccessException, SQLException {
 		Object value = field.get(this);
 		//
-		if(value == null && field.isAnnotationPresent(com.it.soul.lab.sql.entity.Property.class) == true) {
-			com.it.soul.lab.sql.entity.Property annotation = field.getAnnotation(com.it.soul.lab.sql.entity.Property.class);
+		if(value == null && field.isAnnotationPresent(Column.class) == true) {
+			Column annotation = field.getAnnotation(Column.class);
 			String defaultVal = annotation.defaultValue();
 			DataType type = annotation.type();
 			switch (type) {
@@ -136,15 +138,26 @@ public abstract class Entity implements EntityInterface{
 						 && skipPrimary != false) {return null;}
 			}
 			field.setAccessible(true);
-			String name = field.getName();
+			String actualKey = getPropertyKey(field);
 			Object value = getFieldValue(field, exe);
 			DataType type = getDataType(value);
-			result = new Property(name, value, type);
+			result = new Property(actualKey, value, type);
 			field.setAccessible(false);
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | SQLException e) {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	private String getPropertyKey(Field field) {
+		//Introduce Column:name() -> So that, if we want to mapping different column naming in Database Schema.
+		//Logic: if column annotation not present OR Column:Name() is empty, then return field.getName() 
+		//       else return Column:name()
+		if(field.isAnnotationPresent(Column.class) == false) {
+			return field.getName();
+		}
+		Column column = field.getAnnotation(Column.class);
+		boolean hasValue = column.name().trim().isEmpty() == false;
+		return (hasValue) ? column.name().trim() : field.getName();
 	}
 	private boolean shouldAcceptAllProperty() {
 		if(this.getClass().isAnnotationPresent(TableName.class) == false) {
@@ -237,6 +250,31 @@ public abstract class Entity implements EntityInterface{
 		int deletedId = exe.executeDelete(query);
 		return deletedId == 1;
 	}
+	///////////////////////////////////////Class API///////////////////////////////////////
+	private static <T extends Entity> boolean shouldAcceptAllProperty(Class<T> type) {
+		if(type.isAnnotationPresent(TableName.class) == false) {
+			return true;
+		}
+		TableName tableName = (TableName) type.getAnnotation(TableName.class);
+		return tableName.acceptAll();
+	}
+	private static <T extends Entity> Map<String, String> mapColumnsToProperties(Class<T> type) {
+		boolean acceptAll = Entity.shouldAcceptAllProperty(type);
+		if (acceptAll) {return null;}
+		
+		Map<String, String> result = new HashMap<>();
+		for (Field field : type.getDeclaredFields()) {
+			if(acceptAll == false && field.isAnnotationPresent(Column.class) == false) {
+				continue;
+			}
+			Column column = field.getAnnotation(Column.class);
+			String columnName = (column.name().trim().isEmpty() == false) ? column.name().trim() : field.getName();
+			field.setAccessible(true);
+			result.put(columnName, field.getName());
+			field.setAccessible(false);
+		}
+		return result;
+	}
 	private static <T extends Entity> String tableName(Class<T> type) {
 		if(type.isAnnotationPresent(TableName.class) == false) {
 			return type.getSimpleName();
@@ -275,6 +313,6 @@ public abstract class Entity implements EntityInterface{
 		}
 		ResultSet set = exe.executeSelect(query);
 		Table table = exe.collection(set);
-		return table.inflate(type);
+		return table.inflate(type, Entity.mapColumnsToProperties(type));
 	}
 }

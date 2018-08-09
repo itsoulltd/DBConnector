@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.entity.Entity;
 import com.it.soul.lab.sql.entity.PrimaryKey;
-import com.it.soul.lab.sql.entity.Property;
+import com.it.soul.lab.sql.entity.Column;
 import com.it.soul.lab.sql.entity.TableName;
 import com.it.soul.lab.sql.query.models.DataType;
 
@@ -25,7 +25,7 @@ import com.it.soul.lab.sql.query.models.DataType;
 
 @TableName(value = "Person", acceptAll = false)
 public class Person extends Entity {
-	@Property
+	@Column
 	@PrimaryKey(name = "uuid", autoIncrement = false)
 	private String uuid;
 	public String getUuid() {
@@ -34,39 +34,39 @@ public class Person extends Entity {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
-	@Property(defaultValue="towhid-islam")
-	private String name;
+	@Column(name="name", defaultValue="towhid-islam")
+	private String name_test;
 	
-	@Property(defaultValue="34", type = DataType.INT)
+	@Column(defaultValue="34", type = DataType.INT)
 	private Integer age;
 	
-	@Property(defaultValue="true", type = DataType.BOOL)
+	@Column(defaultValue="true", type = DataType.BOOL)
 	private Boolean isActive;
 	
-	@Property(defaultValue="0.00", type = DataType.DOUBLE)
+	@Column(defaultValue="0.00", type = DataType.DOUBLE)
 	private Double salary;
 	
 	private Date dob;
 	
-	@Property(defaultValue="2010-06-21 21:01:01", type=DataType.SQLTIMESTAMP, parseFormat="yyyy-MM-dd HH:mm:ss")
+	@Column(defaultValue="2010-06-21 21:01:01", type=DataType.SQLTIMESTAMP, parseFormat="yyyy-MM-dd HH:mm:ss")
 	private Timestamp createDate;
 	
 	private Float height;
 	
-	@Property(defaultValue="2010-06-21" , type=DataType.SQLDATE, parseFormat="yyyy-MM-dd")
+	@Column(defaultValue="2010-06-21" , type=DataType.SQLDATE, parseFormat="yyyy-MM-dd")
 	private Date dobDate;
 	
-	@Property(defaultValue="21:01:01" , type=DataType.SQLTIMESTAMP, parseFormat="HH:mm:ss")
+	@Column(defaultValue="21:01:01" , type=DataType.SQLTIMESTAMP, parseFormat="HH:mm:ss")
 	private Timestamp createTime;
 	
 	public Person() {
 		super();
 	}
-	public String getName() {
-		return name;
+	public String getName_test() {
+		return name_test;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setName_test(String name_test) {
+		this.name_test = name_test;
 	}
 	public Integer getAge() {
 		return age;

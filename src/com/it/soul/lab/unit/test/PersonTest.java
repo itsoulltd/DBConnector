@@ -67,7 +67,7 @@ public class PersonTest {
 	public void testUpdate() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
-		person.setName(getRandomName());
+		person.setName_test(getRandomName());
 		try {
 			Boolean res = person.insert(exe) == 1;
 			Assert.assertTrue("Inserted", res);
@@ -118,7 +118,7 @@ public class PersonTest {
 	public void testDelete() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
-		person.setName(getRandomName());
+		person.setName_test(getRandomName());
 		try {
 			Boolean res = person.insert(exe) == 1;
 			Assert.assertTrue("Inserted", res);
@@ -139,10 +139,10 @@ public class PersonTest {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testReadClassOfTSQLExecutorExpressionInterpreter() {
 		try {
-			ExpressionInterpreter exp = new Expression(new Property("name", "towhid-islam"), Operator.EQUAL);
+			ExpressionInterpreter exp = new Expression(new Property("name", "Sohana"), Operator.EQUAL);
 			List<Person> sons = Person.read(Person.class, exe, exp);
 			for (Person person : sons) {
 				if(person.getDob() != null) {
@@ -161,7 +161,8 @@ public class PersonTest {
 		}
 	}
 	
-	@Test public void getPropertyTest() {
+	//@Test 
+	public void getPropertyTest() {
 		Person person = new Person();
 		
 		//UseCase when uuid is @PrimaryKey and autoIncrement is false.
@@ -171,8 +172,14 @@ public class PersonTest {
 		prop = person.getPropertyTest("uuid", exe, false);
 		Assert.assertTrue(prop != null);
 		
-		prop = person.getPropertyTest("", exe, true);
-		Assert.assertTrue(prop == null);
+		//prop = person.getPropertyTest("", exe, true);
+		//Assert.assertTrue(prop == null);
+		
+		Property nameProp = person.getPropertyTest("name_test", exe, false);
+		Assert.assertTrue(nameProp.getKey().equalsIgnoreCase("name"));
+		
+		Property salaryProp = person.getPropertyTest("salary", exe, false);
+		Assert.assertTrue(salaryProp.getKey().equalsIgnoreCase("salary"));
 	}
 
 }

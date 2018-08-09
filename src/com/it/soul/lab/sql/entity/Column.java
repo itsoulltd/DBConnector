@@ -10,7 +10,8 @@ import com.it.soul.lab.sql.query.models.DataType;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Property {
+public @interface Column {
+	public String name() default "";
 	public String defaultValue() default "";
 	public DataType type() default DataType.STRING;
 	public String parseFormat() default "";

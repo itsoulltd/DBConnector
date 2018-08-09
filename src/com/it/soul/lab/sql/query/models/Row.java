@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.it.soul.lab.sql.query.models.DataType;
 
@@ -62,23 +63,25 @@ public class Row {
 		}
     	return result;
     }
-    public Map<String,Property> keyValueMapToNames(List<String> names){
+    public Map<String,Property> keyValueMapToNames(Map<String, String> mappingToFields){ //Key=Column:Name, value=Class.fieldName
+    	if(mappingToFields == null || mappingToFields.size() < 1) {
+    		return keyValueMap();
+    	}
     	//This does a shallow copy
     	Map<String, Property> dataMap = keyValueMap(); 
         Map<String,Property> nXRow = new HashMap<String, Property>(dataMap.size() <= 0 ? 1 : dataMap.size());
         if (dataMap.size() > 0) {
-            if (names.size() == getKeys().length) {
-                for (int index = 0; index < names.size(); index++) {
-                    String key = names.get(index);
-                    String crosKey = getKeys()[index];
-                    if (dataMap.containsKey(crosKey)) {
-                    	Property m = dataMap.get(crosKey);
-                    	Property n = new Property(key, m.getValue(),
-                                m.getType());
-                        nXRow.put(key, n);
-                    }
+        	//
+        	for (Entry<String,String> mapEntry : mappingToFields.entrySet()) {
+        		String columnName = mapEntry.getKey();
+        		if (dataMap.containsKey(columnName)) {
+        			String newKey = mapEntry.getValue();
+                	Property m = dataMap.get(columnName);
+                	Property newProp = new Property(mapEntry.getValue(), m.getValue(),
+                            m.getType());
+                    nXRow.put(newKey, newProp);
                 }
-            }
+			}
         }
         return nXRow;
     }
@@ -90,6 +93,21 @@ public class Row {
 		T newInstance = cls.newInstance();
 		Field[] fields = cls.getDeclaredFields();
 		Map<String, Property> data = this.keyValueMap();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Property entry = data.get(field.getName());
+            if(entry != null) {
+            	field.set(newInstance, entry.getValue());
+            }
+            field.setAccessible(false);
+        }
+		return newInstance;
+	}
+    public <T> T inflate(Class<T> type, Map<String, String> mappingKeys) throws InstantiationException, IllegalAccessException {
+		Class<T> cls = type;
+		T newInstance = cls.newInstance();
+		Field[] fields = cls.getDeclaredFields();
+		Map<String, Property> data = this.keyValueMapToNames(mappingKeys);
         for (Field field : fields) {
             field.setAccessible(true);
             Property entry = data.get(field.getName());
