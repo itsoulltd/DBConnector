@@ -89,19 +89,7 @@ public class Row {
     	return properties.size();
     }
     public <T> T inflate(Class<T> type) throws InstantiationException, IllegalAccessException {
-		Class<T> cls = type;
-		T newInstance = cls.newInstance();
-		Field[] fields = cls.getDeclaredFields();
-		Map<String, Property> data = this.keyValueMap();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            Property entry = data.get(field.getName());
-            if(entry != null) {
-            	field.set(newInstance, entry.getValue());
-            }
-            field.setAccessible(false);
-        }
-		return newInstance;
+		return inflate(type, null);
 	}
     public <T> T inflate(Class<T> type, Map<String, String> mappingKeys) throws InstantiationException, IllegalAccessException {
 		Class<T> cls = type;

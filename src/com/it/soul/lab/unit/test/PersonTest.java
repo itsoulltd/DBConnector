@@ -63,13 +63,13 @@ public class PersonTest {
 		exe.close();
 	}
 
-	//@Test
+	@Test
 	public void testUpdate() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
 		person.setName_test(getRandomName());
 		try {
-			Boolean res = person.insert(exe) == 1;
+			Boolean res = person.insert(exe);
 			Assert.assertTrue("Inserted", res);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -107,7 +107,7 @@ public class PersonTest {
 		person.setCreateTime(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 		
 		try {
-			Boolean res = person.insert(exe) == 1;
+			Boolean res = person.insert(exe);
 			Assert.assertTrue("Inserted", res);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -120,7 +120,7 @@ public class PersonTest {
 		person.setUuid(UUID.randomUUID().toString());
 		person.setName_test(getRandomName());
 		try {
-			Boolean res = person.insert(exe) == 1;
+			Boolean res = person.insert(exe);
 			Assert.assertTrue("Inserted", res);
 			Boolean del = person.delete(exe);
 			Assert.assertTrue("Deleted", del);
@@ -139,7 +139,7 @@ public class PersonTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testReadClassOfTSQLExecutorExpressionInterpreter() {
 		try {
 			ExpressionInterpreter exp = new Expression(new Property("name", "Sohana"), Operator.EQUAL);

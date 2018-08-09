@@ -222,7 +222,7 @@ public abstract class Entity implements EntityInterface{
 		return new Expression(getPrimaryProperty(null), Operator.EQUAL);
 	}
 	@Override
-	public Integer insert(SQLExecutor exe, String... keys) throws SQLException, Exception {
+	public Boolean insert(SQLExecutor exe, String... keys) throws SQLException, Exception {
 		List<Property> properties = new ArrayList<>();
 		if(keys.length > 0) {
 			for (String key : keys) {
@@ -239,7 +239,24 @@ public abstract class Entity implements EntityInterface{
 															.values(properties.toArray(new Property[0])).build();
 		
 		int insert = exe.executeInsert(isAutoIncrement(), query);
-		return insert;
+		if(isAutoIncrement()) {
+			//update primary key to insert
+			updateAutoID(insert);
+		}
+		return insert >= 1; //0=failed to insert, 1=successful to insert, >1=the auto incremented id which means inserted.
+	}
+	private void updateAutoID(int insert) throws NoSuchFieldException, IllegalAccessException {
+		PrimaryKey pmKey = getPrimaryKey();
+		if(pmKey != null && pmKey.name().trim().isEmpty() == false) {
+			try {
+				Field primaryField = getClass().getDeclaredField(pmKey.name().trim());
+				primaryField.setAccessible(true);
+				primaryField.set(this, insert);
+				primaryField.setAccessible(false);
+			} catch (SecurityException | IllegalArgumentException e) {
+				e.printStackTrace();
+			} 
+		}
 	}
 	@Override
 	public Boolean delete(SQLExecutor exe) throws SQLException, Exception {

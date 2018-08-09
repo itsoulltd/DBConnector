@@ -54,15 +54,14 @@ public class PassengerTest {
 		exe.close();
 	}
 	
-	//@Test
+	@Test
 	public void testUpdate() {
 		Passenger passenger = new Passenger();
 		passenger.setName(getRandomName());
 		passenger.setAge(getRandomAge());
 		try {
-			Integer res = passenger.insert(exe);
-			passenger.setId(res);
-			Assert.assertTrue("Inserted", res > 0);
+			Boolean res = passenger.insert(exe);
+			Assert.assertTrue("Inserted", res);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -81,9 +80,8 @@ public class PassengerTest {
 		Passenger passenger = new Passenger();
 		passenger.setName(getRandomName());
 		try {
-			Integer res = passenger.insert(exe);
-			passenger.setId(res);
-			Assert.assertTrue("Inserted", res > 0);
+			Boolean res = passenger.insert(exe);
+			Assert.assertTrue("Inserted", res);
 			Boolean del = passenger.delete(exe);
 			Assert.assertTrue("Deleted", del);
 		} catch (Exception e) {
