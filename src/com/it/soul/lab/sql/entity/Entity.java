@@ -43,7 +43,7 @@ public abstract class Entity implements EntityInterface{
 			if(acceptAll == false && hasColumnAnnotation(field) == false) {
 				continue;
 			}
-			Property prop = getProperty(getPropertyKey(field), exe, skipPrimary);
+			Property prop = getProperty(field.getName(), exe, skipPrimary);
 			if(prop == null) {continue;}
 			result.add(prop);
 		}
