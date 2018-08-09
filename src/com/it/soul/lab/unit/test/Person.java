@@ -3,6 +3,7 @@ package com.it.soul.lab.unit.test;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.entity.Entity;
 import com.it.soul.lab.sql.entity.PrimaryKey;
 import com.it.soul.lab.sql.entity.Property;
@@ -114,5 +115,9 @@ public class Person extends Entity {
 	}
 	public void setCreateTime(Timestamp createTime) {
 		this.createTime = createTime;
+	}
+	
+	public com.it.soul.lab.sql.query.models.Property getPropertyTest(String key, SQLExecutor exe, boolean skipPrimary) {
+		return getProperty(key, exe, skipPrimary);
 	}
 }

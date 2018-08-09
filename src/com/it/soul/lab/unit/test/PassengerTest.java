@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.it.soul.lab.connect.JDBConnection;
 import com.it.soul.lab.connect.JDBConnection.DriverClass;
 import com.it.soul.lab.sql.SQLExecutor;
+import com.it.soul.lab.sql.query.models.Property;
 
 public class PassengerTest {
 	
@@ -53,7 +54,7 @@ public class PassengerTest {
 		exe.close();
 	}
 	
-	@Test
+	//@Test
 	public void testUpdate() {
 		Passenger passenger = new Passenger();
 		passenger.setName(getRandomName());
@@ -75,7 +76,7 @@ public class PassengerTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testDelete() {
 		Passenger passenger = new Passenger();
 		passenger.setName(getRandomName());
@@ -88,6 +89,17 @@ public class PassengerTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test public void getPropertyTest() {
+		Passenger passenger = new Passenger();
+		
+		//UseCase when id is @PrimaryKey and autoIncrement is true.
+		Property prop = passenger.getPropertyTest("id", exe, true);
+		Assert.assertTrue(prop == null);
+		
+		prop = passenger.getPropertyTest("id", exe, false);
+		Assert.assertTrue(prop != null);
 	}
 
 }

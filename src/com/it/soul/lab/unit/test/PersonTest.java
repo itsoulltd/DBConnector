@@ -63,7 +63,7 @@ public class PersonTest {
 		exe.close();
 	}
 
-	@Test
+	//@Test
 	public void testUpdate() {
 		Person person = new Person();
 		person.setUuid(UUID.randomUUID().toString());
@@ -159,6 +159,20 @@ public class PersonTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test public void getPropertyTest() {
+		Person person = new Person();
+		
+		//UseCase when uuid is @PrimaryKey and autoIncrement is false.
+		Property prop = person.getPropertyTest("uuid", exe, true);
+		Assert.assertTrue(prop == null);
+		
+		prop = person.getPropertyTest("uuid", exe, false);
+		Assert.assertTrue(prop != null);
+		
+		prop = person.getPropertyTest("", exe, true);
+		Assert.assertTrue(prop == null);
 	}
 
 }

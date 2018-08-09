@@ -1,7 +1,9 @@
 package com.it.soul.lab.unit.test;
 
+import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.entity.Entity;
 import com.it.soul.lab.sql.entity.PrimaryKey;
+import com.it.soul.lab.sql.query.models.Property;
 
 public class Passenger extends Entity {
 	
@@ -34,6 +36,10 @@ public class Passenger extends Entity {
 	}
 	public void setSex(String sex) {
 		this.sex = sex;
+	}
+	
+	public Property getPropertyTest(String key, SQLExecutor exe, boolean skipPrimary) {
+		return getProperty(key, exe, skipPrimary);
 	}
 
 }

@@ -34,14 +34,14 @@ public abstract class Entity implements EntityInterface{
 		boolean hasPropertyAnno = field.isAnnotationPresent(com.it.soul.lab.sql.entity.Property.class);
 		return hasPropertyAnno;
 	}
-	protected List<Property> getProperties(SQLExecutor exe) {
+	protected List<Property> getProperties(SQLExecutor exe, boolean skipPrimary) {
 		List<Property> result = new ArrayList<>();
 		boolean acceptAll = shouldAcceptAllProperty();
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if(acceptAll == false && hasPropertyAnnotation(field) == false) {
 				continue;
 			}
-			Property prop = getProperty(field.getName(), exe);
+			Property prop = getProperty(field.getName(), exe, skipPrimary);
 			if(prop == null) {continue;}
 			result.add(prop);
 		}
@@ -126,12 +126,14 @@ public abstract class Entity implements EntityInterface{
 		//always.
 		return value;
 	}
-	protected Property getProperty(String key, SQLExecutor exe) {
+	protected Property getProperty(String key, SQLExecutor exe, boolean skipPrimary) {
 		Property result = null;
 		try {
 			Field field = this.getClass().getDeclaredField(key);
 			if(field.isAnnotationPresent(PrimaryKey.class)) {
-				if (((PrimaryKey)field.getAnnotation(PrimaryKey.class)).autoIncrement() == true) {return null;}
+				if (skipPrimary) {return null;}
+				if (((PrimaryKey)field.getAnnotation(PrimaryKey.class)).autoIncrement() == true
+						 && skipPrimary != false) {return null;}
 			}
 			field.setAccessible(true);
 			String name = field.getName();
@@ -177,13 +179,8 @@ public abstract class Entity implements EntityInterface{
 		Property result = null;
 		try {
 			String key = getPrimaryKey().name().trim();
-			Field field = this.getClass().getDeclaredField(key);
-			field.setAccessible(true);
-			Object value = getFieldValue(field, exe);
-			DataType type = getDataType(value);
-			result = new Property(key, value, type);
-			field.setAccessible(false);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | SQLException e) {
+			result = getProperty(key, exe, false);
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -193,12 +190,12 @@ public abstract class Entity implements EntityInterface{
 		if(keys.length > 0) {
 			for (String key : keys) {
 				String skey = key.trim();
-				Property prop = getProperty(skey, exe);
+				Property prop = getProperty(skey, exe, true);
 				if (prop == null) {continue;}
 				properties.add(prop);
 			}
 		}else {
-			properties = getProperties(exe);
+			properties = getProperties(exe, true);
 		}
 		String tableName = Entity.tableName(getClass());
 		SQLUpdateQuery query = (SQLUpdateQuery) new SQLQuery.Builder(QueryType.UPDATE)
@@ -217,12 +214,12 @@ public abstract class Entity implements EntityInterface{
 		if(keys.length > 0) {
 			for (String key : keys) {
 				String skey = key.trim();
-				Property prop = getProperty(skey, exe);
+				Property prop = getProperty(skey, exe, false);
 				if (prop == null) {continue;}
 				properties.add(prop);
 			}
 		}else {
-			properties = getProperties(exe);
+			properties = getProperties(exe, false);
 		}
 		SQLInsertQuery query = (SQLInsertQuery) new SQLQuery.Builder(QueryType.INSERT)
 															.into(Entity.tableName(getClass()))
