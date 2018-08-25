@@ -27,7 +27,7 @@ public class PredicateTest {
 		Predicate pred = new Where("name")
 				.isEqualTo("sohana", DataType.STRING)
 				.and("salary")
-				.greaterThen(2000.0, DataType.DOUBLE)
+				.isGreaterThen(2000.0, DataType.DOUBLE)
 				.or(new Expression("age", Operator.EQUAL))
 				.not();
 		//System.out.println(pred.interpret());

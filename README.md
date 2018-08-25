@@ -114,15 +114,17 @@
 									.whereParams(Logic.OR, "id", "age")
 									.build();
                 
-	ExpressionInterpreter andExp = new AndExpression(new Expression("id", Operator.EQUAL)
-    									, new Expression("age", Operator.GREATER_THAN_OR_EQUAL));
-    
-    ExpressionInterpreter clause = new OrExpression(new Expression("name", Operator.LIKE), andExp);
+	Predicate predicate = new Where("id")
+							.isEqualTo(229, DataType.INT)
+							.and("age")
+							.isGreaterThenOrEqual(24, DataType.INT)
+							.or("name")
+							.isLike("soha", DataType.STRING);
     
 	SQLQuery query = new SQLQuery.Builder(QueryType.SELECT)
 									.columns()
 									.from("Passenger")
-									.where(clause)
+									.where(predicate)
 									.build();
                                     
 	System.out.printls(query.toString()); //Will print the SQL statement, that can be used any JDBC implementation.

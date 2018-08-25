@@ -94,7 +94,7 @@ public class Where implements WhereClause {
 	}
 
 	@Override
-	public Predicate greaterThen(Object value, DataType type) {
+	public Predicate isGreaterThen(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.GREATER_THAN);
 	}
 
@@ -104,22 +104,22 @@ public class Where implements WhereClause {
 	}
 
 	@Override
-	public Predicate greaterThenOrEqual(Object value, DataType type) {
+	public Predicate isGreaterThenOrEqual(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.GREATER_THAN_OR_EQUAL);
 	}
 
 	@Override
-	public Predicate lessThen(Object value, DataType type) {
+	public Predicate isLessThen(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.LESS_THAN);
 	}
 
 	@Override
-	public Predicate lessThenOrEqual(Object value, DataType type) {
+	public Predicate isLessThenOrEqual(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.LESS_THAN_OR_EQUAL);
 	}
 
 	@Override
-	public Predicate in(Object value, DataType type) {
+	public Predicate isIn(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.IN);
 	}
 
@@ -129,7 +129,7 @@ public class Where implements WhereClause {
 	}
 
 	@Override
-	public Predicate like(Object value, DataType type) {
+	public Predicate isLike(Object value, DataType type) {
 		return getProxy().createExpression(value, type, Operator.LIKE);
 	}
 
