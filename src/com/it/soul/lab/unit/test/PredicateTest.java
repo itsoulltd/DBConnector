@@ -7,13 +7,14 @@ import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.models.AndExpression;
+import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.NotExpression;
 import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.OrExpression;
 import com.it.soul.lab.sql.query.models.Predicate;
-import com.it.soul.lab.sql.query.models.PredicateExpression;
+import com.it.soul.lab.sql.query.models.Where;
 import com.it.soul.lab.sql.query.models.Property;
 
 public class PredicateTest {
@@ -23,11 +24,13 @@ public class PredicateTest {
 	@Test
 	public void test() {
 		
-		Predicate pred = new PredicateExpression("name", "sohana", Operator.EQUAL)
-				.and("salary", 20000.00, Operator.GREATER_THAN)
+		Predicate pred = new Where("name")
+				.isEqualTo("sohana", DataType.STRING)
+				.and("salary")
+				.greaterThen(2000.0, DataType.DOUBLE)
 				.or(new Expression("age", Operator.EQUAL))
 				.not();
-		System.out.println(pred.interpret());
+		//System.out.println(pred.interpret());
 		
 		SQLSelectQuery query = new SQLQuery.Builder(QueryType.SELECT).columns()
 									.from("Passenger")
@@ -40,7 +43,7 @@ public class PredicateTest {
 	@Test
 	public void testOnly() {
 		
-		Predicate pred = new PredicateExpression("name", "sohana", Operator.EQUAL);
+		Predicate pred = new Where("name").isEqualTo("sohana", DataType.STRING);
 		
 		SQLSelectQuery query = new SQLQuery.Builder(QueryType.SELECT).columns()
 									.from("Passenger")
@@ -64,7 +67,7 @@ public class PredicateTest {
 				, new Expression(new Property("salary", "20000.00"), Operator.GREATER_THAN));
 		pred = new OrExpression(pred, new Expression("age", Operator.EQUAL));
 		pred = new NotExpression(pred);
-		System.out.println(pred.interpret());
+		//System.out.println(pred.interpret());
 		
 		SQLSelectQuery query = new SQLQuery.Builder(QueryType.SELECT).columns()
 									.from("Passenger")
