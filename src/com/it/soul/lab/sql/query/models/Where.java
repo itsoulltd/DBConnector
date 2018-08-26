@@ -1,10 +1,5 @@
 package com.it.soul.lab.sql.query.models;
 
-import java.sql.Blob;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-
 public class Where implements WhereClause {
 	
 	public Where(String key) {

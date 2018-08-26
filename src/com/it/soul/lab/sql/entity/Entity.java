@@ -1,11 +1,9 @@
 package com.it.soul.lab.sql.entity;
 
 import java.lang.reflect.Field;
-import java.sql.Blob;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
