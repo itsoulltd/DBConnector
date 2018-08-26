@@ -24,10 +24,10 @@ public class PassengerTest {
 	public void before(){
 		
 		try {
-			Connection conn = new JDBConnection.Builder("jdbc:mysql://localhost:3306/testDB")
-										.driver(DriverClass.MYSQL)
-										.credential("root","towhid@123")
-										.build();
+			Connection conn = new JDBConnection.Builder(DriverClass.MYSQL)
+					.database("testDB")
+					.credential("root","towhid@123")
+					.build();
 			exe = new SQLExecutor(conn);
 		} catch (SQLException e) {
 			exe.close();

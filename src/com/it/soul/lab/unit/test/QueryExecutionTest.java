@@ -12,18 +12,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.it.soul.lab.connect.JDBConnection;
-import com.it.soul.lab.connect.JDBConnection.DriverClass;
 import com.it.soul.lab.sql.SQLExecutor;
 import com.it.soul.lab.sql.query.SQLDeleteQuery;
 import com.it.soul.lab.sql.query.SQLInsertQuery;
 import com.it.soul.lab.sql.query.SQLQuery;
+import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLScalerQuery;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.SQLUpdateQuery;
 import com.it.soul.lab.sql.query.models.DataType;
-import com.it.soul.lab.sql.query.models.Operator;
-import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.models.Expression;
+import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.Property;
 import com.it.soul.lab.sql.query.models.ScalerType;
 import com.it.soul.lab.sql.query.models.Table;
@@ -36,7 +35,6 @@ public class QueryExecutionTest {
 	public void before(){
 		try {
 			Connection conn = new JDBConnection.Builder("jdbc:mysql://localhost:3306/testDB")
-										.driver(DriverClass.MYSQL)
 										.credential("root","towhid@123")
 										.build();
 			exe = new SQLExecutor(conn);
