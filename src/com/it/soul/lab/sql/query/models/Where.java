@@ -1,5 +1,10 @@
 package com.it.soul.lab.sql.query.models;
 
+import java.sql.Blob;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+
 public class Where implements WhereClause {
 	
 	public Where(String key) {
@@ -22,6 +27,9 @@ public class Where implements WhereClause {
 		}
 		
 		public Predicate createExpression(Object value, DataType type, Operator opt) {
+			if (type == null) {
+				type = DataType.getDataType(value);
+			}
 			ExpressionInterpreter exp = new Expression(new Property(key, value, type), opt);
 			if(expression == null) {
 				expression = exp;
@@ -89,53 +97,53 @@ public class Where implements WhereClause {
 	}
 	
 	@Override
-	public Predicate isEqualTo(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.EQUAL);
+	public Predicate isEqualTo(Object value) {
+		return getProxy().createExpression(value, null, Operator.EQUAL);
 	}
 
 	@Override
-	public Predicate isGreaterThen(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.GREATER_THAN);
+	public Predicate isGreaterThen(Object value) {
+		return getProxy().createExpression(value, null, Operator.GREATER_THAN);
 	}
 
 	@Override
-	public Predicate notEqualTo(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.NOTEQUAL);
+	public Predicate notEqualTo(Object value) {
+		return getProxy().createExpression(value, null, Operator.NOTEQUAL);
 	}
 
 	@Override
-	public Predicate isGreaterThenOrEqual(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.GREATER_THAN_OR_EQUAL);
+	public Predicate isGreaterThenOrEqual(Object value) {
+		return getProxy().createExpression(value, null, Operator.GREATER_THAN_OR_EQUAL);
 	}
 
 	@Override
-	public Predicate isLessThen(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.LESS_THAN);
+	public Predicate isLessThen(Object value) {
+		return getProxy().createExpression(value, null, Operator.LESS_THAN);
 	}
 
 	@Override
-	public Predicate isLessThenOrEqual(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.LESS_THAN_OR_EQUAL);
+	public Predicate isLessThenOrEqual(Object value) {
+		return getProxy().createExpression(value, null, Operator.LESS_THAN_OR_EQUAL);
 	}
 
 	@Override
-	public Predicate isIn(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.IN);
+	public Predicate isIn(Object value) {
+		return getProxy().createExpression(value, null, Operator.IN);
 	}
 
 	@Override
-	public Predicate notIn(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.NOT_IN);
+	public Predicate notIn(Object value) {
+		return getProxy().createExpression(value, null, Operator.NOT_IN);
 	}
 
 	@Override
-	public Predicate isLike(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.LIKE);
+	public Predicate isLike(Object value) {
+		return getProxy().createExpression(value, null, Operator.LIKE);
 	}
 
 	@Override
-	public Predicate notLike(Object value, DataType type) {
-		return getProxy().createExpression(value, type, Operator.NOT_LIKE);
+	public Predicate notLike(Object value) {
+		return getProxy().createExpression(value, null, Operator.NOT_LIKE);
 	}
 
 	

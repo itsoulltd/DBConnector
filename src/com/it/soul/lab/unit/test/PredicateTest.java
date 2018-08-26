@@ -7,15 +7,14 @@ import com.it.soul.lab.sql.query.SQLQuery;
 import com.it.soul.lab.sql.query.SQLQuery.QueryType;
 import com.it.soul.lab.sql.query.SQLSelectQuery;
 import com.it.soul.lab.sql.query.models.AndExpression;
-import com.it.soul.lab.sql.query.models.DataType;
 import com.it.soul.lab.sql.query.models.Expression;
 import com.it.soul.lab.sql.query.models.ExpressionInterpreter;
 import com.it.soul.lab.sql.query.models.NotExpression;
 import com.it.soul.lab.sql.query.models.Operator;
 import com.it.soul.lab.sql.query.models.OrExpression;
 import com.it.soul.lab.sql.query.models.Predicate;
-import com.it.soul.lab.sql.query.models.Where;
 import com.it.soul.lab.sql.query.models.Property;
+import com.it.soul.lab.sql.query.models.Where;
 
 public class PredicateTest {
 	
@@ -25,9 +24,9 @@ public class PredicateTest {
 	public void test() {
 		
 		Predicate pred = new Where("name")
-				.isEqualTo("sohana", DataType.STRING)
+				.isEqualTo("sohana")
 				.and("salary")
-				.isGreaterThen(2000.0, DataType.DOUBLE)
+				.isGreaterThen(2000.0)
 				.or(new Expression("age", Operator.EQUAL))
 				.not();
 		//System.out.println(pred.interpret());
@@ -43,7 +42,7 @@ public class PredicateTest {
 	@Test
 	public void testOnly() {
 		
-		Predicate pred = new Where("name").isEqualTo("sohana", DataType.STRING);
+		Predicate pred = new Where("name").isEqualTo("sohana");
 		
 		SQLSelectQuery query = new SQLQuery.Builder(QueryType.SELECT).columns()
 									.from("Passenger")

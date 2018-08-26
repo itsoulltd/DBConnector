@@ -115,11 +115,11 @@
 									.build();
                 
 	Predicate predicate = new Where("id")
-							.isEqualTo(229, DataType.INT)
+							.isEqualTo(229)
 							.and("age")
-							.isGreaterThenOrEqual(24, DataType.INT)
+							.isGreaterThenOrEqual(24)
 							.or("name")
-							.isLike("soha", DataType.STRING);
+							.isLike("soha");
     
 	SQLQuery query = new SQLQuery.Builder(QueryType.SELECT)
 									.columns()

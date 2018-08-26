@@ -50,29 +50,7 @@ public abstract class Entity implements EntityInterface{
 		return result;
 	}
 	private DataType getDataType(Object value) {
-		if(value instanceof Integer) {
-			return DataType.INT;
-		}else if(value instanceof Double) {
-			return DataType.DOUBLE;
-		}else if(value instanceof Float) {
-			return DataType.FLOAT;
-		}else if(value instanceof Boolean) {
-			return DataType.BOOL;
-		}else if(value instanceof String) {
-			return DataType.STRING;
-		}else if(value instanceof Date || value instanceof java.util.Date) {
-			return DataType.SQLDATE;
-		}else if(value instanceof Timestamp || value instanceof Time) {
-			return DataType.SQLTIMESTAMP;
-		}else if(value instanceof Blob) {
-			return DataType.BLOB;
-		}else if(value instanceof Integer) {
-			return DataType.INT;
-		}else if(value instanceof Byte[]) {
-			return DataType.BYTEARRAY;
-		}else {
-			return DataType.OBJECT;
-		}
+		return DataType.getDataType(value);
 	}
 	private java.util.Date parseDate(String val, DataType type, String format){
 		try {
