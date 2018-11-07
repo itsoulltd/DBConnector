@@ -105,14 +105,14 @@ public class SQLExecutor implements Serializable{
 	}
 	
 	public void end() throws SQLException{
-		if(conn != null && conn.isClosed() == false && conn.getAutoCommit() == false) {
+		if(conn != null && conn.isClosed() == false) {
 			conn.commit();
 			conn.setAutoCommit(true);
 		}
 	}
 	
 	public void abort() throws SQLException{
-		if(conn != null && conn.isClosed() == false && conn.getAutoCommit() == false) {
+		if(conn != null && conn.isClosed() == false) {
 			conn.rollback();
 			conn.setAutoCommit(true);
 		}
@@ -205,23 +205,15 @@ public class SQLExecutor implements Serializable{
         PreparedStatement stmt = null;
         try{ 
             if(conn != null){
-            	conn.setAutoCommit(false);
+            	//
                 stmt = conn.prepareStatement(query);
                 stmt.executeUpdate();
                 isCreated = true;
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
             }            
         }catch(SQLException exp){
-        	
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
-        	isCreated = false;
         	throw exp;
         }finally{
-        	if(stmt != null)
-        		stmt.close();
-        	conn.setAutoCommit(true);
+        	if(stmt != null) stmt.close();
         }
         return isCreated;		
     }
@@ -233,36 +225,34 @@ public class SQLExecutor implements Serializable{
      * @param query
      * @return Number Of affected rows
      */
-    public int executeCUDQuery(String query)
+    public ResultSet executeCRUDQuery(String query)
     throws SQLException,Exception{
     	
     	if(query == null 
-				|| query.length() <=0 
-				|| !query.trim().toLowerCase().startsWith("insert")
-				|| !query.trim().toLowerCase().startsWith("update")
-				|| !query.trim().toLowerCase().startsWith("delete")){
+				|| query.length() <=0){
 			throw new Exception("Bad Formated Query : " + query);
 		}
     	
-        int rowUpdate = 0;
-        PreparedStatement stmt = null;
-        try{ 
-            if(conn != null){
-                stmt = conn.prepareStatement(query);
-                rowUpdate = stmt.executeUpdate();
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
-            }            
-        }catch(SQLException exp){
-        	
-        	if(!conn.getAutoCommit())
-        		conn.rollback(); 
-            throw exp;
-        }finally{
-        	if(stmt != null)
-        		stmt.close();
-        }
-        return rowUpdate;		
+    	if(query.trim().toLowerCase().startsWith("insert")
+				|| query.trim().toLowerCase().startsWith("update")
+				|| query.trim().toLowerCase().startsWith("delete")) {    		
+            PreparedStatement stmt = null;
+            try{ 
+                if(conn != null){
+                    stmt = conn.prepareStatement(query);
+                    int rowUpdate = stmt.executeUpdate();
+                    System.out.println("rows effected " + (rowUpdate == 0 ? "NO" : "YES"));
+                }            
+            }catch(SQLException exp){
+                throw exp;
+            }finally{
+            	if(stmt != null)
+            		stmt.close();
+            }
+            return null;
+    	}else {
+    		return executeSelect(query);
+    	}	
     }
     
     /**
@@ -298,15 +288,11 @@ public class SQLExecutor implements Serializable{
                 	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereProperties().keyValueMap());
                 
                 rowUpdated = stmt.executeUpdate();
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
+                 
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch (IllegalArgumentException e) {
-        	 
             throw e;
 		}finally{
         	if(stmt != null)
@@ -345,17 +331,12 @@ public class SQLExecutor implements Serializable{
                 	stmt = bindValueToStatement(stmt, length+1, whereKeySet, query.getWhereProperties().keyValueMap());
                 
                 rowUpdated = stmt.executeUpdate();
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
             }            
-        }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
-            throw exp;
-        }catch (IllegalArgumentException e) { throw e;}
+        }
+        catch(SQLException exp) { throw exp;}
+        catch (IllegalArgumentException e) { throw e;}
         finally{
-        	if(stmt != null)
-        		stmt.close();
+        	if(stmt != null) stmt.close();
         }
         return rowUpdated;		
     }
@@ -400,7 +381,7 @@ public class SQLExecutor implements Serializable{
         try{ 
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
             if(conn != null){
-                conn.setAutoCommit(false);
+                //
                 List<int[]> batchUpdatedRowsCount = new ArrayList<int[]>();
                 
                 stmt = conn.prepareStatement(query);
@@ -430,13 +411,9 @@ public class SQLExecutor implements Serializable{
                 		affectedRows.add(rr[i]);
                 	}
 				}
-            	
-            	if(!conn.getAutoCommit())
-            		conn.commit(); 
+        		
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch(IllegalArgumentException iel){
         	throw iel;
@@ -449,7 +426,6 @@ public class SQLExecutor implements Serializable{
 				}
         		stmt.close();
         	}
-        	conn.setAutoCommit(true);
         }
         return affectedRows.toArray(new Integer[]{});		
     }
@@ -476,19 +452,13 @@ public class SQLExecutor implements Serializable{
                 stmt = conn.prepareStatement(query);
                 stmt = bindValueToStatement(stmt, 1, dQuery.getWhereParams(), dQuery.getWhereProperties().keyValueMap());
                 rowUpdated = stmt.executeUpdate();
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch (IllegalArgumentException e) {
-        	 
             throw e;
 		}finally{
-        	if(stmt != null)
-        		stmt.close();
+        	if(stmt != null) stmt.close();
         }
         return rowUpdated;		
     }
@@ -518,7 +488,7 @@ public class SQLExecutor implements Serializable{
         try{
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
             if(conn != null){
-            	conn.setAutoCommit(false);
+            	//
                 int batchCount = 1;
                 stmt = conn.prepareStatement(query);
             	for (Row paramValue: whereClause) {
@@ -531,17 +501,11 @@ public class SQLExecutor implements Serializable{
 				}
             	if(whereClause.size() % batchSize != 0)
             		stmt.executeBatch();
-            	
-                if(!conn.getAutoCommit())
-                	conn.commit(); 
+            	 
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
-        	 
             throw exp;
         }catch (IllegalArgumentException e) {
- 
             throw e;
 		}finally{
 			if(stmt != null){
@@ -552,7 +516,6 @@ public class SQLExecutor implements Serializable{
 				}
         		stmt.close();
         	}
-        	conn.setAutoCommit(true);
         }
         return rowUpdated;		
     }
@@ -586,18 +549,13 @@ public class SQLExecutor implements Serializable{
 					stmt = conn.prepareStatement(query);                	
 					lastIncrementedID = stmt.executeUpdate();
 				}
-				if(!conn.getAutoCommit())
-                	conn.commit(); 
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch(IllegalArgumentException iel){
         	throw iel;
         }finally{
-        	if(stmt != null)
-        		stmt.close();
+        	if(stmt != null) stmt.close();
         }
         return lastIncrementedID;		
     }
@@ -638,18 +596,13 @@ public class SQLExecutor implements Serializable{
                 	stmt = bindValueToStatement(stmt, 1, iQuery.getRow().getKeys(), iQuery.getRow().keyValueMap());
                 	affectedRows = stmt.executeUpdate();
             	}
-            	if(!conn.getAutoCommit())
-            		conn.commit(); 
             }            
         }catch(SQLException exp){
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch(IllegalArgumentException iel){
         	throw iel;
         }finally{
-        	if(stmt != null)
-        		stmt.close();
+        	if(stmt != null) stmt.close();
         }
         return affectedRows;		
     }
@@ -693,7 +646,7 @@ public class SQLExecutor implements Serializable{
         try{ 
         	batchSize = (batchSize < 100) ? 100 : batchSize;//Least should be 100
             if(conn != null){
-                conn.setAutoCommit(false);
+                //
             	if(isAutoGenaretedId){
             		stmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 	int batchCount = 1;
@@ -732,13 +685,8 @@ public class SQLExecutor implements Serializable{
                     	}
     				}
             	}
-            	if(!conn.getAutoCommit())
-            		conn.commit();
             }            
         }catch(SQLException exp){
-        	
-        	if(!conn.getAutoCommit())
-        		conn.rollback();
             throw exp;
         }catch(IllegalArgumentException iel){
         	throw iel;
@@ -751,7 +699,6 @@ public class SQLExecutor implements Serializable{
 				}
         		stmt.close();
         	}
-        	conn.setAutoCommit(true);
         }
         return affectedRows.toArray(new Integer[]{});		
     }

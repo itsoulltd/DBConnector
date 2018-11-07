@@ -9,7 +9,7 @@ import com.it.soul.lab.service.MailService;
 import com.it.soul.lab.service.MailService.ContentType;
 import com.it.soul.lab.service.MailService.MailServiceType;
 
-public class MailSerciceTest {
+public class MailServiceTest {
 	
 	private MailService service;
 	
