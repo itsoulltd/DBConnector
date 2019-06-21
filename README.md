@@ -1,4 +1,4 @@
-## JDBConnector (Depricated : See JSQLEditor project)
+## JDBConnector (Deprecated : See JSQLEditor project)
 
 
 ### JDBConnector has 3 ways of connecting with DataSource:
